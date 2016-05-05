@@ -33,7 +33,7 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public ViewResolver viewResolver() {
-        /* It searchs for jsp pages here */
+        /* It searches for jsp pages here */
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
         viewResolver.setPrefix("/WEB-INF/jsp/");
         viewResolver.setSuffix(".jsp");
