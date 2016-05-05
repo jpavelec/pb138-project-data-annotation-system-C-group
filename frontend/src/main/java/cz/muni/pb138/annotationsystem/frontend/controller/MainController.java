@@ -21,7 +21,7 @@ public class MainController {
     private Api api;
 
     @RequestMapping("/**")
-    public String whatever2(ServletRequest req) {
+    public String whatever1(ServletRequest req) {
 
         //TO DO: if user is an administrator return "view-admin" else return "view-user"
 
