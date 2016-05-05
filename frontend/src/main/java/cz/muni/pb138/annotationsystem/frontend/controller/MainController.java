@@ -21,7 +21,7 @@ public class MainController {
     private Api api;
 
     @RequestMapping("/**")
-    public String whatever1(ServletRequest req) {
+    public String primaryView(ServletRequest req) {
 
         //TO DO: if user is an administrator return "view-admin" else return "view-user"
 
@@ -30,9 +30,30 @@ public class MainController {
     }
 
     @RequestMapping("/upload")
-    public String whatever2(ServletRequest req) {
+    public String upload(ServletRequest req) {
 
         return "view-upload";
+
+    }
+
+    @RequestMapping("/stats")
+    public String stats(ServletRequest req) {
+
+        return "view-stats";
+
+    }
+
+    @RequestMapping("/mark")
+    public String mark(ServletRequest req) {
+
+        return "view-mark";
+
+    }
+
+    @RequestMapping("/assign")
+    public String assign(ServletRequest req) {
+
+        return "view-assign";
 
     }
 

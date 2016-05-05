@@ -21,11 +21,11 @@
             <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Upload a new dictionary">
         </form>
         </br>
-        <form action="<spring:url value="/"/>">
+        <form action="<spring:url value="/mark"/>">
             <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Mark words">
         </form>
         </br>
-        <form action="<spring:url value="/"/>">
+        <form action="<spring:url value="/stats"/>">
             <input type="submit" class="btn btn-lg btn-primary btn-block"   value="View statistics">
         </form>
         </br>

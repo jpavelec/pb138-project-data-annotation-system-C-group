@@ -14,31 +14,11 @@
 </head>
 <body>
     <div class="container">
-        <form class="form-signin">
-            <h2>Upload a new dictionary:</h2>
-            <label for="uploadDic">Pick dictionary file (CSV)</label>
-            <input id="uploadDic" type='file' name='userFile'>
+            <h3>Hello, I'm a young webpage and I would like to show <i><b>word marking</b></i> when I grow up. Please fulfill my wild dreams and code me!</h3>
             </br>
-            <label for="uploadNoise">Pick noise file (CSV) - optional</label>
-            <input id="uploadNoise" type='file' name='userFile'>
-            </br>
-            <label for="inputRepetition">Enter repetition in %</label>
-            <input id="inputRepetition"placeholder="percentage" required>
-            </br>
-            <label for="inputMax">Enter maximum size of one package</label>
-            <input id="inputMax"placeholder="number" required>
-            </br>
-            </br>
-        </form>
-        </br>
-        <form action="<spring:url value="/assign"/>">
-            <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Upload">
-        </form>
-        </br>
         <form action="<spring:url value="/"/>">
             <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back">
         </form>
-        </br>
     </div>
 </body>
 </html>
