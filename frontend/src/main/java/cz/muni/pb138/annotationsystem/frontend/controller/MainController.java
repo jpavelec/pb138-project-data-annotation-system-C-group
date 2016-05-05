@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/**")
-public class ZlutouckyController {
+public class MainController {
 
     @Inject
     private Api api;
@@ -23,7 +23,16 @@ public class ZlutouckyController {
     @RequestMapping("/**")
     public String whatever2(ServletRequest req) {
 
-        return "redirect:/pes";
+        //TO DO: if user is an administrator return "view-admin" else return "view-user"
+
+        return "view-admin";
+
+    }
+
+    @RequestMapping("/upload")
+    public String whatever2(ServletRequest req) {
+
+        return "view-upload";
 
     }
 
@@ -32,7 +41,7 @@ public class ZlutouckyController {
 
         req.setAttribute("yellow", api.prilisZlutoucky(animal));
 
-        return "view-one";
+        return "redirect:/pes";
 
     }
 
