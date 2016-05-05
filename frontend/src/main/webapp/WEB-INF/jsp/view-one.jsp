@@ -31,7 +31,7 @@
         </form>
         </br>
         <form action="<spring:url value="/"/>">
-            <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Back">
+            <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back">
         </form>
         </br>
         <div>
