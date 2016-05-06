@@ -20,10 +20,10 @@ public class MainController {
     @Inject
     private Api api;
 
-    @RequestMapping("/**")
+    @RequestMapping("/")
     public String primaryView(ServletRequest req) {
 
-        //TO DO: if user is an administrator return "view-admin" else return "view-user"
+        //TO DO: if user is an administrator return "view-admin" else return "view-mark"
 
         return "view-admin";
 
@@ -33,6 +33,13 @@ public class MainController {
     public String upload(ServletRequest req) {
 
         return "view-upload";
+
+    }
+
+    @RequestMapping("/packages")
+    public String packages(ServletRequest req) {
+
+        return "view-packages";
 
     }
 
@@ -57,7 +64,8 @@ public class MainController {
 
     }
 
-    @RequestMapping("/{animal}")
+
+    @RequestMapping("/mark/{animal}")
     public String whatever(ServletRequest req, @PathVariable String animal) {
 
         req.setAttribute("yellow", api.prilisZlutoucky(animal));

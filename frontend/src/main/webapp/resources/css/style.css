@@ -1,40 +1,119 @@
-body {
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #eee;
+.token-word {
+	cursor: pointer;
+	padding-right: 0.2em;
+	padding-left: 0.2em;
+}
+.token-head {
+	cursor: no-drop;
+	padding-right: 0.2em;
+	padding-left: 0.2em;
+	color: red;
 }
 
-.form-signin {
-  max-width: 330px;
-  padding: 15px;
-  margin: 0 auto;
+.next {
+	cursor: pointer;
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	vertical-align: bottom;
 }
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
-  margin-bottom: 10px;
+
+#minus-next {
+	background-color: red;
+	float: left;
 }
-.form-signin .checkbox {
-  font-weight: normal;
+
+#plus-next {
+	background-color: green;
+	float: right;
 }
-.form-signin .form-control {
-  position: relative;
-  height: auto;
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
-  padding: 10px;
-  font-size: 16px;
+
+#counter {
+	float: right;
+	font-size: 120%;
 }
-.form-signin .form-control:focus {
-  z-index: 2;
+
+#np {
+	width: 100%;
+	text-align: center;
+	padding-top: 3em;
+	font-size: 250%;
 }
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
+
+#ontology {
+	width: 100%;
+	text-align: center;
+	font-size: 180%;
 }
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+
+#btnPrevious {
+	float: right;
+	vertical-align: bottom;
+	font-size: 120%;
+}
+
+#btnChangeContext {
+	float: left;
+	font-size: 120%;
+	vertical-align: bottom;
+}
+
+.main {
+	height: 100%;
+}
+
+// 3 columns in CSS
+#main1 {
+	margin:0; padding:0;
+}
+#main2 {
+	margin:0; padding:0;
+}
+
+	#left {
+		float:left;
+		width:150px;
+		margin:0; padding:0;
+		background:url("corner.gif") top right no-repeat;
+		font-size:80%;
+		}
+	#right {
+		float:right;
+		width:150px;
+		margin:0; padding:0;
+		background:url("corner.gif") top right no-repeat;
+		font-size:80%;
+		}
+	#middle {
+		margin:0 150px;
+		font-size:80%;
+		}
+	.column-in {
+		margin:0; padding:0.5em 1em;
+		}
+.cleaner {
+		clear:both;
+		height:1px;
+		font-size:1px;
+		border:none;
+		margin:0; padding:0;
+		background:transparent;
+		}
+
+#upload,#load {
+  color: blue;
+  cursor: pointer;
+}
+
+#help {
+  font-size: 150%;
+  text-align: center;
+  display: none;
+}
+#example {
+  padding-top: 1em;
+  font-size: 110%;
+}
+#help b {
+  color: red;
 }
