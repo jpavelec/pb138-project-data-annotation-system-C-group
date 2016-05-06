@@ -40,12 +40,13 @@
                     </div>
                     <div id="np">word</div>
                     <div id="ontology">Is the word an animal?</div>
-                    <input type="button" value="Previous word" name="btnPrevious" />
+                    </br>
+                    <input type="button" class="btn btn-lg btn-primary btn-block" value="Previous word" name="btnPrevious" />
                 </div>
             </div>
         </div>
         <form action="<spring:url value="/packages"/>">
-            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Go back">
+            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Finish marking">
         </form>
     </div>
 </body>

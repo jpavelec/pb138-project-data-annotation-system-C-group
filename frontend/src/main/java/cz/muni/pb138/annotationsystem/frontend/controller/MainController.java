@@ -23,7 +23,7 @@ public class MainController {
     @RequestMapping("/")
     public String primaryView(ServletRequest req) {
 
-        //TO DO: if user is an administrator return "view-admin" else return "view-mark"
+        //TO DO: if user is an administrator return "view-admin" else return "view-packages"
 
         return "view-admin";
 

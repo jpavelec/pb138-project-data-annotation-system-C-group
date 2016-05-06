@@ -16,10 +16,17 @@
 </head>
 <body>
     <div class="container">
+        <ul>
+            <li>package 1 (60% finished)</li>
+            <li>package 2 (100% finished)</li>
+            <li>package 3 (100% finished)</li>
+            <li>package 4 (100% finished)</li>
+        </ul>
         <form action="<spring:url value="/mark"/>">
             <input type="submit" class="btn btn-lg btn-primary btn-block" value="Pick this package">
         </form>
         </br>
+        <!--- show the following buttong only for administrator -->
         <form action="<spring:url value="/"/>">
             <input type="submit" class="btn btn-lg btn-primary btn-block" value="Go back">
         </form>
