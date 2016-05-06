@@ -9,7 +9,7 @@ public class ServletInitializer extends AbstractAnnotationConfigDispatcherServle
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class<?>[]{SpringMvcConfig.class};
+        return new Class<?>[]{FrontendConfig.class};
     }
 
     @Override
