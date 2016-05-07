@@ -38,6 +38,7 @@ public class BackendConfig {
         dataSource.setPassword(env.getRequiredProperty("dataSource.password"));
         */
         EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
+        // HINT: add method .addScript to create scheme for testing.
         EmbeddedDatabase db = builder.setType(EmbeddedDatabaseType.DERBY).build();
         return db;
     }
