@@ -11,7 +11,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.sql.DataSource;
 
@@ -26,11 +28,8 @@ public class PersonDao implements Dao<Person> {
     private static final Logger logger = Logger.getLogger(PersonDao.class.getName());
     private DataSource dataSource;
 
+    @Inject
     public PersonDao(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -190,6 +189,11 @@ public class PersonDao implements Dao<Person> {
             throw new ServiceFailureException(
                 "Error when retriving user with id " + id, ex);
         }
+    }
+
+    @Override
+    public List<Person> getAll() throws DaoException {
+        return null;
     }
 
 }

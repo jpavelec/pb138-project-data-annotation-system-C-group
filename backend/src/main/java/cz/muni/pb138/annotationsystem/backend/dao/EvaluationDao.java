@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import javax.sql.DataSource;
 
 /**
@@ -79,7 +80,7 @@ public class EvaluationDao implements Dao<Evaluation> {
         PersonDao personDao = new PersonDao(dataSource);
         Person person = new Person();
         person = personDao.getById(rs.getLong("personid"));
-        AnswerDao answerDao = new AnswerDao(dataSource);
+        AnswerDao answerDao = new AnswerDaoImpl(dataSource);
         Answer answer = new Answer();
         answer = answerDao.getById(rs.getLong("answerid"));
         eval.setPerson(person);
@@ -147,6 +148,11 @@ public class EvaluationDao implements Dao<Evaluation> {
             throw new ServiceFailureException(
                 "Error when retriving evaluation with id " + id, ex);
         }
+    }
+
+    @Override
+    public List<Evaluation> getAll() throws DaoException {
+        return null;
     }
 
     @Override

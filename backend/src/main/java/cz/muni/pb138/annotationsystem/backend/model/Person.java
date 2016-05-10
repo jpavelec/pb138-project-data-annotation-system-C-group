@@ -12,8 +12,6 @@ public class Person {
     private String username;
     private boolean isAdmin;
 
-    //Map<Answer, Evaluation> evals;
-
     public Long getId() {
         return id;
     }

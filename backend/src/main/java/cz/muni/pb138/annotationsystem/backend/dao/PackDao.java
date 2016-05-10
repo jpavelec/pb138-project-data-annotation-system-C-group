@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 
@@ -141,6 +142,11 @@ public class PackDao implements Dao<Pack> {
             throw new ServiceFailureException(
                     "Error when retrieving pack with id " + id, ex);
         }
+    }
+
+    @Override
+    public List<Pack> getAll() throws DaoException {
+        return null;
     }
 
     @Override

@@ -11,6 +11,8 @@ public class Pack {
 
     private String question;
     private String name;
+    private int noiseRate;
+    private int repeating;
 
     public String getName() {
         return name;
@@ -19,9 +21,6 @@ public class Pack {
     public void setName(String name) {
         this.name = name;
     }
-
-    private int noiseRate;
-    private int repeating;
 
     public Long getId() {
         return id;

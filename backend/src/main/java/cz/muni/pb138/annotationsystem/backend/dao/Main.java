@@ -47,7 +47,7 @@ public class Main {
         
         try {
             String line;
-            br = new BufferedReader(new FileReader("/home/pepa/data/prog/xml/pb138-project-data-annotation-system-C-group/backend/src/main/resources/animal.txt"));
+            br = new BufferedReader(new FileReader("/home/ondrejvelisek/projects/annotation-system/backend/src/main/resources/animal.txt"));
             
             if ((line = br.readLine()) != null) {
                 Pack pack = new Pack();
@@ -61,7 +61,7 @@ public class Main {
                 int numberOfPack = 0;
                 int countAnswersInSubpack = PACK_SIZE;
                 SubpackDao subpackDao = new SubpackDao(dataSource);
-                AnswerDao answerDao = new AnswerDao(dataSource);
+                AnswerDao answerDao = new AnswerDaoImpl(dataSource);
                 Subpack subpack = new Subpack();
                 subpack.setParent(pack);
                 Answer answer = new Answer();

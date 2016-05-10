@@ -11,10 +11,9 @@ public class Subpack {
 
     private Pack parent;
     private String name;
-   // private List<Answer> answers;
-   // private List<Answer> repeats;
-
-   // private List<Person> users;
+    private List<Answer> answers;
+    private List<Answer> repeats;
+    private List<Person> users;
 
     public Long getId() {
         return id;
@@ -40,7 +39,7 @@ public class Subpack {
         this.name = name;
     }
 
-   /* public List<Answer> getAnswers() {
+    public List<Answer> getAnswers() {
         return answers;
     }
 
@@ -62,7 +61,7 @@ public class Subpack {
 
     public void setUsers(List<Person> users) {
         this.users = users;
-    }*/
+    }
 
     @Override
     public String toString() {

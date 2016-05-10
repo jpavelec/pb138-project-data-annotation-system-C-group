@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import javax.sql.DataSource;
 
 /**
@@ -134,6 +135,11 @@ public class SubpackDao implements Dao<Subpack> {
             throw new ServiceFailureException(
                 "Error when retriving subpack with id " + id, ex);
         }
+    }
+
+    @Override
+    public List<Subpack> getAll() throws DaoException {
+        return null;
     }
 
     @Override

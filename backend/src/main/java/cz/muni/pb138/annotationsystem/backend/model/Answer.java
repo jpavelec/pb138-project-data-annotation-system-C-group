@@ -12,7 +12,6 @@ public class Answer {
     private Subpack fromSubpack;
     private String answer;
     private Boolean isNoise;
-    //private Map<Person, Evaluation> evaluations;
 
     public Subpack getFromSubpack() {
         return fromSubpack;
