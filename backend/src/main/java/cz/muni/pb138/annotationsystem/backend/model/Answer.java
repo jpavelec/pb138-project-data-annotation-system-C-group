@@ -1,6 +1,5 @@
 package cz.muni.pb138.annotationsystem.backend.model;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,8 +9,26 @@ public class Answer {
 
     private Long id;
 
+    private Subpack fromSubpack;
     private String answer;
-    private Map<User, Evaluation> evaluations;
+    private Boolean isNoise;
+    //private Map<Person, Evaluation> evaluations;
+
+    public Subpack getFromSubpack() {
+        return fromSubpack;
+    }
+
+    public void setFromSubpack(Subpack fromSubpack) {
+        this.fromSubpack = fromSubpack;
+    }
+
+    public Boolean isIsNoise() {
+        return isNoise;
+    }
+
+    public void setIsNoise(Boolean isNoise) {
+        this.isNoise = isNoise;
+    }
 
     public Long getId() {
         return id;
@@ -29,11 +46,18 @@ public class Answer {
         this.answer = answer;
     }
 
-    public Map<User, Evaluation> getEvaluations() {
+    /*public Map<Person, Evaluation> getEvaluations() {
         return evaluations;
     }
 
-    public void setEvaluations(Map<User, Evaluation> evaluations) {
+    public void setEvaluations(Map<Person, Evaluation> evaluations) {
         this.evaluations = evaluations;
+    }*/
+
+    @Override
+    public String toString() {
+        return "Answer{" + "id=" + id + ", fromSubpack=" + fromSubpack.getName() + ", answer=" + answer + ", isNoise=" + isNoise + '}';
     }
+    
+    
 }

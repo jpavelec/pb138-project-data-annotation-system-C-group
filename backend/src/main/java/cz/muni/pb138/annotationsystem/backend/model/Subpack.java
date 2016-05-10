@@ -10,11 +10,11 @@ public class Subpack {
     private Long id;
 
     private Pack parent;
-    private List<Answer> answers;
-    private List<Answer> repeats;
-    private List<Grain> noise;
+    private String name;
+   // private List<Answer> answers;
+   // private List<Answer> repeats;
 
-    private List<User> users;
+   // private List<Person> users;
 
     public Long getId() {
         return id;
@@ -32,7 +32,15 @@ public class Subpack {
         this.parent = parent;
     }
 
-    public List<Answer> getAnswers() {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+   /* public List<Answer> getAnswers() {
         return answers;
     }
 
@@ -48,19 +56,26 @@ public class Subpack {
         this.repeats = repeats;
     }
 
-    public List<Grain> getNoise() {
-        return noise;
-    }
-
-    public void setNoise(List<Grain> noise) {
-        this.noise = noise;
-    }
-
-    public List<User> getUsers() {
+    public List<Person> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(List<Person> users) {
         this.users = users;
+    }*/
+
+    @Override
+    public String toString() {
+        /*return "Subpack with id "+id+" has parent pack "+parent+
+               " subpack name is "+name+" contains "+answers.size()+
+               " answers (noise is included) and "+repeats.size()+
+               " repeated answers for "+users.size()+" users";*/
+        
+        return "Subpack with id "+id+" has parent pack "+parent+
+               " subpack name is "+name+" contains 0"+
+               " answers (noise is included) and 0"+
+               " repeated answers for 0 users";
     }
+    
+    
 }

@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Tue May 10 12:59:26 CEST 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0154-9a52-4f53-00000662c1e0 
+on database directory memory:/home/pepa/data/prog/xml/pb138-project-data-annotation-system-C-group/backend/backend with class loader sun.misc.Launcher$AppClassLoader@73d16e93 
+Loaded from file:/home/pepa/.m2/repository/org/apache/derby/derby/10.12.1.1/derby-10.12.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_91-b14
+user.dir=/home/pepa/data/prog/xml/pb138-project-data-annotation-system-C-group/backend
+os.name=Linux
+os.arch=amd64
+os.version=3.19.0-58-generic
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

@@ -1,5 +1,7 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
+import cz.muni.pb138.annotationsystem.backend.common.DaoException;
+
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
  */
