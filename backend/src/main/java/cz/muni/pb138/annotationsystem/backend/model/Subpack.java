@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.backend.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,9 +12,19 @@ public class Subpack {
 
     private Pack parent;
     private String name;
-    private List<Answer> answers;
-    private List<Answer> repeats;
     private List<Person> users;
+
+    public Subpack() {
+    }
+
+    public Subpack(Pack parent, String name) {
+        this(parent, name, new ArrayList<Person>());
+    }
+
+    public Subpack(Pack parent, String name, List<Person> users) {
+        this.parent = parent;
+        this.users = users;
+    }
 
     public Long getId() {
         return id;
@@ -37,22 +48,6 @@ public class Subpack {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Answer> getAnswers() {
-        return answers;
-    }
-
-    public void setAnswers(List<Answer> answers) {
-        this.answers = answers;
-    }
-
-    public List<Answer> getRepeats() {
-        return repeats;
-    }
-
-    public void setRepeats(List<Answer> repeats) {
-        this.repeats = repeats;
     }
 
     public List<Person> getUsers() {

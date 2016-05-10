@@ -1,25 +1,23 @@
 package cz.muni.pb138.annotationsystem.backend.api;
 
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
-import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
 
-import javax.inject.Named;
 import java.util.List;
 
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
  */
-public interface AnswerManager {
+public interface PackManager {
 
-    Answer nextAnswer(Person person, Subpack subpack);
+    void createPack(Pack pack, List<Answer> answers, int numOfAnswersInSubpack);
 
-    Answer getAnswerById(Long id);
+    Pack getPackById(Long id);
 
-    List<Answer> getAnswersInSubpack(Subpack subpack);
+    List<Pack> getAllPacks();
 
-    List<Answer> getAnswersInPack(Pack pack);
+    void deletePack(Pack pack);
 
 }

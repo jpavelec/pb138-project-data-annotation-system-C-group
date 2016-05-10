@@ -12,6 +12,14 @@ public class Person {
     private String username;
     private boolean isAdmin;
 
+    public Person() {
+    }
+
+    public Person(String username, boolean isAdmin) {
+        this.username = username;
+        this.isAdmin = isAdmin;
+    }
+
     public Long getId() {
         return id;
     }
@@ -35,14 +43,6 @@ public class Person {
     public void setIsAdmin(boolean admin) {
         this.isAdmin = admin;
     }
-
-    /*public Map<Answer, Evaluation> getEvals() {
-        return evals;
-    }
-
-    public void setEvals(Map<Answer, Evaluation> evals) {
-        this.evals = evals;
-    }*/
 
     @Override
     public String toString() {

@@ -4,13 +4,23 @@ package cz.muni.pb138.annotationsystem.backend.model;
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
  */
 public class Evaluation {
-    
+
     private Long id;
     
     private Person person;
     private Answer answer;
     private Rating rating;
     private int elapsedTime;
+
+    public Evaluation() {
+    }
+
+    public Evaluation(Person person, Answer answer, Rating rating, int elapsedTime) {
+        this.person = person;
+        this.answer = answer;
+        this.rating = rating;
+        this.elapsedTime = elapsedTime;
+    }
 
     public Long getId() {
         return id;

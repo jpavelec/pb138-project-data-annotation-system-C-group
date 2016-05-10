@@ -4,22 +4,18 @@ import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
+import cz.muni.pb138.annotationsystem.backend.model.Rating;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
-
-import javax.inject.Named;
-import java.util.List;
 
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
  */
-public interface AnswerManager {
+public interface EvaluationManager {
 
-    Answer nextAnswer(Person person, Subpack subpack);
+    void eval(Evaluation evaluation);
 
-    Answer getAnswerById(Long id);
+    Evaluation getEvaluationById(Long id);
 
-    List<Answer> getAnswersInSubpack(Subpack subpack);
-
-    List<Answer> getAnswersInPack(Pack pack);
+    void correct(Evaluation evaluation);
 
 }

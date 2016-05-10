@@ -30,17 +30,22 @@ public class BackendConfig {
 
     @Bean
     public DataSource dataSource() {
+        /* ======== PRODUCTION DB ======== */
         /*
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(env.getRequiredProperty("dataSource.driverClassName"));
         dataSource.setUrl(env.getRequiredProperty("dataSource.url"));
         dataSource.setUsername(env.getRequiredProperty("dataSource.username"));
         dataSource.setPassword(env.getRequiredProperty("dataSource.password"));
+        return dataSource;
         */
+        /* ======== TEST IN MEMORY DB ======== */
         EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-        // HINT: add method .addScript to create scheme for testing.
-        EmbeddedDatabase db = builder.setType(EmbeddedDatabaseType.DERBY).build();
-        return db;
+        EmbeddedDatabase dataSource = builder
+                .setType(EmbeddedDatabaseType.DERBY)
+                .addScripts("createTables.sql", "testData.sql")
+                .build();
+        return dataSource;
     }
 
 }

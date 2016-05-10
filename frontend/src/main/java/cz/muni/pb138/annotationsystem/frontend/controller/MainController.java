@@ -1,6 +1,6 @@
 package cz.muni.pb138.annotationsystem.frontend.controller;
 
-import cz.muni.pb138.annotationsystem.backend.api.Api;
+import cz.muni.pb138.annotationsystem.backend.api.PackManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class MainController {
 
     @Inject
-    private Api api;
+    private PackManager packManager;
 
     @RequestMapping("/")
     public String primaryView(ServletRequest req) {
@@ -68,7 +68,8 @@ public class MainController {
     @RequestMapping("/mark/{animal}")
     public String whatever(ServletRequest req, @PathVariable String animal) {
 
-        req.setAttribute("yellow", api.prilisZlutoucky(animal));
+        packManager.createPack(null, null, 1000);
+        req.setAttribute("yellow", "placeholder");
 
         return "redirect:/pes";
 

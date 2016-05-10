@@ -15,15 +15,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.sql.DataSource;
 
 /**
  * @author Josef Pavelec <jospavelec@gmail.com>
  */
+@Named
 public class EvaluationDao implements Dao<Evaluation> {
 
     private DataSource dataSource;
 
+    @Inject
     public EvaluationDao(DataSource dataSource) {
         this.dataSource = dataSource;
     }

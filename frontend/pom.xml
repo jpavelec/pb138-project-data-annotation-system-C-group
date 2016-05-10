@@ -72,15 +72,6 @@
                     <path>/</path>
                 </configuration>
             </plugin>
-            <!-- allow maven plugins in general??? -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 

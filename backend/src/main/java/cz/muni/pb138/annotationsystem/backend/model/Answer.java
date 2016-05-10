@@ -13,6 +13,15 @@ public class Answer {
     private String answer;
     private Boolean isNoise;
 
+    public Answer() {
+    }
+
+    public Answer(Subpack fromSubpack, String answer, Boolean isNoise) {
+        this.fromSubpack = fromSubpack;
+        this.answer = answer;
+        this.isNoise = isNoise;
+    }
+
     public Subpack getFromSubpack() {
         return fromSubpack;
     }

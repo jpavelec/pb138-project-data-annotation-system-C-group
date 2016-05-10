@@ -13,11 +13,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.sql.DataSource;
 
 /**
  * @author Josef Pavelec <jospavelec@gmail.com>
  */
+@Named
 public class PackDao implements Dao<Pack> {
     
     private static final Logger logger = Logger.getLogger(
@@ -25,6 +28,7 @@ public class PackDao implements Dao<Pack> {
     
     private DataSource dataSource;
 
+    @Inject
     public PackDao(DataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -98,8 +102,8 @@ public class PackDao implements Dao<Pack> {
 
             st.setString(1, pack.getQuestion());
             st.setString(2, pack.getName());
-            st.setInt(3, pack.getRepeating());
-            st.setInt(4, pack.getNoiseRate());
+            st.setInt(3, (int) pack.getRepeating());
+            st.setInt(4, (int) pack.getNoiseRate());
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
                 throw new ServiceFailureException("Internal Error: More rows ("
@@ -162,8 +166,8 @@ public class PackDao implements Dao<Pack> {
 
             st.setString(1, pack.getQuestion());
             st.setString(2, pack.getName());
-            st.setInt(3, pack.getRepeating());
-            st.setInt(4, pack.getNoiseRate());
+            st.setInt(3, (int) pack.getRepeating());
+            st.setInt(4, (int) pack.getNoiseRate());
             st.setLong(5, pack.getId());
 
             int count = st.executeUpdate();

@@ -11,8 +11,18 @@ public class Pack {
 
     private String question;
     private String name;
-    private int noiseRate;
-    private int repeating;
+    private double noiseRate;
+    private double repeating;
+
+    public Pack() {
+    }
+
+    public Pack(String question, String name, double noiseRate, double repeating) {
+        this.question = question;
+        this.name = name;
+        this.noiseRate = noiseRate;
+        this.repeating = repeating;
+    }
 
     public String getName() {
         return name;
@@ -38,19 +48,19 @@ public class Pack {
         this.question = question;
     }
 
-    public int getNoiseRate() {
+    public double getNoiseRate() {
         return noiseRate;
     }
 
-    public void setNoiseRate(int noiseRate) {
+    public void setNoiseRate(double noiseRate) {
         this.noiseRate = noiseRate;
     }
 
-    public int getRepeating() {
+    public double getRepeating() {
         return repeating;
     }
 
-    public void setRepeating(int repeating) {
+    public void setRepeating(double repeating) {
         this.repeating = repeating;
     }
 

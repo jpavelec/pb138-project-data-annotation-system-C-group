@@ -68,7 +68,7 @@ public class Main {
                 while ((line = br.readLine()) != null) {
                     if (countAnswersInSubpack == PACK_SIZE) {
                         subpack.setId(null);
-                        subpack.setName("A"+Integer.toString(numberOfPack));
+                        //subpack.setName("A"+Integer.toString(numberOfPack));
                         subpackDao.create(subpack);
                         countAnswersInSubpack = 0;
                         numberOfPack++;

@@ -11,15 +11,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.sql.DataSource;
 
 /**
  * @author Josef Pavelec <jospavelec@gmail.com>
  */
+@Named
 public class SubpackDao implements Dao<Subpack> {
     
     private DataSource dataSource;
 
+    @Inject
     public SubpackDao(DataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -36,12 +40,6 @@ public class SubpackDao implements Dao<Subpack> {
         }
         if (subpack.getParent() == null) {
             throw new ValidationException("Subpack parent is null");
-        }
-        if (subpack.getName() == null) {
-            throw new ValidationException("Subpack name is null");
-        }
-        if (subpack.getName().isEmpty()) {
-            throw new ValidationException("Subpack name is empty");
         }
     }
 
@@ -80,7 +78,7 @@ public class SubpackDao implements Dao<Subpack> {
                     "INSERT INTO subpack (packid, name) VALUES (?,?)",
                     Statement.RETURN_GENERATED_KEYS);
             st.setLong(1, subpack.getParent().getId());
-            st.setString(2, subpack.getName());
+            st.setString(2, "" /*subpack.getName()*/);
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
                 throw new ServiceFailureException("Internal Error: More rows ("
@@ -102,7 +100,7 @@ public class SubpackDao implements Dao<Subpack> {
         PackDao packDao = new PackDao(dataSource);
         pack = packDao.getById(rs.getLong("packid"));
         subpack.setParent(pack);
-        subpack.setName(rs.getString("name"));
+        //subpack.setName(rs.getString("name"));
         return subpack;
     }
 
