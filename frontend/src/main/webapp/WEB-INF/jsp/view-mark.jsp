@@ -2,6 +2,9 @@
 <%@ taglib prefix="spring" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="utf-8" trimDirectiveWhitespaces="true" session="false" %>
 
+<!--
+@author Matej Rajtár <matej.rajtar@gmail.com>
+-->
 
 <!DOCTYPE html>
 <html lang="${pageContext.request.locale}">
@@ -34,7 +37,7 @@
             </div>
             <div id="middle">
                 <div class="column-in">
-                    <div id="counter"></div>
+                    <div id="counter">1/1000</div>
                     <div>
                         <span id="filename">name of the package thats being solved</span>
                     </div>

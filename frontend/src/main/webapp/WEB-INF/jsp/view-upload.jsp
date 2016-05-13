@@ -2,6 +2,9 @@
 <%@ taglib prefix="spring" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="utf-8" trimDirectiveWhitespaces="true" session="false" %>
 
+<!--
+@author Matej Rajtár <matej.rajtar@gmail.com>
+-->
 
 <!DOCTYPE html>
 <html lang="${pageContext.request.locale}">
@@ -14,13 +17,13 @@
 </head>
 <body>
     <div class="container">
-        <form class="form-signin">
+        <form class="form-signin" method="post">
             <h2>Upload a new dictionary:</h2>
             <label for="uploadDic">Pick dictionary file (CSV)</label>
-            <input id="uploadDic" type='file' name='userFile'>
+            <input id="uploadDic" type='file' name='userFile' <%--required--%>>
             </br>
             <label for="uploadNoise">Pick noise file (CSV) - optional</label>
-            <input id="uploadNoise" type='file' name='userFile'>
+            <input id="uploadNoise" type='file' name='userFile' <%--required--%>>
             </br>
             <label for="inputRepetition">Enter repetition in %</label>
             <input id="inputRepetition"placeholder="percentage" required>
@@ -29,11 +32,9 @@
             <input id="inputMax"placeholder="number" required>
             </br>
             </br>
-        </form>
-        </br>
-        <form action="<spring:url value="/assign"/>">
             <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Upload">
         </form>
+        </br>
         </br>
         <form action="<spring:url value="/"/>">
             <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back">
