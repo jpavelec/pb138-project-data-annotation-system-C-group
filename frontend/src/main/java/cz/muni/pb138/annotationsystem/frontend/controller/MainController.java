@@ -29,10 +29,16 @@ public class MainController {
 
     }
 
-    @RequestMapping("/upload")
-    public String upload(ServletRequest req) {
+    @RequestMapping(value="/upload",method={RequestMethod.GET})
+    public String doGet(ServletRequest req){
 
         return "view-upload";
+    }
+
+    @RequestMapping(value="/upload",method={RequestMethod.POST})
+    public String doPost(ServletRequest req){
+
+        return "view-assign";
 
     }
 
