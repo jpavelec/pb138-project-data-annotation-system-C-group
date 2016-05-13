@@ -60,9 +60,17 @@ public class Subpack {
 
     @Override
     public String toString() {
-        return "Subpack with id "+id+" has parent pack "+parent+
-               " subpack name is "+name+" for "+users.size()+" users";
+        int countOfUsers;
+        if (users == null) {
+            countOfUsers = 0;
+        } else {
+            countOfUsers = users.size();
+        }
+        return "Subpack{" + "id=" + id + ", name=" + name +", from pack=" + 
+                parent.getName()  + ", annotates " + countOfUsers + " users}";
     }
+    
+    
     
     
 }

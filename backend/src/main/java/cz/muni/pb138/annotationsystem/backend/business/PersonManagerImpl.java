@@ -2,7 +2,7 @@ package cz.muni.pb138.annotationsystem.backend.business;
 
 import cz.muni.pb138.annotationsystem.backend.api.PersonManager;
 import cz.muni.pb138.annotationsystem.backend.dao.AnswerDao;
-import cz.muni.pb138.annotationsystem.backend.dao.PersonDao;
+import cz.muni.pb138.annotationsystem.backend.dao.PersonDaoImpl;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 
@@ -18,7 +18,7 @@ import java.util.List;
 public class PersonManagerImpl implements PersonManager {
 
     @Inject
-    private PersonDao personDao;
+    private PersonDaoImpl personDao;
 
     @Override
     public void createPerson(Person person) {

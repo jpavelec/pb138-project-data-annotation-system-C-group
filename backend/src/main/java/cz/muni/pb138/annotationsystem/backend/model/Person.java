@@ -1,6 +1,5 @@
 package cz.muni.pb138.annotationsystem.backend.model;
 
-import java.util.Map;
 
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>

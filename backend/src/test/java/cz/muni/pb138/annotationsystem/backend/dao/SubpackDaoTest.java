@@ -33,26 +33,26 @@ public class SubpackDaoTest {
     }
 
     /**
-     * Test of create method, of class SubpackDao.
+     * Test of create method, of class SubpackDaoImpl.
      */
     @Test
     public void testCreate() throws Exception {
         System.out.println("create");
         Subpack subpack = null;
-        SubpackDao instance = null;
+        SubpackDaoImpl instance = null;
         instance.create(subpack);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
     /**
-     * Test of getById method, of class SubpackDao.
+     * Test of getById method, of class SubpackDaoImpl.
      */
     @Test
     public void testGetById() throws Exception {
         System.out.println("getById");
         Long id = null;
-        SubpackDao instance = null;
+        SubpackDaoImpl instance = null;
         Subpack expResult = null;
         Subpack result = instance.getById(id);
         assertEquals(expResult, result);
@@ -61,26 +61,26 @@ public class SubpackDaoTest {
     }
 
     /**
-     * Test of update method, of class SubpackDao.
+     * Test of update method, of class SubpackDaoImpl.
      */
     @Test
     public void testUpdate() throws Exception {
         System.out.println("update");
         Subpack subpack = null;
-        SubpackDao instance = null;
+        SubpackDaoImpl instance = null;
         instance.update(subpack);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
     /**
-     * Test of delete method, of class SubpackDao.
+     * Test of delete method, of class SubpackDaoImpl.
      */
     @Test
     public void testDelete() throws Exception {
         System.out.println("delete");
         Subpack subpack = null;
-        SubpackDao instance = null;
+        SubpackDaoImpl instance = null;
         instance.delete(subpack);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

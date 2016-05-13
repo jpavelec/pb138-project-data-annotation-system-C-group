@@ -3,7 +3,7 @@ package cz.muni.pb138.annotationsystem.backend.business;
 import ch.qos.logback.classic.spi.PackagingDataCalculator;
 import cz.muni.pb138.annotationsystem.backend.api.PackManager;
 import cz.muni.pb138.annotationsystem.backend.dao.AnswerDao;
-import cz.muni.pb138.annotationsystem.backend.dao.PackDao;
+import cz.muni.pb138.annotationsystem.backend.dao.PackDaoImpl;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 
@@ -19,7 +19,7 @@ import java.util.List;
 public class PackManagerImpl implements PackManager {
 
     @Inject
-    private PackDao packDao;
+    private PackDaoImpl packDao;
 
     @Override
     public void createPack(Pack pack, List<Answer> answers, int numOfAnswersInSubpack) {

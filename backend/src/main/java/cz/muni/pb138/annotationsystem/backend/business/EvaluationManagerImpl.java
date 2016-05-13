@@ -4,7 +4,7 @@ import cz.muni.pb138.annotationsystem.backend.api.AnswerManager;
 import cz.muni.pb138.annotationsystem.backend.api.EvaluationManager;
 import cz.muni.pb138.annotationsystem.backend.api.PersonManager;
 import cz.muni.pb138.annotationsystem.backend.dao.AnswerDao;
-import cz.muni.pb138.annotationsystem.backend.dao.EvaluationDao;
+import cz.muni.pb138.annotationsystem.backend.dao.EvaluationDaoImpl;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
@@ -20,7 +20,7 @@ import javax.inject.Named;
 public class EvaluationManagerImpl implements EvaluationManager {
 
     @Inject
-    private EvaluationDao evaluationDao;
+    private EvaluationDaoImpl evaluationDao;
 
     @Inject
     private PersonManager personManager;

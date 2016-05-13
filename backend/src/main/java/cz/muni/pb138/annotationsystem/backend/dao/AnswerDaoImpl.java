@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -114,7 +115,7 @@ public class AnswerDaoImpl implements AnswerDao {
         Answer answer = new Answer();
         answer.setId(rs.getLong("id"));
         Subpack subpack = new Subpack();
-        SubpackDao subpackDao = new SubpackDao(dataSource);
+        SubpackDaoImpl subpackDao = new SubpackDaoImpl(dataSource);
         subpack = subpackDao.getById(rs.getLong("subpackid"));
         answer.setFromSubpack(subpack);
         answer.setAnswer(rs.getString("answervalue"));
@@ -155,7 +156,22 @@ public class AnswerDaoImpl implements AnswerDao {
 
     @Override
     public List<Answer> getAll() throws DaoException {
-        return null;
+        checkDataSource();
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "SELECT id, subpackid, answervalue, isnoise FROM answer");
+            ResultSet rs = st.executeQuery()) {
+            List<Answer> answers = new ArrayList<>();
+            while (rs.next()) {
+                answers.add(resultSetToAnswer(rs));
+            }
+            
+            return answers;
+            
+        } catch (SQLException ex) {
+            String msg = "Error when getting all answers from DB";
+            throw new ServiceFailureException(msg, ex);
+        }
     }
 
     @Override

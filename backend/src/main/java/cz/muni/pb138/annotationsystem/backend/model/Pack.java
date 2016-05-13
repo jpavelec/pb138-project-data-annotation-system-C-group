@@ -64,9 +64,11 @@ public class Pack {
 
     @Override
     public String toString() {
-        return "Pack with id "+id+" has question: "+question+", name of pack: "+
-                name+", with noiseRate: "+noiseRate + " and repeating: "+repeatingRate;
+        return "Pack{" + "id=" + id + ", question=" + question + ", name=" + name + 
+                ", noiseRate=" + noiseRate + ", repeatingRate=" + repeatingRate + '}';
     }
+
+    
     
     
 }
