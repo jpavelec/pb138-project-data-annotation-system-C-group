@@ -36,44 +36,44 @@ public class EvaluationDao implements Dao<Evaluation> {
         this.dataSource = dataSource;
     }
 
-    private void checkDataSource(DataSource dataSource) {
+    private void checkDataSource() {
         if (dataSource == null) {
             throw new IllegalStateException("DataSource is not set");
         }
     }
     
-    private void validate(Evaluation bean) {
-        if (bean == null) {
+    private void validate(Evaluation evaluation) {
+        if (evaluation == null) {
             throw new IllegalArgumentException("Evaluation is null");
         }
-        if (bean.getPerson() == null) {
+        if (evaluation.getPerson() == null) {
             throw new ValidationException("User of evaluation is null");
         }
-        if (bean.getAnswer() == null) {
+        if (evaluation.getAnswer() == null) {
             throw new ValidationException("Answer of evaluation is null");
         }
-        if (bean.getRating() == null) {
+        if (evaluation.getRating() == null) {
             throw new ValidationException("Rating of evaluation is null");
         }
     }
     
-    private Long getKey(ResultSet keyRS, Evaluation bean) throws ServiceFailureException, SQLException {
+    private Long getKey(ResultSet keyRS, Evaluation evaluation) throws ServiceFailureException, SQLException {
         if (keyRS.next()) {
             if (keyRS.getMetaData().getColumnCount() != 1) {
                 throw new ServiceFailureException("Internal Error: Generated key"
-                        + "retriving failed when trying to insert evaluation " + bean
+                        + "retriving failed when trying to insert evaluation " + evaluation
                         + " - wrong key fields count: " + keyRS.getMetaData().getColumnCount());
             }
             Long result = keyRS.getLong(1);
             if (keyRS.next()) {
                 throw new ServiceFailureException("Internal Error: Generated key"
-                        + "retriving failed when trying to insert evaluation " + bean
+                        + "retriving failed when trying to insert evaluation " + evaluation
                         + " - more keys found");
             }
             return result;
         } else {
             throw new ServiceFailureException("Internal Error: Generated key"
-                    + "retriving failed when trying to insert evaluation " + bean
+                    + "retriving failed when trying to insert evaluation " + evaluation
                     + " - no key found");
         }
     }
@@ -89,64 +89,67 @@ public class EvaluationDao implements Dao<Evaluation> {
         answer = answerDao.getById(rs.getLong("answerid"));
         eval.setPerson(person);
         eval.setAnswer(answer);
-        eval.setRating(Rating.getRating(rs.getString("rating")));
+        eval.setRating(Rating.valueOf(rs.getString("rating")));
         eval.setElapsedTime(rs.getInt("elapsedtime"));
         return eval;
     }
     
     
     @Override
-    public void create(Evaluation bean) throws DaoException {
-        //validate(bean);
-        if (bean.getId() != null) {
+    public void create(Evaluation evaluation) throws DaoException {
+        checkDataSource();
+        validate(evaluation);
+        if (evaluation.getId() != null) {
             throw new ValidationException("Evaluation id is already set");
         }
-        try {
-            Connection connection = dataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                    "INSERT INTO evaluation (personid, answerid, rating, elapsedTime) VALUES (?,?,?,?)",
-                    Statement.RETURN_GENERATED_KEYS);
-            st.setLong(1, bean.getPerson().getId());
-            st.setLong(2, bean.getAnswer().getId());
-            st.setString(3, bean.getRating().getSymbol());
-            st.setInt(4, bean.getElapsedTime());
+                "INSERT INTO evaluation (personid, answerid, rating, elapsedTime) VALUES (?,?,?,?)",
+                Statement.RETURN_GENERATED_KEYS)) {
+            
+            st.setLong(1, evaluation.getPerson().getId());
+            st.setLong(2, evaluation.getAnswer().getId());
+            st.setString(3, evaluation.getRating().toString());
+            st.setInt(4, evaluation.getElapsedTime());
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
                 throw new ServiceFailureException("Internal Error: More rows ("
-                        + addedRows + ") inserted when trying to insert evaluation " + bean);
+                        + addedRows + ") inserted when trying to insert evaluation " + evaluation);
             }
             
-            ResultSet keyRS = st.getGeneratedKeys();
-            bean.setId(getKey(keyRS, bean));
+            try (ResultSet keyRS = st.getGeneratedKeys()) {
+                evaluation.setId(getKey(keyRS, evaluation));
+            }
             
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when inserting user " + bean, ex);
+            throw new ServiceFailureException("Error when inserting user " + evaluation, ex);
         }
     }
 
     @Override
     public Evaluation getById(Long id) throws DaoException {
-        try {
-            Connection connection = dataSource.getConnection();
+        checkDataSource();
+        try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                "SELECT id, personid, answerid, rating, elapsedTime FROM evaluation WHERE id = ?");
+                "SELECT id, personid, answerid, rating, elapsedTime FROM evaluation WHERE id = ?")) {
             
             st.setLong(1, id);
 
-            ResultSet rs = st.executeQuery();
+            try (ResultSet rs = st.executeQuery()) {
             
-            if (rs.next()) {
-                Evaluation eval = resultSetToEvaluation(rs);
-                
                 if (rs.next()) {
-                    throw new ServiceFailureException(
-                        "Internal error: More entities with the same id found " +
-                        "(source id: " + id + ", found " + eval + 
-                        " and " + resultSetToEvaluation(rs));
+                    Evaluation eval = resultSetToEvaluation(rs);
+
+                    if (rs.next()) {
+                        throw new ServiceFailureException(
+                            "Internal error: More entities with the same id found " +
+                            "(source id: " + id + ", found " + eval + 
+                            " and " + resultSetToEvaluation(rs));
+                    }
+                    return eval;
+                } else {
+                    return null;
                 }
-                return eval;
-            } else {
-                return null;
             }
         } catch (SQLException ex) {
             throw new ServiceFailureException(
@@ -160,58 +163,59 @@ public class EvaluationDao implements Dao<Evaluation> {
     }
 
     @Override
-    public void update(Evaluation bean) throws DaoException {
-        validate(bean);
-        if (bean.getId() == null) {
+    public void update(Evaluation evaluation) throws DaoException {
+        checkDataSource();
+        validate(evaluation);
+        if (evaluation.getId() == null) {
             throw new IllegalEntityException("Evaluation id is null");
         }
-        try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareCall(
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
                     "UPDATE evaluation SET personid = ?, answerid = ?, " +
-                    "rating = ?, elapsedTime = ? WHERE id = ?");
-            st.setLong(1, bean.getPerson().getId());
-            st.setLong(2, bean.getAnswer().getId());
-            st.setString(3, bean.getRating().getSymbol());
-            st.setInt(4, bean.getElapsedTime());
-            st.setLong(5, bean.getId());
+                    "rating = ?, elapsedTime = ? WHERE id = ?")) {
+            
+            st.setLong(1, evaluation.getPerson().getId());
+            st.setLong(2, evaluation.getAnswer().getId());
+            st.setString(3, evaluation.getRating().toString());
+            st.setInt(4, evaluation.getElapsedTime());
+            st.setLong(5, evaluation.getId());
 
             int count = st.executeUpdate();
             if (count == 0) {
-                throw new EntityNotFoundException("Evaluation " + bean + " was not found in database!");
+                throw new EntityNotFoundException("Evaluation " + evaluation + " was not found in database!");
             } else if (count != 1) {
                 throw new ServiceFailureException("Invalid updated rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
             throw new ServiceFailureException(
-                    "Error when updating evaluation " + bean, ex);
+                "Error when updating evaluation " + evaluation, ex);
         }
     }
 
     @Override
-    public void delete(Evaluation bean) throws DaoException {
-        if (bean == null) {
+    public void delete(Evaluation evaluation) throws DaoException {
+        checkDataSource();
+        if (evaluation == null) {
             throw new IllegalArgumentException("Evaluation is null");
         }
-        if (bean.getId() == null) {
-            throw new IllegalArgumentException("Evaluation id is null");
+        if (evaluation.getId() == null) {
+            throw new IllegalEntityException("Evaluation id is null");
         }
-        try {
-            Connection connection = dataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                "DELETE FROM evaluation WHERE id = ?");
+                "DELETE FROM evaluation WHERE id = ?")) {
             
-            st.setLong(1, bean.getId());
+            st.setLong(1, evaluation.getId());
             
             int count = st.executeUpdate();
             if (count == 0) {
-                throw new EntityNotFoundException("Evaluation " + bean + " was not found in database!");
+                throw new EntityNotFoundException("Evaluation " + evaluation + " was not found in database!");
             } else if (count != 1) {
                 throw new ServiceFailureException("Invalid deleted rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
             throw new ServiceFailureException(
-                    "Error when updating evaluation " + bean, ex);
+                    "Error when updating evaluation " + evaluation, ex);
         }
     }
 

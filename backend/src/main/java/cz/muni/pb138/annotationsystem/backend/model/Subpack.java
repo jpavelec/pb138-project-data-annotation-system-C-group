@@ -60,15 +60,8 @@ public class Subpack {
 
     @Override
     public String toString() {
-        /*return "Subpack with id "+id+" has parent pack "+parent+
-               " subpack name is "+name+" contains "+answers.size()+
-               " answers (noise is included) and "+repeats.size()+
-               " repeated answers for "+users.size()+" users";*/
-        
         return "Subpack with id "+id+" has parent pack "+parent+
-               " subpack name is "+name+" contains 0"+
-               " answers (noise is included) and 0"+
-               " repeated answers for 0 users";
+               " subpack name is "+name+" for "+users.size()+" users";
     }
     
     

@@ -1,6 +1,8 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
+import cz.muni.pb138.annotationsystem.backend.common.EntityNotFoundException;
+import cz.muni.pb138.annotationsystem.backend.common.IllegalEntityException;
 import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
@@ -11,6 +13,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.sql.DataSource;
@@ -32,6 +36,10 @@ public class SubpackDao implements Dao<Subpack> {
         if (dataSource == null) {
             throw new IllegalStateException("DataSource is not set");
         }
+    }
+
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     private void validate(Subpack subpack) {
@@ -72,11 +80,11 @@ public class SubpackDao implements Dao<Subpack> {
             throw new ValidationException("Subpack id is already set");
         }
 
-        try {
-            Connection connection = dataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
                     "INSERT INTO subpack (packid, name) VALUES (?,?)",
-                    Statement.RETURN_GENERATED_KEYS);
+                    Statement.RETURN_GENERATED_KEYS)) {
+            
             st.setLong(1, subpack.getParent().getId());
             st.setString(2, "" /*subpack.getName()*/);
             int addedRows = st.executeUpdate();
@@ -85,9 +93,9 @@ public class SubpackDao implements Dao<Subpack> {
                         + addedRows + ") inserted when trying to insert subpack " + subpack);
             }
             
-            ResultSet keyRS = st.getGeneratedKeys();
-            subpack.setId(getKey(keyRS, subpack));
-            
+            try (ResultSet keyRS = st.getGeneratedKeys()) {
+                subpack.setId(getKey(keyRS, subpack));
+            }
         } catch (SQLException ex) {
             throw new ServiceFailureException("Error when inserting subpack " + subpack, ex);
         }
@@ -107,27 +115,27 @@ public class SubpackDao implements Dao<Subpack> {
     @Override
     public Subpack getById(Long id) throws DaoException {
         checkDataSource();
-        try {
-            Connection connection = dataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                    "SELECT id, packid, name FROM subpack WHERE id = ?");
+                "SELECT id, packid, name FROM subpack WHERE id = ?")) {
             
             st.setLong(1, id);
             
-            ResultSet rs = st.executeQuery();
+            try (ResultSet rs = st.executeQuery()) {
             
-            if (rs.next()) {
-                Subpack subpack = resultSetToSubpack(rs);
-                
                 if (rs.next()) {
-                    throw new ServiceFailureException(
-                        "Internal error: More entities with the same id found " +
-                        "(source id: " + id + ", found " + subpack + 
-                        " and " + resultSetToSubpack(rs));
+                    Subpack subpack = resultSetToSubpack(rs);
+
+                    if (rs.next()) {
+                        throw new ServiceFailureException(
+                            "Internal error: More entities with the same id found " +
+                            "(source id: " + id + ", found " + subpack + 
+                            " and " + resultSetToSubpack(rs));
+                    }
+                    return subpack;
+                } else {
+                    return null;
                 }
-                return subpack;
-            } else {
-                return null;
             }
         } catch (SQLException ex) {
             throw new ServiceFailureException(
@@ -142,12 +150,61 @@ public class SubpackDao implements Dao<Subpack> {
 
     @Override
     public void update(Subpack subpack) throws DaoException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        checkDataSource();
+        validate(subpack);
+        if (subpack.getId() == null) {
+            throw new IllegalEntityException("Subpack id is null");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "UPDATE subpack SET packid = ?, name = ? WHERE id = ?")) {
+            
+            st.setLong(1, subpack.getParent().getId());
+            st.setString(2, subpack.getName());
+            st.setLong(3, subpack.getId());
+            
+            int count = st.executeUpdate();
+            if (count == 0) {
+                throw new EntityNotFoundException("Subpack" + subpack + "wasn't found in database");
+            } else if (count != 1) {
+                throw new ServiceFailureException(
+                "Invalid updated rows count detected (one row should be updated): " + count);
+            }
+            
+        } catch (SQLException ex) {
+            throw new ServiceFailureException("Error when updating subpack " + subpack, ex);
+        }
     }
 
     @Override
     public void delete(Subpack subpack) throws DaoException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        checkDataSource();
+        if (subpack == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (subpack.getId() == null) {
+            throw new IllegalEntityException("Subpack id is null");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "DELETE FROM subpack WHERE id = ?")) {
+            
+            st.setLong(1, subpack.getId());
+            
+            int count = st.executeUpdate();
+            if (count == 0) {
+                throw new EntityNotFoundException("Subpack " + subpack + " was not found in database!");
+            } else if (count != 1) {
+                throw new ServiceFailureException(
+                        "Invalid deleted rows count detected (one row should be updated): " + count);
+            }
+            
+        } catch (SQLException ex) {
+            //Logger.getLogger(SubpackDao.class.getName()).log(Level.SEVERE, null, ex);
+            throw new ServiceFailureException(
+                    "Error when updating subpack " + subpack, ex);
+        }
+        
     }
 
 }

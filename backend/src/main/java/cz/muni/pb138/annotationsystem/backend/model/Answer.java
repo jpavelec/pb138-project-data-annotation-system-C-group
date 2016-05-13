@@ -1,7 +1,5 @@
 package cz.muni.pb138.annotationsystem.backend.model;
 
-import java.util.Map;
-
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
  */
@@ -54,17 +52,11 @@ public class Answer {
         this.answer = answer;
     }
 
-    /*public Map<Person, Evaluation> getEvaluations() {
-        return evaluations;
-    }
-
-    public void setEvaluations(Map<Person, Evaluation> evaluations) {
-        this.evaluations = evaluations;
-    }*/
-
+    
     @Override
     public String toString() {
-        return "Answer{" + "id=" + id + ", fromSubpack=" + fromSubpack.getName() + ", answer=" + answer + ", isNoise=" + isNoise + '}';
+        return "Answer{" + "id=" + id + ", fromSubpack=" + fromSubpack.getName() + 
+               ", answer=" + answer + ", isNoise=" + isNoise + '}';
     }
     
     

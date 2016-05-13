@@ -27,6 +27,16 @@ public class PackDao implements Dao<Pack> {
             PackDao.class.getName());
     
     private DataSource dataSource;
+    
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+    
+    private void checkDataSource() {
+        if (dataSource == null) {
+            throw new IllegalStateException("DataSource is not set");
+        }
+    }
 
     @Inject
     public PackDao(DataSource dataSource) {
@@ -49,7 +59,7 @@ public class PackDao implements Dao<Pack> {
         if (pack.getName().isEmpty()) {
             throw new ValidationException("Pack name is empty");
         }
-        if (pack.getRepeating() < 0 || pack.getRepeating() > 100) {
+        if (pack.getRepeatingRate() < 0 || pack.getRepeatingRate() > 100) {
             throw new ValidationException("Repeate ratio is out of interval");
         }
         if (pack.getNoiseRate() < 0 || pack.getNoiseRate() > 100) {
@@ -83,26 +93,26 @@ public class PackDao implements Dao<Pack> {
         pack.setId(rs.getLong("id"));
         pack.setQuestion(rs.getString("question"));
         pack.setName(rs.getString("name"));
-        pack.setRepeating(rs.getInt("repeat"));
+        pack.setRepeatingRate(rs.getInt("repeat"));
         pack.setNoiseRate(rs.getInt("noise"));
         return pack;
     }
     
     @Override
     public void create(Pack pack) throws DaoException {
+        checkDataSource();
         validate(pack);
         if (pack.getId() != null) {
             throw new IllegalEntityException("Pack id is already set");
         }
-        try {
-                Connection connection = dataSource.getConnection();
-                PreparedStatement st = connection.prepareStatement(
-                        "INSERT INTO pack (question, name, repeat, noise) VALUES (?,?,?,?)",
-                        Statement.RETURN_GENERATED_KEYS); 
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "INSERT INTO pack (question, name, repeat, noise) VALUES (?,?,?,?)",
+                Statement.RETURN_GENERATED_KEYS)) {
 
             st.setString(1, pack.getQuestion());
             st.setString(2, pack.getName());
-            st.setInt(3, (int) pack.getRepeating());
+            st.setInt(3, (int) pack.getRepeatingRate());
             st.setInt(4, (int) pack.getNoiseRate());
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
@@ -110,8 +120,9 @@ public class PackDao implements Dao<Pack> {
                         + addedRows + ") inserted when trying to insert pack " + pack);
             }
 
-            ResultSet keyRS = st.getGeneratedKeys();
-            pack.setId(getKey(keyRS, pack));
+            try (ResultSet keyRS = st.getGeneratedKeys()) {
+                pack.setId(getKey(keyRS, pack));
+            }
 
         } catch (SQLException ex) {
             throw new ServiceFailureException("Error when inserting pack " + pack, ex);
@@ -120,31 +131,29 @@ public class PackDao implements Dao<Pack> {
 
     @Override
     public Pack getById(Long id) throws DaoException {
-        try {
-            Connection connection = dataSource.getConnection();
+        checkDataSource();
+        try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                        "SELECT id, question, name, repeat, noise FROM pack WHERE id = ?"); 
+                "SELECT id, question, name, repeat, noise FROM pack WHERE id = ?")) { 
 
             st.setLong(1, id);
-            ResultSet rs = st.executeQuery();
-
-            if (rs.next()) {
-                Pack pack = resultSetToPack(rs);
+            try (ResultSet rs = st.executeQuery()) {
 
                 if (rs.next()) {
-                    throw new ServiceFailureException(
-                            "Internal error: More entities with the same id found "
-                            + "(source id: " + id + ", found " + pack + " and " + resultSetToPack(rs));
+                    Pack pack = resultSetToPack(rs);
+                    if (rs.next()) {
+                        throw new ServiceFailureException(
+                            "Internal error: More entities with the same id found " +
+                            "(source id: " + id + ", found " + pack + " and " + resultSetToPack(rs));
+                    }
+                    return pack;
+                } else {
+                    return null;
                 }
-
-                return pack;
-            } else {
-                return null;
             }
-
         } catch (SQLException ex) {
             throw new ServiceFailureException(
-                    "Error when retrieving pack with id " + id, ex);
+                "Error when retrieving pack with id " + id, ex);
         }
     }
 
@@ -155,18 +164,18 @@ public class PackDao implements Dao<Pack> {
 
     @Override
     public void update(Pack pack) throws DaoException {
+        checkDataSource();
         validate(pack);
         if (pack.getId() == null) {
             throw new IllegalEntityException("Pack id is null");
         }
-        try (
-                Connection connection = dataSource.getConnection();
-                PreparedStatement st = connection.prepareStatement(
-                        "UPDATE pack SET question = ?, name = ?, repeat = ?, noise = ? WHERE id = ?")) {
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "UPDATE pack SET question = ?, name = ?, repeat = ?, noise = ? WHERE id = ?")) {
 
             st.setString(1, pack.getQuestion());
             st.setString(2, pack.getName());
-            st.setInt(3, (int) pack.getRepeating());
+            st.setInt(3, (int) pack.getRepeatingRate());
             st.setInt(4, (int) pack.getNoiseRate());
             st.setLong(5, pack.getId());
 
@@ -184,16 +193,16 @@ public class PackDao implements Dao<Pack> {
 
     @Override
     public void delete(Pack pack) throws DaoException {
+        checkDataSource();
         if (pack == null) {
             throw new IllegalArgumentException("Pack is null");
         }
         if (pack.getId() == null) {
-            throw new IllegalArgumentException("Pack id is null");
+            throw new IllegalEntityException("Pack id is null");
         }
-        try {
-                Connection connection = dataSource.getConnection();
-                PreparedStatement st = connection.prepareStatement(
-                        "DELETE FROM pack WHERE id = ?");
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "DELETE FROM pack WHERE id = ?")) {
 
             st.setLong(1, pack.getId());
 
@@ -205,7 +214,7 @@ public class PackDao implements Dao<Pack> {
             }
         } catch (SQLException ex) {
             throw new ServiceFailureException(
-                    "Error when updating pack " + pack, ex);
+                "Error when updating pack " + pack, ex);
         }
     }
 

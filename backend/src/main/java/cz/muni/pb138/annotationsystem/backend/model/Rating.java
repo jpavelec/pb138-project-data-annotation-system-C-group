@@ -6,27 +6,7 @@ package cz.muni.pb138.annotationsystem.backend.model;
  */
 public enum Rating {
     
-    POSITIVE("+"), 
-    NEGATIVE("-"),
-    NONSENSE("/");
-    
-    private String symbol;
-    
-    private Rating(String value) {
-        this.symbol = value;
-    }
-    
-    public String getSymbol() {
-        return symbol;
-    }
-
-    // DELETE
-    public static Rating getRating(String symbol) {
-        switch (symbol) {
-            case "+": return Rating.POSITIVE;
-            case "-": return Rating.NEGATIVE;
-            case "/": return Rating.NONSENSE;
-        }
-        return null;
-    }
+    POSITIVE, 
+    NEGATIVE,
+    NONSENSE;
 }

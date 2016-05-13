@@ -1,7 +1,5 @@
 package cz.muni.pb138.annotationsystem.backend.model;
 
-import java.util.List;
-
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
  */
@@ -12,16 +10,16 @@ public class Pack {
     private String question;
     private String name;
     private double noiseRate;
-    private double repeating;
+    private double repeatingRate;
 
     public Pack() {
     }
 
-    public Pack(String question, String name, double noiseRate, double repeating) {
+    public Pack(String question, String name, double noiseRate, double repeatingRate) {
         this.question = question;
         this.name = name;
         this.noiseRate = noiseRate;
-        this.repeating = repeating;
+        this.repeatingRate = repeatingRate;
     }
 
     public String getName() {
@@ -56,18 +54,18 @@ public class Pack {
         this.noiseRate = noiseRate;
     }
 
-    public double getRepeating() {
-        return repeating;
+    public double getRepeatingRate() {
+        return repeatingRate;
     }
 
-    public void setRepeating(double repeating) {
-        this.repeating = repeating;
+    public void setRepeatingRate(double repeatingRate) {
+        this.repeatingRate = repeatingRate;
     }
 
     @Override
     public String toString() {
         return "Pack with id "+id+" has question: "+question+", name of pack: "+
-                name+", with noiseRate: "+noiseRate + " and repeating: "+repeating;
+                name+", with noiseRate: "+noiseRate + " and repeating: "+repeatingRate;
     }
     
     

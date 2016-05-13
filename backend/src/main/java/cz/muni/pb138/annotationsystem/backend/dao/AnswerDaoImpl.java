@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.sql.DataSource;
-//import javax.inject.Named;
 
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
@@ -25,11 +24,16 @@ import javax.sql.DataSource;
  */
 @Named
 public class AnswerDaoImpl implements AnswerDao {
-    
+
     private static final Logger logger = Logger.getLogger(
             AnswerDao.class.getName());
-    
+
     private DataSource dataSource;
+
+    @Inject
+    public AnswerDaoImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
     
     private void checkDataSource() {
         if (dataSource == null) {
@@ -37,11 +41,6 @@ public class AnswerDaoImpl implements AnswerDao {
         }
     }
 
-    @Inject
-    public AnswerDaoImpl(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-    
     private void validate(Answer answer) throws IllegalArgumentException {
         if (answer == null) {
             throw new IllegalArgumentException("Answer is null");
@@ -80,7 +79,7 @@ public class AnswerDaoImpl implements AnswerDao {
                     + " - no key found");
         }
     }
-    
+
     @Override
     public void create(Answer answer) {
         validate(answer);
@@ -88,11 +87,10 @@ public class AnswerDaoImpl implements AnswerDao {
         if (answer.getId() != null) {
             throw new IllegalEntityException("Answer id is already set");
         }
-        try (Connection connection = dataSource.getConnection()) {
-
+        try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
                 "INSERT INTO answer (subpackid, answervalue, isnoise) VALUES (?,?,?)",
-                Statement.RETURN_GENERATED_KEYS); 
+                Statement.RETURN_GENERATED_KEYS)) {
 
             st.setLong(1, answer.getFromSubpack().getId());
             st.setString(2, answer.getAnswer());
@@ -103,14 +101,15 @@ public class AnswerDaoImpl implements AnswerDao {
                         + addedRows + ") inserted when trying to insert answer " + answer);
             }
 
-            ResultSet keyRS = st.getGeneratedKeys();
-            answer.setId(getKey(keyRS, answer));
+            try (ResultSet keyRS = st.getGeneratedKeys()) {
+                answer.setId(getKey(keyRS, answer));
+            }
 
         } catch (SQLException ex) {
             throw new ServiceFailureException("Error when inserting answer " + answer, ex);
         }
     }
-    
+
     private Answer resultSetToAnswer(ResultSet rs) throws SQLException, DaoException {
         Answer answer = new Answer();
         answer.setId(rs.getLong("id"));
@@ -125,29 +124,29 @@ public class AnswerDaoImpl implements AnswerDao {
 
     @Override
     public Answer getById(Long id) throws DaoException {
-        try {
-            Connection connection = dataSource.getConnection();
+        checkDataSource();
+        try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                "SELECT id, subpackid, answervalue, isnoise FROM answer WHERE id = ?"); 
+                "SELECT id, subpackid, answervalue, isnoise FROM answer WHERE id = ?")) {
 
             st.setLong(1, id);
-            ResultSet rs = st.executeQuery();
-
-            if (rs.next()) {
-                Answer answer = resultSetToAnswer(rs);
+            try (ResultSet rs = st.executeQuery()) {
 
                 if (rs.next()) {
-                    throw new ServiceFailureException(
-                        "Internal error: More entities with the same id found " +
-                        "(source id: " + id + ", found " + answer + " and " + 
-                        resultSetToAnswer(rs));
+                    Answer answer = resultSetToAnswer(rs);
+
+                    if (rs.next()) {
+                        throw new ServiceFailureException(
+                                "Internal error: More entities with the same id found "
+                                + "(source id: " + id + ", found " + answer + " and "
+                                + resultSetToAnswer(rs));
+                    }
+
+                    return answer;
+                } else {
+                    return null;
                 }
-
-                return answer;
-            } else {
-                return null;
             }
-
         } catch (SQLException ex) {
             throw new ServiceFailureException(
                     "Error when retrieving subpack with id " + id, ex);
@@ -161,14 +160,14 @@ public class AnswerDaoImpl implements AnswerDao {
 
     @Override
     public void update(Answer answer) {
+        checkDataSource();
         validate(answer);
         if (answer.getId() == null) {
             throw new IllegalEntityException("Answer id is null");
         }
-        try {
-                Connection connection = dataSource.getConnection();
-                PreparedStatement st = connection.prepareStatement(
-                        "UPDATE answer SET subpackid = ?, answervalue = ?, isnoise = ? WHERE id = ?");
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "UPDATE answer SET subpackid = ?, answervalue = ?, isnoise = ? WHERE id = ?")) {
 
             st.setLong(1, answer.getFromSubpack().getId());
             st.setString(2, answer.getAnswer());
@@ -189,16 +188,16 @@ public class AnswerDaoImpl implements AnswerDao {
 
     @Override
     public void delete(Answer answer) {
+        checkDataSource();
         if (answer == null) {
             throw new IllegalArgumentException("Answer is null");
         }
         if (answer.getId() == null) {
-            throw new IllegalArgumentException("Answer id is null");
+            throw new IllegalEntityException("Answer id is null");
         }
-        try {
-                Connection connection = dataSource.getConnection();
-                PreparedStatement st = connection.prepareStatement(
-                        "DELETE FROM answer WHERE id = ?");
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                    "DELETE FROM answer WHERE id = ?")) {
 
             st.setLong(1, answer.getId());
 
@@ -207,7 +206,7 @@ public class AnswerDaoImpl implements AnswerDao {
                 throw new EntityNotFoundException("Answer " + answer + " was not found in database!");
             } else if (count != 1) {
                 throw new ServiceFailureException(
-                    "Invalid deleted rows count detected (one row should be updated): " + count);
+                        "Invalid deleted rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
             throw new ServiceFailureException(
