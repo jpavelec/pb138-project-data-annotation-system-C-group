@@ -26,7 +26,7 @@
             <input type="submit" class="btn btn-lg btn-primary btn-block" value="Pick this package">
         </form>
         </br>
-        <!--- show the following buttong only for administrator -->
+        <!--- show the following button only for administrator -->
         <form action="<spring:url value="/"/>">
             <input type="submit" class="btn btn-lg btn-primary btn-block" value="Go back">
         </form>
