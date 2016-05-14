@@ -18,39 +18,44 @@
     <title>Annotation system</title>
 </head>
 <body>
-<div class="container">
-    <div id="main1">
-        <div id="main2">
-            <div id="left">
-                <div class="column-in">
-                    <div class="next" id="minus-next">
-                        <img src="<c:url value="/resources/images/minus.svg" />" width="100%"/>
-                    </div>
-                </div>
+    <div class="container">
+
+        <div id="finish">
+            <form action="<spring:url value="/packages"/>">
+                <input type="submit" class="btn btn-lg btn-primary btn-block" value="Finish marking and return">
+            </form>
+        </div>
+
+        <div class="column-in">
+            <div id="counter">1/1000</div>
+            <div>
+                <span id="filename">package name</span>
             </div>
-            <div id="right">
-                <div class="column-in">
-                    <div class="next" id="plus-next">
-                        <img src="<c:url value="/resources/images/plus.svg" />" width="100%"/>
-                    </div>
-                </div>
+            <div id="ontology">Is the following word an animal?</div>
+            <div id="np">word</div>
+            </br>
+            <div id="wrap">
+                <input type="button" value="Previous word" name="btnPrevious" />
+                <input type="button" value="Report this word" name="btnChangeContext" />
             </div>
-            <div id="middle">
-                <div class="column-in">
-                    <div id="counter">1/1000</div>
-                    <div>
-                        <span id="filename">name of the package thats being solved</span>
-                    </div>
-                    <div id="np">word</div>
-                    <div id="ontology">Is the word an animal?</div>
-                    </br>
-                    <input type="button" class="btn btn-lg btn-primary btn-block" value="Previous word" name="btnPrevious" />
+        </div>
+
+        <div id="left">
+            <div class="column-in">
+                <div class="next" id="minus-next">
+                    <img src="<c:url value="/resources/images/no.svg" />" width="100%"/>
                 </div>
             </div>
         </div>
-        <form action="<spring:url value="/packages"/>">
-            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Finish marking">
-        </form>
+
+        <div id="right">
+            <div class="column-in">
+                <div class="next" id="plus-next">
+                    <img src="<c:url value="/resources/images/yes.svg" />" width="100%"/>
+                </div>
+            </div>
+        </div>
+
     </div>
 </body>
 </html>

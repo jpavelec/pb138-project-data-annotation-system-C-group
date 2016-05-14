@@ -1,31 +1,39 @@
-.token-word {
-	cursor: pointer;
-	padding-right: 0.2em;
-	padding-left: 0.2em;
-}
-.token-head {
-	cursor: no-drop;
-	padding-right: 0.2em;
-	padding-left: 0.2em;
-	color: red;
+#finish {
+	margin:0; padding: 5px;
 }
 
-.next {
-	cursor: pointer;
-	height: 100%;
-	width: 100%;
-	text-align: center;
-	vertical-align: bottom;
+#left {
+	float:left;
+	width:50%;
+	max-width: 300px;
+	margin:0; padding:0;
 }
 
 #minus-next {
+
 	background-color: red;
-	float: left;
+	margin:0; padding: 5px;
+}
+
+#right {
+	float:right;
+	width:50%;
+	max-width: 300px;
+	margin:0; padding:0;
 }
 
 #plus-next {
+
 	background-color: green;
-	float: right;
+	margin:0; padding: 5px;
+}
+
+#middle {
+	margin:0 150px;
+	font-size:80%;
+}
+.column-in {
+	margin:0; padding:1em 1em;
 }
 
 #counter {
@@ -36,84 +44,27 @@
 #np {
 	width: 100%;
 	text-align: center;
-	padding-top: 3em;
 	font-size: 250%;
+	font-weight: bold;
 }
 
 #ontology {
 	width: 100%;
 	text-align: center;
-	font-size: 180%;
+	padding-top: 1em;
+	font-size: 150%;
+}
+
+#wrap {
+	text-align: center
 }
 
 #btnPrevious {
-	float: right;
 	vertical-align: bottom;
 	font-size: 120%;
 }
 
 #btnChangeContext {
-	float: left;
 	font-size: 120%;
 	vertical-align: bottom;
-}
-
-.main {
-	height: 100%;
-}
-
-// 3 columns in CSS
-#main1 {
-	margin:0; padding:0;
-}
-#main2 {
-	margin:0; padding:0;
-}
-
-	#left {
-		float:left;
-		width:150px;
-		margin:0; padding:0;
-		background:url("corner.gif") top right no-repeat;
-		font-size:80%;
-		}
-	#right {
-		float:right;
-		width:150px;
-		margin:0; padding:0;
-		background:url("corner.gif") top right no-repeat;
-		font-size:80%;
-		}
-	#middle {
-		margin:0 150px;
-		font-size:80%;
-		}
-	.column-in {
-		margin:0; padding:0.5em 1em;
-		}
-.cleaner {
-		clear:both;
-		height:1px;
-		font-size:1px;
-		border:none;
-		margin:0; padding:0;
-		background:transparent;
-		}
-
-#upload,#load {
-  color: blue;
-  cursor: pointer;
-}
-
-#help {
-  font-size: 150%;
-  text-align: center;
-  display: none;
-}
-#example {
-  padding-top: 1em;
-  font-size: 110%;
-}
-#help b {
-  color: red;
 }
