@@ -20,7 +20,7 @@
 <body>
 <div class="container">
     <div id="wrap">
-        <form method="post">
+        <form method="POST">
             <h2>Upload a new dictionary:</h2>
             <span class="btn btn-default btn-file">
                 <label for="uploadDic">Pick dictionary file (CSV)</label>

@@ -33,6 +33,7 @@
             <input type="submit" class="btn btn-lg btn-primary btn-block"   value="View statistics">
         </form>
         </br>
+        <h2>Btw! Did you know that: ${person}?  </h2>
     </div>
 </body>
 </html>

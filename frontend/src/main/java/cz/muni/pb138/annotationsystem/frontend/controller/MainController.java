@@ -1,6 +1,10 @@
 package cz.muni.pb138.annotationsystem.frontend.controller;
 
+import cz.muni.pb138.annotationsystem.backend.api.AnswerManager;
 import cz.muni.pb138.annotationsystem.backend.api.PackManager;
+import cz.muni.pb138.annotationsystem.backend.api.PersonManager;
+import cz.muni.pb138.annotationsystem.backend.model.Answer;
+import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +24,18 @@ public class MainController {
     @Inject
     private PackManager packManager;
 
+    @Inject
+    private AnswerManager answerManager;
+
+    @Inject
+    private PersonManager personManager;
+
     @RequestMapping("/")
     public String primaryView(ServletRequest req) {
 
         //TO DO: if user is an administrator return "view-admin" else return "view-packages"
+
+        req.setAttribute("person", personManager.getPersonById((long)1));
 
         return "view-admin";
 
