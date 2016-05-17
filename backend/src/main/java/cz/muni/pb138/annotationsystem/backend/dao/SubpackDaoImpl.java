@@ -24,7 +24,7 @@ import javax.sql.DataSource;
  * @author Josef Pavelec <jospavelec@gmail.com>
  */
 @Named
-public class SubpackDaoImpl implements Dao<Subpack> {
+public class SubpackDaoImpl implements SubpackDao {
     
     private DataSource dataSource;
 

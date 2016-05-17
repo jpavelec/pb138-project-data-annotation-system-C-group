@@ -2,6 +2,7 @@ package cz.muni.pb138.annotationsystem.backend.business;
 
 import cz.muni.pb138.annotationsystem.backend.api.AnswerManager;
 import cz.muni.pb138.annotationsystem.backend.api.SubpackManager;
+import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.dao.AnswerDao;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
@@ -26,21 +27,21 @@ public class AnswerManagerImpl implements AnswerManager {
     private SubpackManager subpackManager;
 
     @Override
-    public Answer nextAnswer(Person person, Subpack subpack) {
+    public Answer nextAnswer(Person person, Subpack subpack) throws DaoException {
         Answer a = new Answer(subpackManager.getSubpackById((long) 1), "Jelen", false);
         a.setId((long) 12);
         return a;
     }
 
     @Override
-    public Answer getAnswerById(Long id) {
+    public Answer getAnswerById(Long id) throws DaoException {
         Answer a = new Answer(subpackManager.getSubpackById((long) 1), "Paroháč", false);
         a.setId((long) 10);
         return a;
     }
 
     @Override
-    public List<Answer> getAnswersInSubpack(Subpack subpack) {
+    public List<Answer> getAnswersInSubpack(Subpack subpack) throws DaoException {
         Answer a1 = new Answer(subpackManager.getSubpackById((long) 1), "Paroháč", false);
         a1.setId((long) 10);
         Answer a2 = new Answer(subpackManager.getSubpackById((long) 1), "Jelen", false);
@@ -52,7 +53,7 @@ public class AnswerManagerImpl implements AnswerManager {
     }
 
     @Override
-    public List<Answer> getAnswersInPack(Pack pack) {
+    public List<Answer> getAnswersInPack(Pack pack) throws DaoException {
         Answer a1 = new Answer(subpackManager.getSubpackById((long) 1), "Paroháč", false);
         a1.setId((long) 10);
         Answer a2 = new Answer(subpackManager.getSubpackById((long) 1), "Jelen", false);

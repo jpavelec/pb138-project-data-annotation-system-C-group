@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.backend.api;
 
+import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
@@ -14,12 +15,12 @@ import java.util.List;
  */
 public interface AnswerManager {
 
-    Answer nextAnswer(Person person, Subpack subpack);
+    Answer nextAnswer(Person person, Subpack subpack) throws DaoException;
 
-    Answer getAnswerById(Long id);
+    Answer getAnswerById(Long id) throws DaoException;
 
-    List<Answer> getAnswersInSubpack(Subpack subpack);
+    List<Answer> getAnswersInSubpack(Subpack subpack) throws DaoException;
 
-    List<Answer> getAnswersInPack(Pack pack);
+    List<Answer> getAnswersInPack(Pack pack) throws DaoException;
 
 }

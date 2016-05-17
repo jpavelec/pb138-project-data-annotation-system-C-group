@@ -69,8 +69,4 @@ public class Subpack {
         return "Subpack{" + "id=" + id + ", name=" + name +", from pack=" + 
                 parent.getName()  + ", annotates " + countOfUsers + " users}";
     }
-    
-    
-    
-    
 }

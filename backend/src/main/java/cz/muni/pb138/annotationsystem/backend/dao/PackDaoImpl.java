@@ -22,7 +22,7 @@ import javax.sql.DataSource;
  * @author Josef Pavelec <jospavelec@gmail.com>
  */
 @Named
-public class PackDaoImpl implements Dao<Pack> {
+public class PackDaoImpl implements PackDao {
     
     private static final Logger logger = Logger.getLogger(PackDaoImpl.class.getName());
     

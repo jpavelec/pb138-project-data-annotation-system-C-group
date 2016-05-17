@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.backend.api;
 
+import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
 
@@ -10,12 +11,12 @@ import java.util.List;
  */
 public interface PersonManager {
 
-    void createPerson(Person person);
+    void createPerson(Person person) throws DaoException;
 
-    Person getPersonByUsername(String username);
+    Person getPersonByUsername(String username) throws DaoException;
 
-    Person getPersonById(Long id);
+    Person getPersonById(Long id) throws DaoException;
 
-    List<Person> getAllPersons();
+    List<Person> getAllPersons() throws DaoException;
 
 }

@@ -49,5 +49,20 @@ public class Person {
             return "Person with id " + id + " is an admin and has username " + username;
         return "Person with id " + id + " is a user and has username " + username;
     }
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Person person = (Person) o;
+
+        return getId() != null && getId().equals(person.getId());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? getId().hashCode() : 0;
+    }
 }

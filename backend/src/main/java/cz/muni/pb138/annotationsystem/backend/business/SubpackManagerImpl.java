@@ -4,6 +4,7 @@ import cz.muni.pb138.annotationsystem.backend.api.AnswerManager;
 import cz.muni.pb138.annotationsystem.backend.api.PackManager;
 import cz.muni.pb138.annotationsystem.backend.api.PersonManager;
 import cz.muni.pb138.annotationsystem.backend.api.SubpackManager;
+import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.dao.AnswerDao;
 import cz.muni.pb138.annotationsystem.backend.dao.SubpackDaoImpl;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
@@ -35,7 +36,7 @@ public class SubpackManagerImpl implements SubpackManager {
     private PersonManager personManager;
 
     @Override
-    public Subpack getSubpackById(Long id) {
+    public Subpack getSubpackById(Long id) throws DaoException {
         Subpack s = new Subpack(packManager.getPackById((long) 1), "animals 2");
         s.setId((long) 3);
         s.setUsers(personManager.getAllPersons());
@@ -43,7 +44,7 @@ public class SubpackManagerImpl implements SubpackManager {
     }
 
     @Override
-    public List<Subpack> getSubpacksInPack(Pack pack) {
+    public List<Subpack> getSubpacksInPack(Pack pack) throws DaoException {
         List<Subpack> subpacks = new ArrayList<>();
 
         Subpack s1 = new Subpack(packManager.getPackById((long) 1), "animals 2");
@@ -61,7 +62,7 @@ public class SubpackManagerImpl implements SubpackManager {
     }
 
     @Override
-    public List<Subpack> getSubpacksAssignedToPerson(Person person) {
+    public List<Subpack> getSubpacksAssignedToPerson(Person person) throws DaoException {
         List<Subpack> subpacks = new ArrayList<>();
 
         Subpack s1 = new Subpack(packManager.getPackById((long) 1), "animals 2");
@@ -78,7 +79,7 @@ public class SubpackManagerImpl implements SubpackManager {
     }
 
     @Override
-    public List<Person> getPersonsAssignedToSubpack(Subpack subpack) {
+    public List<Person> getPersonsAssignedToSubpack(Subpack subpack) throws DaoException {
         return personManager.getAllPersons();
     }
 

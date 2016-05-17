@@ -24,7 +24,7 @@ import javax.sql.DataSource;
  * @author Josef Pavelec <jospavelec@gmail.com>
  */
 @Named
-public class PersonDaoImpl implements Dao<Person> {
+public class PersonDaoImpl implements PersonDao {
 
     private static final Logger logger = Logger.getLogger(PersonDaoImpl.class.getName());
     private DataSource dataSource;

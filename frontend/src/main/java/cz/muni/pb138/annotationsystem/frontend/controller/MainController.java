@@ -3,6 +3,7 @@ package cz.muni.pb138.annotationsystem.frontend.controller;
 import cz.muni.pb138.annotationsystem.backend.api.AnswerManager;
 import cz.muni.pb138.annotationsystem.backend.api.PackManager;
 import cz.muni.pb138.annotationsystem.backend.api.PersonManager;
+import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import org.springframework.stereotype.Controller;
@@ -35,7 +36,11 @@ public class MainController {
 
         //TO DO: if user is an administrator return "view-admin" else return "view-packages"
 
-        req.setAttribute("person", personManager.getPersonById((long)1));
+        try {
+            req.setAttribute("person", personManager.getPersonById((long)1));
+        } catch (DaoException e) {
+            //redirect to error page with error message in flush attribute.
+        }
 
         return "view-admin";
 
