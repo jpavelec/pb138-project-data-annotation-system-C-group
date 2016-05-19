@@ -80,7 +80,6 @@ public class PersonDaoImpl implements PersonDao {
         Person person = new Person();
         person.setId(rs.getLong("id"));
         person.setUsername(rs.getString("username"));
-        person.setIsAdmin(rs.getBoolean("isadmin"));
         return person;
     }
 
@@ -94,11 +93,10 @@ public class PersonDaoImpl implements PersonDao {
 
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                "INSERT INTO person (username, isadmin) VALUES (?,?)",
+                "INSERT INTO person (username) VALUES (?)",
                 Statement.RETURN_GENERATED_KEYS)) {
             
             st.setString(1, person.getUsername());
-            st.setBoolean(2, person.getIsAdmin());
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
                 throw new ServiceFailureException("Internal Error: More rows ("
@@ -123,11 +121,10 @@ public class PersonDaoImpl implements PersonDao {
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                    "UPDATE person SET username = ?, isadmin = ? WHERE id = ?")) {
+                    "UPDATE person SET username = ? WHERE id = ?")) {
             
             st.setString(1, person.getUsername());
-            st.setBoolean(2, person.getIsAdmin());
-            st.setLong(3, person.getId());
+            st.setLong(2, person.getId());
 
             int count = st.executeUpdate();
             if (count == 0) {
@@ -173,7 +170,7 @@ public class PersonDaoImpl implements PersonDao {
         checkDataSource();
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                    "SELECT id, username, isadmin FROM person WHERE id = ?")) {
+                    "SELECT id, username FROM person WHERE id = ?")) {
             
             st.setLong(1, id);
             
@@ -205,7 +202,7 @@ public class PersonDaoImpl implements PersonDao {
         checkDataSource();
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                "SELECT id, username, isadmin FROM person");
+                "SELECT id, username FROM person");
             ResultSet rs = st.executeQuery()) {
             List<Person> users = new ArrayList<>();
             while (rs.next()) {

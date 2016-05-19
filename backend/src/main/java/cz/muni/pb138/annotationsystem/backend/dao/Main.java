@@ -109,7 +109,7 @@ public class Main {
         }
         
         Answer answer = new Answer();
-        Person user = new Person("Jan Anotator",false);
+        Person user = new Person("Jan Anotator");
         
         personDao.create(user);
         Evaluation eval;

@@ -115,7 +115,6 @@ public class PersonManagerTest {
         assertNotNull(result.getId());
         assertEquals(persons[1].getId(), result.getId());
         assertEquals(persons[1].getUsername(), result.getUsername());
-        assertEquals(persons[1].getIsAdmin(), result.getIsAdmin());
 
         assertEquals(persons[1], result);
     }
@@ -151,7 +150,6 @@ public class PersonManagerTest {
         assertNotNull(result.getId());
         assertEquals(persons[1].getId(), result.getId());
         assertEquals(persons[1].getUsername(), result.getUsername());
-        assertEquals(persons[1].getIsAdmin(), result.getIsAdmin());
 
         assertEquals(persons[1], result);
     }
@@ -195,17 +193,17 @@ public class PersonManagerTest {
 
 
     private Person getPerson0() {
-        Person person = new Person("RichLannister", false);
+        Person person = new Person("RichLannister");
         return person;
     }
 
     private Person getPerson1() {
-        Person person = new Person("DeadSnow", true);
+        Person person = new Person("DeadSnow");
         return person;
     }
 
     private Person getPerson2() {
-        Person person = new Person("Khaleesi", false);
+        Person person = new Person("Khaleesi");
         return person;
     }
 
