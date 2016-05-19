@@ -1,5 +1,7 @@
 package cz.muni.pb138.annotationsystem.backend.model;
 
+import java.util.Objects;
+
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
  */
@@ -67,8 +69,23 @@ public class Pack {
         return "Pack{" + "id=" + id + ", question=" + question + ", name=" + name + 
                 ", noiseRate=" + noiseRate + ", repeatingRate=" + repeatingRate + '}';
     }
-
     
+    @Override
+    public int hashCode() {
+        return getId() != null ? getId().hashCode() : 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Pack packObj = (Pack) o;
+
+        return getId() != null && getId().equals(packObj.getId());
+    }
+    
+        
     
     
 }

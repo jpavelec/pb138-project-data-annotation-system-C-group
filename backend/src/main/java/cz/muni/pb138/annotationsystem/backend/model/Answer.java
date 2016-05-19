@@ -59,5 +59,21 @@ public class Answer {
                ", answer=" + answer + ", isNoise=" + isNoise + '}';
     }
     
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Answer answerObj = (Answer) o;
+
+        return getId() != null && getId().equals(answerObj.getId());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? getId().hashCode() : 0;
+    }
+    
     
 }
