@@ -31,7 +31,7 @@ public class PersonManagerImpl implements PersonManager {
 
     @Override
     public Person getPersonByUsername(String username) throws DaoException {
-        List<Person> all = personDao.getAll();
+        /*List<Person> all = personDao.getAll();
         Person result = null;
         for (Person p : all) {
             if (p.getUsername().equals(username)) {
@@ -42,7 +42,8 @@ public class PersonManagerImpl implements PersonManager {
         if (result == null) {
             throw new BeanNotExistsException();
         }
-        return result;
+        return result;*/
+        return personDao.getByUsername(username);
     }
 
     @Override

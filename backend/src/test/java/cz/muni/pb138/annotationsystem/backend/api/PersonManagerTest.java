@@ -3,6 +3,7 @@ package cz.muni.pb138.annotationsystem.backend.api;
 import cz.muni.pb138.annotationsystem.backend.common.BeanAlreadyExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
+import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.config.TestConfig;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import org.junit.After;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.*;
+
 
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
@@ -73,21 +75,21 @@ public class PersonManagerTest {
         personManager.createPerson(null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ValidationException.class)
     public void createPersonWithId() throws Exception {
         Person person0 = getPerson0();
         person0.setId((long) 1);
         personManager.createPerson(person0);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ValidationException.class)
     public void createPersonWithoutUsername() throws Exception {
         Person person0 = getPerson0();
         person0.setUsername(null);
         personManager.createPerson(person0);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ValidationException.class)
     public void createPersonWithEmptyUsername() throws Exception {
         Person person0 = getPerson0();
         person0.setUsername("");
@@ -131,12 +133,17 @@ public class PersonManagerTest {
         personManager.getPersonByUsername("");
     }
 
-    @Test(expected = BeanNotExistsException.class)
+    /*@Test(expected = BeanNotExistsException.class)
     public void getPersonByUsernameUnknownUsername() throws Exception {
         Person[] persons = createPersons();
         personManager.getPersonByUsername("UNKNOWN_USERNAME");
+    }*/
+    
+    @Test
+    public void getPersonByUsernameUnknownUsername() throws Exception {
+        Person[] persons = createPersons();
+        assertNull(personManager.getPersonByUsername("UNKNOWN_USERNAME"));
     }
-
 
 
     @Test
@@ -166,10 +173,18 @@ public class PersonManagerTest {
         Person result = personManager.getPersonById((long) -1);
     }
 
-    @Test(expected = BeanNotExistsException.class)
+    /*@Test(expected = BeanNotExistsException.class)
     public void getPersonByIdUnknownId() throws Exception {
         Person[] persons = createPersons();
         personManager.getPersonById((long) 99);
+    }*/
+    
+    @Test
+    public void getPersonByIdUnknownId() throws Exception {
+        Person[] persons = createPersons();
+        assertNull(personManager.getPersonById((long) 99));
+        
+                
     }
 
 

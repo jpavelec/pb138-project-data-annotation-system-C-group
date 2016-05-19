@@ -1,5 +1,7 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
+import cz.muni.pb138.annotationsystem.backend.common.BeanAlreadyExistsException;
+import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.IllegalEntityException;
@@ -34,9 +36,9 @@ public class PersonDaoImpl implements PersonDao {
         this.dataSource = dataSource;
     }
 
-    public void setDataSource(DataSource dataSource) {
+    /*public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
-    }
+    }*/
 
     private void checkDataSource() {
         if (dataSource == null) {
@@ -89,6 +91,17 @@ public class PersonDaoImpl implements PersonDao {
         validate(person);
         if (person.getId() != null) {
             throw new ValidationException("User id is already set");
+        }
+        
+        /* TODO I'm trying find username which shouldn't be in DB
+           There will be an exception when I can't find username in DB
+           Compare with null approach is more comfortable than handle
+           with an exception
+
+        */
+        if (this.getByUsername(person.getUsername()) != null) {
+            throw new BeanAlreadyExistsException("User with nickname " + 
+                    person.getUsername() + " already exists");
         }
 
         try (Connection connection = dataSource.getConnection();
@@ -168,6 +181,12 @@ public class PersonDaoImpl implements PersonDao {
     @Override
     public Person getById(Long id) throws DaoException {
         checkDataSource();
+        if (id == null) {
+            throw new IllegalArgumentException("Id is null");
+        }
+        if (id < 0) {
+            throw new IllegalArgumentException("Id is negative");
+        }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
                     "SELECT id, username FROM person WHERE id = ?")) {
@@ -188,6 +207,10 @@ public class PersonDaoImpl implements PersonDao {
                             
                     return person;
                 } else {
+                    /*  Throw an exception isn't a good way how to solve
+                        nonexisting record in DB, I thnik 
+                    throw new BeanNotExistsException("Person with id " +
+                            id + "isn't in DB"); */
                     return null;
                 }
             }
@@ -196,6 +219,50 @@ public class PersonDaoImpl implements PersonDao {
                 "Error when retriving user with id " + id, ex);
         }
     }
+
+    @Override
+    public Person getByUsername(String username) {
+        checkDataSource();
+        if (username == null) {
+            throw new IllegalArgumentException("Username is null");
+        }
+        if (username.isEmpty()) {
+            throw new IllegalArgumentException("Username is empty");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                    "SELECT id, username FROM person WHERE username = ?")) {
+            
+            st.setString(1, username);
+            
+            try (ResultSet rs = st.executeQuery()) {
+            
+                if (rs.next()) {
+                    Person person = resultSetToPerson(rs);
+                
+                    if (rs.next()) {
+                        throw new ServiceFailureException(
+                            "Internal error: More entities with the same username found " +
+                            "(source username: " + username + ", found " + person + 
+                            " and " + resultSetToPerson(rs));
+                    }
+                            
+                    return person;
+                } else {
+                    /*  Throw an exception isn't a good way how to solve
+                        nonexisting record in DB, I thnik
+                    throw new BeanNotExistsException("Person with username " +
+                            username + "isn't in DB");*/
+                    return null;
+                }
+            }
+        } catch (SQLException ex) {
+            throw new ServiceFailureException(
+                "Error when retriving user with username " + username, ex);
+        }
+    }
+    
+    
 
     @Override
     public List<Person> getAll() throws DaoException {
