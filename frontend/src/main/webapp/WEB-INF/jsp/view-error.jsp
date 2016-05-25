@@ -2,6 +2,9 @@
 <%@ taglib prefix="spring" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="utf-8" trimDirectiveWhitespaces="true" session="false" %>
 
+<!--
+@author Matej Rajtár <matej.rajtar@gmail.com>
+-->
 
 <!DOCTYPE html>
 <html lang="${pageContext.request.locale}">
@@ -15,18 +18,12 @@
     <title>Annotation system</title>
 </head>
 <body>
-    <div class="container">
-        </br>
-        <h2>Select the subpack you wish to start marking:</h2>
-        <div class="list-group">
-            <c:forEach items = "${subpacks}" var="subpack">
-                <a href="/packages/${subpack.id}" class="list-group-item">ID: <b>${subpack.id}</b> NAME: <b>${subpack.name}</b></a>
-            </c:forEach>
-        </div>
-        </br>
-        <form action="<spring:url value="/"/>">
-            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Go back">
-        </form>
+<div class="container">
+    <div id="wrap">
+            <div id="middle">
+                <p>Somtin went rong -_-</p>
+            </div>
     </div>
+</div>
 </body>
 </html>

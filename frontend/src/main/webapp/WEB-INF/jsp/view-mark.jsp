@@ -29,10 +29,12 @@
         <div class="column-in">
             <div id="counter">1/1000</div>
             <div>
-                <span id="filename">package name</span>
+                <span id="fileid">Subpack id: ${thisSubpack.id}</span>
+                </br>
+                <span id="filename">Subpack name: ${thisSubpack.name}</span>
             </div>
             <div id="ontology">Is the following word an animal?</div>
-            <div id="np">word</div>
+            <div id="np">${thisAnswer.answer}</div>
             </br>
             <div id="wrap">
                 <input type="button" value="Previous word" name="btnPrevious" />

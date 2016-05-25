@@ -39,6 +39,7 @@ public class SubpackManagerImpl implements SubpackManager {
     public Subpack getSubpackById(Long id) throws DaoException {
         Subpack s = new Subpack(packManager.getPackById((long) 1), "animals 2");
         s.setId((long) 3);
+        s.setName("A-Z");
         s.setUsers(personManager.getAllPersons());
         return s;
     }
@@ -49,10 +50,12 @@ public class SubpackManagerImpl implements SubpackManager {
 
         Subpack s1 = new Subpack(packManager.getPackById((long) 1), "animals 2");
         s1.setId((long) 3);
+        s1.setName("A-M");
         s1.setUsers(personManager.getAllPersons());
 
         Subpack s2 = new Subpack(packManager.getPackById((long) 1), "animals 2");
         s2.setId((long) 2);
+        s2.setName("M-Z");
         s2.setUsers(personManager.getAllPersons());
 
         subpacks.add(s1);
@@ -67,10 +70,12 @@ public class SubpackManagerImpl implements SubpackManager {
 
         Subpack s1 = new Subpack(packManager.getPackById((long) 1), "animals 2");
         s1.setId((long) 3);
+        s1.setName("A-M");
         s1.setUsers(personManager.getAllPersons());
 
         Subpack s2 = new Subpack(packManager.getPackById((long) 1), "animals 2");
         s2.setId((long) 2);
+        s2.setName("M-Z");
         s2.setUsers(personManager.getAllPersons());
 
         subpacks.add(s1);
