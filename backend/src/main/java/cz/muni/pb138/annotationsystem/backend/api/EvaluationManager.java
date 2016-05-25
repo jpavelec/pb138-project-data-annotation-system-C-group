@@ -8,6 +8,8 @@ import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Rating;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
 
+import java.util.List;
+
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
  */
@@ -17,6 +19,5 @@ public interface EvaluationManager {
 
     Evaluation getEvaluationById(Long id) throws DaoException;
 
-    void correct(Evaluation evaluation);
-
+    List<Evaluation> getEvaluationsOfPerson(Person person) throws DaoException;
 }

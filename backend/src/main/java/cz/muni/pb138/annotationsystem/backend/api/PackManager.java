@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.backend.api;
 
+import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public interface PackManager {
 
-    void createPack(Pack pack, List<Answer> answers, int numOfAnswersInSubpack);
+    void createPack(Pack pack, List<String> answers, List<String> noise, int numOfAnswersInSubpack);
 
     Pack getPackById(Long id);
 

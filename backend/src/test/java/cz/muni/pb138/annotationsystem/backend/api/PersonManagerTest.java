@@ -58,7 +58,7 @@ public class PersonManagerTest {
     @Test
     public void createPerson() throws Exception {
 
-        Person person0 = getPerson0();
+        Person person0 = TestUtils.getPerson0();
         personManager.createPerson(person0);
 
         assertNotNull(person0.getId());
@@ -77,31 +77,31 @@ public class PersonManagerTest {
 
     @Test(expected = ValidationException.class)
     public void createPersonWithId() throws Exception {
-        Person person0 = getPerson0();
+        Person person0 = TestUtils.getPerson0();
         person0.setId((long) 1);
         personManager.createPerson(person0);
     }
 
     @Test(expected = ValidationException.class)
     public void createPersonWithoutUsername() throws Exception {
-        Person person0 = getPerson0();
+        Person person0 = TestUtils.getPerson0();
         person0.setUsername(null);
         personManager.createPerson(person0);
     }
 
     @Test(expected = ValidationException.class)
     public void createPersonWithEmptyUsername() throws Exception {
-        Person person0 = getPerson0();
+        Person person0 = TestUtils.getPerson0();
         person0.setUsername("");
         personManager.createPerson(person0);
     }
 
     @Test(expected = BeanAlreadyExistsException.class)
     public void createPersonWithDuplicitUsername() throws Exception {
-        Person person0 = getPerson0();
+        Person person0 = TestUtils.getPerson0();
         personManager.createPerson(person0);
 
-        Person person1 = getPerson0();
+        Person person1 = TestUtils.getPerson0();
         personManager.createPerson(person1);
     }
 
@@ -109,7 +109,7 @@ public class PersonManagerTest {
 
     @Test
     public void getPersonByUsername() throws Exception {
-        Person[] persons = createPersons();
+        Person[] persons = TestUtils.createPersons(personManager);
 
         Person result = personManager.getPersonByUsername(persons[1].getUsername());
 
@@ -123,33 +123,28 @@ public class PersonManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void getPersonByUsernameWithoutUsername() throws Exception {
-        Person[] persons = createPersons();
-        Person result = personManager.getPersonByUsername(null);
+        Person[] persons = TestUtils.createPersons(personManager);
+        personManager.getPersonByUsername(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void getPersonByUsernameWithEmptyUsername() throws Exception {
-        Person[] persons = createPersons();
+        Person[] persons = TestUtils.createPersons(personManager);
         personManager.getPersonByUsername("");
     }
 
-    /*@Test(expected = BeanNotExistsException.class)
+    @Test(expected = BeanNotExistsException.class)
     public void getPersonByUsernameUnknownUsername() throws Exception {
-        Person[] persons = createPersons();
+        Person[] persons = TestUtils.createPersons(personManager);
         personManager.getPersonByUsername("UNKNOWN_USERNAME");
-    }*/
-    
-    @Test
-    public void getPersonByUsernameUnknownUsername() throws Exception {
-        Person[] persons = createPersons();
-        assertNull(personManager.getPersonByUsername("UNKNOWN_USERNAME"));
     }
+
 
 
     @Test
     public void getPersonById() throws Exception {
 
-        Person[] persons = createPersons();
+        Person[] persons = TestUtils.createPersons(personManager);
 
         Person result = personManager.getPersonById(persons[1].getId());
 
@@ -163,35 +158,27 @@ public class PersonManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void getPersonByIdWithoutId() throws Exception {
-        Person[] persons = createPersons();
-        Person result = personManager.getPersonById(null);
+        Person[] persons = TestUtils.createPersons(personManager);
+        personManager.getPersonById(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void getPersonByIdWithNegativeId() throws Exception {
-        Person[] persons = createPersons();
-        Person result = personManager.getPersonById((long) -1);
+        Person[] persons = TestUtils.createPersons(personManager);
+        personManager.getPersonById((long) -1);
     }
 
-    /*@Test(expected = BeanNotExistsException.class)
+    @Test(expected = BeanNotExistsException.class)
     public void getPersonByIdUnknownId() throws Exception {
-        Person[] persons = createPersons();
+        Person[] persons = TestUtils.createPersons(personManager);
         personManager.getPersonById((long) 99);
-    }*/
-    
-    @Test
-    public void getPersonByIdUnknownId() throws Exception {
-        Person[] persons = createPersons();
-        assertNull(personManager.getPersonById((long) 99));
-        
-                
     }
 
 
 
     @Test
     public void getAllPersons() throws Exception {
-        Set<Person> persons = new HashSet<>(Arrays.asList(createPersons()));
+        Set<Person> persons = new HashSet<>(Arrays.asList(TestUtils.createPersons(personManager)));
 
         Set<Person> result = new HashSet<>(personManager.getAllPersons());
 
@@ -203,36 +190,6 @@ public class PersonManagerTest {
         List<Person> result = personManager.getAllPersons();
 
         assertEquals(new ArrayList<Person>(), result);
-    }
-
-
-
-    private Person getPerson0() {
-        Person person = new Person("RichLannister");
-        return person;
-    }
-
-    private Person getPerson1() {
-        Person person = new Person("DeadSnow");
-        return person;
-    }
-
-    private Person getPerson2() {
-        Person person = new Person("Khaleesi");
-        return person;
-    }
-
-    private Person[] createPersons() throws Exception {
-        Person person0 = getPerson0();
-        personManager.createPerson(person0);
-
-        Person person1 = getPerson1();
-        personManager.createPerson(person1);
-
-        Person person2 = getPerson2();
-        personManager.createPerson(person2);
-
-        return new Person[]{person0, person1, person2};
     }
 
 }

@@ -5,6 +5,7 @@ import cz.muni.pb138.annotationsystem.backend.api.EvaluationManager;
 import cz.muni.pb138.annotationsystem.backend.api.PersonManager;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.dao.AnswerDao;
+import cz.muni.pb138.annotationsystem.backend.dao.EvaluationDao;
 import cz.muni.pb138.annotationsystem.backend.dao.EvaluationDaoImpl;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
@@ -13,6 +14,8 @@ import cz.muni.pb138.annotationsystem.backend.model.Rating;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
@@ -21,7 +24,7 @@ import javax.inject.Named;
 public class EvaluationManagerImpl implements EvaluationManager {
 
     @Inject
-    private EvaluationDaoImpl evaluationDao;
+    private EvaluationDao evaluationDao;
 
     @Inject
     private PersonManager personManager;
@@ -42,7 +45,7 @@ public class EvaluationManagerImpl implements EvaluationManager {
     }
 
     @Override
-    public void correct(Evaluation evaluation) {
-
+    public List<Evaluation> getEvaluationsOfPerson(Person person) throws DaoException {
+        return new ArrayList<>();
     }
 }

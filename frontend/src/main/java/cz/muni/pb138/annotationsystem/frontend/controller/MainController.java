@@ -91,7 +91,7 @@ public class MainController {
     @RequestMapping("/mark/{animal}")
     public String whatever(ServletRequest req, @PathVariable String animal) {
 
-        packManager.createPack(null, null, 1000);
+        packManager.createPack(null, null, null, 1000);
         req.setAttribute("yellow", "placeholder");
 
         return "redirect:/pes";

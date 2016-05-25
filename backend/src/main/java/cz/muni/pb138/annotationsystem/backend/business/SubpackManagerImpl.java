@@ -6,6 +6,7 @@ import cz.muni.pb138.annotationsystem.backend.api.PersonManager;
 import cz.muni.pb138.annotationsystem.backend.api.SubpackManager;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.dao.AnswerDao;
+import cz.muni.pb138.annotationsystem.backend.dao.SubpackDao;
 import cz.muni.pb138.annotationsystem.backend.dao.SubpackDaoImpl;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
@@ -24,7 +25,7 @@ import java.util.List;
 public class SubpackManagerImpl implements SubpackManager {
 
     @Inject
-    private SubpackDaoImpl subpackDao;
+    private SubpackDao subpackDao;
 
     @Inject
     private PackManager packManager;
