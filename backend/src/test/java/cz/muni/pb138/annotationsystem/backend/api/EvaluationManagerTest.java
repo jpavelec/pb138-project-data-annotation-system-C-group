@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.backend.api;
 
+import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.config.TestConfig;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
@@ -22,6 +23,8 @@ import javax.inject.Inject;
 import javax.sql.DataSource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -183,14 +186,98 @@ public class EvaluationManagerTest {
 
     @Test
     public void getEvaluationById() throws Exception {
-        fail("TODO");
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
+
+        Evaluation result = evaluationManager.getEvaluationById(evals[1].getId());
+
+        assertEquals(evals[1], result);
+        assertEquals(evals[1].getId(), result.getId());
+        assertEquals(evals[1].getElapsedTime(), result.getElapsedTime());
+        assertEquals(evals[1].getAnswer(), result.getAnswer());
+        assertEquals(evals[1].getPerson(), result.getPerson());
+        assertEquals(evals[1].getRating(), result.getRating());
+        assertTrue(evaluationManager.getEvaluationsOfPerson(persons[1]).contains(result));
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void getEvaluationByIdNull() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
+
+        evaluationManager.getEvaluationById(null);
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void getEvaluationByIdNegativeId() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
+
+        evaluationManager.getEvaluationById((long) -1);
+    }
+    @Test(expected = BeanNotExistsException.class)
+    public void getEvaluationByIdUnknownId() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
+
+        evaluationManager.getEvaluationById((long) 99);
     }
 
 
 
     @Test
     public void getEvaluationsOfPerson() throws Exception {
-        fail("TODO");
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
+
+        List<Evaluation> result = evaluationManager.getEvaluationsOfPerson(persons[1]);
+
+        assertEquals(new HashSet<>(Arrays.asList(evals)), new HashSet<>(result));
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void getEvaluationsOfPersonNullPerson() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
+
+        evaluationManager.getEvaluationsOfPerson(null);
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void getEvaluationsOfPersonPersonWithoutId() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
+
+        evaluationManager.getEvaluationsOfPerson(TestUtils.getPerson1());
+    }
+    @Test(expected = BeanNotExistsException.class)
+    public void getEvaluationsOfPersonUnknownPerson() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
+
+        Person person = TestUtils.getPerson1();
+        person.setId((long) 99);
+        evaluationManager.getEvaluationsOfPerson(person);
     }
 
 }

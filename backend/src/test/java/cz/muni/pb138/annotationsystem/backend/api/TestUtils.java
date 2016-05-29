@@ -1,7 +1,11 @@
 package cz.muni.pb138.annotationsystem.backend.api;
 
+import cz.muni.pb138.annotationsystem.backend.model.Answer;
+import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
+import cz.muni.pb138.annotationsystem.backend.model.Rating;
+import cz.muni.pb138.annotationsystem.backend.model.Subpack;
 
 import java.util.Arrays;
 import java.util.List;
@@ -97,5 +101,19 @@ public class TestUtils {
         return new Person[]{person0, person1, person2};
     }
 
+
+    static public Evaluation[] createEvals(EvaluationManager evaluationManager, AnswerManager answerManager, Person person, Subpack subpack) throws Exception {
+        Answer answer0 = answerManager.nextAnswer(person, subpack);
+        Evaluation eval0 = new Evaluation(person, answer0, Rating.POSITIVE, 10);
+        evaluationManager.eval(eval0);
+        Answer answer1 = answerManager.nextAnswer(person, subpack);
+        Evaluation eval1 = new Evaluation(person, answer1, Rating.POSITIVE, 11);
+        evaluationManager.eval(eval1);
+        Answer answer2 = answerManager.nextAnswer(person, subpack);
+        Evaluation eval2 = new Evaluation(person, answer2, Rating.NEGATIVE, 12);
+        evaluationManager.eval(eval2);
+
+        return new Evaluation[]{eval0, eval1, eval2};
+    }
 
 }
