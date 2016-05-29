@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.frontend.controller;
 
+import au.com.bytecode.opencsv.CSVReader;
 import cz.muni.pb138.annotationsystem.backend.api.*;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
@@ -9,11 +10,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,40 +65,64 @@ public class MainController {
     }
 
     @RequestMapping(value="/upload",method={RequestMethod.POST})
-    public String doPost(ServletRequest req){
+    public String doPost(ServletRequest req, HttpSession session, @RequestParam MultipartFile file){
 
-        //TODO: ulozit udaje do databazy
+        if (!file.isEmpty()) {
 
-        return "view-assign";
+            File dir = new File(File.separator + "uploadedfile");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
 
-    }
+            File serverFile = new File(dir.getAbsolutePath() + File.separator + file.getOriginalFilename());
 
-    @RequestMapping("/packages")
-    public String packages(HttpSession session, ServletRequest req) {
+            try {
+                try (InputStream is = file.getInputStream();
+                     BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile))) {
+                    int i;
+                    //write file to server
+                    while ((i = is.read()) != -1) {
+                        stream.write(i);
+                    }
+                    stream.flush();
+                }
+            } catch (IOException e) {
+            }
 
-        try {
-            req.setAttribute("subpacks", subpackManager.getSubpacksAssignedToPerson(personManager.getPersonById((long) 1)));
-        } catch (DaoException e) {
-            return "redirect:/view-error";
+            List<String> mojecsv = new ArrayList<String>();
+            Integer counter = 0;
+
+            String[] nextLine;
+            try {
+                FileReader fileReader = new FileReader(serverFile);
+                CSVReader reader = new CSVReader(fileReader);
+                try {
+                    while ((nextLine = reader.readNext()) != null) {
+                        for(int i=0;i<nextLine.length;i++){
+                            counter++;
+                            mojecsv.add(nextLine[i]);
+                        }
+                    }
+                } catch (IOException e) {
+                    req.setAttribute("error", e);
+                    return "view-error";
+                }
+            } catch (FileNotFoundException e) {
+                req.setAttribute("error", e);
+                return "view-error";
+            }
+
+            req.setAttribute("csvContent", mojecsv);
+            req.setAttribute("csvLength", counter-2);
+            packManager.createPack(null, mojecsv, null, counter-2);
+
+            return "view-assign";
+        }
+        else {
+            req.setAttribute("error", "File empty.");
+            return "view-error";
         }
 
-        return "view-packages";
-
-    }
-
-    @RequestMapping(value="/packages/{subpack}",method={RequestMethod.GET})
-    public String getPackage(RedirectAttributes redirectAttributes, ServletRequest req, @PathVariable String subpack){
-
-        try {
-            Long longSubpack = Long.parseLong(subpack);
-            Subpack thisSubpack = subpackManager.getSubpackById(longSubpack);
-            redirectAttributes.addFlashAttribute("thisSubpack", thisSubpack);
-
-        } catch (DaoException e) {
-            return "redirect:/view-error";
-        }
-
-        return "redirect:/mark/{subpack}/10";
     }
 
     @RequestMapping("/stats")

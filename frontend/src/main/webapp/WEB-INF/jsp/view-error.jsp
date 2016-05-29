@@ -21,7 +21,9 @@
 <div class="container">
     <div id="wrap">
             <div id="middle">
-                <p>Somtin went rong -_-</p>
+                <h1>Oops! Something went terribly wrong. You simply can't always get what you want.</h1>
+                </br>
+                <h1>Error: ${error}</h1>
             </div>
     </div>
 </div>

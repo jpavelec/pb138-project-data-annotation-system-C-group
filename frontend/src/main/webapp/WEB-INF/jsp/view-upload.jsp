@@ -20,15 +20,15 @@
 <body>
 <div class="container">
     <div id="wrap">
-        <form method="POST">
+        <form id="fileuploadForm" method="POST" enctype="multipart/form-data">
             <h2>Upload a new dictionary:</h2>
             <span class="btn btn-default btn-file">
                 <label for="uploadDic">Pick dictionary file (CSV)</label>
-                <input id="uploadDic" type='file' class="file" name='userFile' required>
+                <input id="uploadDic" type='file' class="file" name='file' required>
             </span>
             <span class="btn btn-default btn-file">
                 <label for="uploadNoise">Pick noise file (CSV) - optional</label>
-                <input id="uploadNoise" type='file' name='userFile' required>
+                <input id="uploadNoise" type='file' name='file'>
             </span>
             </br>
             </br>
