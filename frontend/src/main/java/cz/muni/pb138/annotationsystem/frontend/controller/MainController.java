@@ -65,49 +65,25 @@ public class MainController {
     }
 
     @RequestMapping(value = "/upload", method = {RequestMethod.POST})
-    public String doPost(ServletRequest req, HttpSession session, @RequestParam MultipartFile file) {
+    public String doPost(ServletRequest req, @RequestParam MultipartFile file) {
 
         if (!file.isEmpty()) {
 
-            File dir = new File(File.separator + "uploadedfile");
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            File serverFile = new File(dir.getAbsolutePath() + File.separator + file.getOriginalFilename());
-
-            try {
-                try (InputStream is = file.getInputStream();
-                     BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile))) {
-                    int i;
-                    //write file to server
-                    while ((i = is.read()) != -1) {
-                        stream.write(i);
-                    }
-                    stream.flush();
-                }
-            } catch (IOException e) {
-            }
-
             List<String> mojecsv = new ArrayList<String>();
             Integer counter = 0;
-
             String[] nextLine;
+
             try {
-                FileReader fileReader = new FileReader(serverFile);
-                CSVReader reader = new CSVReader(fileReader);
-                try {
-                    while ((nextLine = reader.readNext()) != null) {
-                        for (int i = 0; i < nextLine.length; i++) {
-                            counter++;
-                            mojecsv.add(nextLine[i]);
-                        }
+                BufferedReader in = new BufferedReader(new InputStreamReader(file.getInputStream()));
+                CSVReader reader = new CSVReader(in);
+
+                while ((nextLine = reader.readNext()) != null) {
+                    for (int i = 0; i < nextLine.length; i++) {
+                        counter++;
+                        mojecsv.add(nextLine[i]);
                     }
-                } catch (IOException e) {
-                    req.setAttribute("error", e);
-                    return "view-error";
                 }
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 req.setAttribute("error", e);
                 return "view-error";
             }
