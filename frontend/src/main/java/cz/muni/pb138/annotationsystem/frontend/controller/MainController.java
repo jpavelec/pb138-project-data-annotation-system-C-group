@@ -49,7 +49,7 @@ public class MainController {
     public String primaryView(ServletRequest req) {
 
         try {
-            req.setAttribute("person", personManager.getPersonById((long)1));
+            req.setAttribute("person", personManager.getPersonById((long) 1));
         } catch (DaoException e) {
             return "redirect:/view-error";
         }
@@ -58,14 +58,14 @@ public class MainController {
 
     }
 
-    @RequestMapping(value="/upload",method={RequestMethod.GET})
-    public String doGet(ServletRequest req){
+    @RequestMapping(value = "/upload", method = {RequestMethod.GET})
+    public String doGet(ServletRequest req) {
 
         return "view-upload";
     }
 
-    @RequestMapping(value="/upload",method={RequestMethod.POST})
-    public String doPost(ServletRequest req, HttpSession session, @RequestParam MultipartFile file){
+    @RequestMapping(value = "/upload", method = {RequestMethod.POST})
+    public String doPost(ServletRequest req, HttpSession session, @RequestParam MultipartFile file) {
 
         if (!file.isEmpty()) {
 
@@ -98,7 +98,7 @@ public class MainController {
                 CSVReader reader = new CSVReader(fileReader);
                 try {
                     while ((nextLine = reader.readNext()) != null) {
-                        for(int i=0;i<nextLine.length;i++){
+                        for (int i = 0; i < nextLine.length; i++) {
                             counter++;
                             mojecsv.add(nextLine[i]);
                         }
@@ -113,16 +113,43 @@ public class MainController {
             }
 
             req.setAttribute("csvContent", mojecsv);
-            req.setAttribute("csvLength", counter-2);
-            packManager.createPack(null, mojecsv, null, counter-2);
+            req.setAttribute("csvLength", counter - 2);
+            packManager.createPack(null, mojecsv, null, counter - 2);
 
             return "view-assign";
-        }
-        else {
+        } else {
             req.setAttribute("error", "File empty.");
             return "view-error";
         }
 
+    }
+
+    @RequestMapping("/packages")
+    public String packages(HttpSession session, ServletRequest req) {
+
+        try {
+            req.setAttribute("subpacks", subpackManager.getSubpacksAssignedToPerson(personManager.getPersonById((long) 1)));
+        } catch (DaoException e) {
+            return "redirect:/view-error";
+        }
+
+        return "view-packages";
+
+    }
+
+    @RequestMapping(value = "/packages/{subpack}", method = {RequestMethod.GET})
+    public String getPackage(RedirectAttributes redirectAttributes, ServletRequest req, @PathVariable String subpack) {
+
+        try {
+            Long longSubpack = Long.parseLong(subpack);
+            Subpack thisSubpack = subpackManager.getSubpackById(longSubpack);
+            redirectAttributes.addFlashAttribute("thisSubpack", thisSubpack);
+
+        } catch (DaoException e) {
+            return "redirect:/view-error";
+        }
+
+        return "redirect:/mark/{subpack}/10";
     }
 
     @RequestMapping("/stats")
