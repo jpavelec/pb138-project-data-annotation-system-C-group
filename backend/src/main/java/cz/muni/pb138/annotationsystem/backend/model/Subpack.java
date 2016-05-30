@@ -24,6 +24,7 @@ public class Subpack {
 
     public Subpack(Pack parent, String name, List<Person> users) {
         this.parent = parent;
+        this.name = name;
         this.users = users;
     }
 

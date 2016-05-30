@@ -90,7 +90,12 @@ public class MainController {
 
             req.setAttribute("csvContent", mojecsv);
             req.setAttribute("csvLength", counter - 2);
-            packManager.createPack(null, mojecsv, null, counter - 2);
+            try {
+                packManager.createPack(null, mojecsv, null, counter - 2);
+            } catch (DaoException e) {
+                req.setAttribute("error", "Dao exception.");
+                return "view-error";
+            }
 
             return "view-assign";
         } else {

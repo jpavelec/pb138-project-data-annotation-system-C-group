@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface EvaluationManager {
 
-    void eval(Evaluation evaluation);
+    void eval(Evaluation evaluation) throws DaoException;
 
     Evaluation getEvaluationById(Long id) throws DaoException;
 

@@ -5,7 +5,10 @@ import cz.muni.pb138.annotationsystem.backend.api.PackManager;
 import cz.muni.pb138.annotationsystem.backend.api.PersonManager;
 import cz.muni.pb138.annotationsystem.backend.api.SubpackManager;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
+import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.dao.AnswerDao;
+import cz.muni.pb138.annotationsystem.backend.dao.PackDao;
+import cz.muni.pb138.annotationsystem.backend.dao.PersonDao;
 import cz.muni.pb138.annotationsystem.backend.dao.SubpackDao;
 import cz.muni.pb138.annotationsystem.backend.dao.SubpackDaoImpl;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
@@ -28,74 +31,125 @@ public class SubpackManagerImpl implements SubpackManager {
     private SubpackDao subpackDao;
 
     @Inject
-    private PackManager packManager;
-
-    @Inject
-    private AnswerManager answerManager;
-
-    @Inject
-    private PersonManager personManager;
+    private PersonDao personDao;
 
     @Override
     public Subpack getSubpackById(Long id) throws DaoException {
-        Subpack s = new Subpack(packManager.getPackById((long) 1), "animals 2");
-        s.setId((long) 3);
-        s.setName("A-Z");
-        s.setUsers(personManager.getAllPersons());
-        return s;
+        if (id == null || id < 0) {
+            throw new IllegalArgumentException("id is null or negative");
+        }
+
+        return subpackDao.getById(id);
     }
 
     @Override
     public List<Subpack> getSubpacksInPack(Pack pack) throws DaoException {
+        if (pack == null) {
+            throw new IllegalArgumentException("pack is null");
+        }
+        if (pack.getId() == null || pack.getId() < 0) {
+            throw new IllegalArgumentException("pack id is null");
+        }
+
         List<Subpack> subpacks = new ArrayList<>();
+        for (Subpack s : subpackDao.getAll()) {
+            if (s.getParent().equals(pack)) {
+                subpacks.add(s);
+            }
+        }
 
-        Subpack s1 = new Subpack(packManager.getPackById((long) 1), "animals 2");
-        s1.setId((long) 3);
-        s1.setName("A-M");
-        s1.setUsers(personManager.getAllPersons());
-
-        Subpack s2 = new Subpack(packManager.getPackById((long) 1), "animals 2");
-        s2.setId((long) 2);
-        s2.setName("M-Z");
-        s2.setUsers(personManager.getAllPersons());
-
-        subpacks.add(s1);
-        subpacks.add(s2);
         return subpacks;
-
     }
 
     @Override
     public List<Subpack> getSubpacksAssignedToPerson(Person person) throws DaoException {
+        if (person == null) {
+            throw new IllegalArgumentException("person is null");
+        }
+        if (person.getId() == null || person.getId() < 0) {
+            throw new IllegalArgumentException("person id is null");
+        }
+
         List<Subpack> subpacks = new ArrayList<>();
+        for (Subpack s : subpackDao.getAll()) {
+            if (s.getUsers().contains(person)) {
+                subpacks.add(s);
+            }
+        }
 
-        Subpack s1 = new Subpack(packManager.getPackById((long) 1), "animals 2");
-        s1.setId((long) 3);
-        s1.setName("A-M");
-        s1.setUsers(personManager.getAllPersons());
-
-        Subpack s2 = new Subpack(packManager.getPackById((long) 1), "animals 2");
-        s2.setId((long) 2);
-        s2.setName("M-Z");
-        s2.setUsers(personManager.getAllPersons());
-
-        subpacks.add(s1);
-        subpacks.add(s2);
         return subpacks;
     }
 
     @Override
     public List<Person> getPersonsAssignedToSubpack(Subpack subpack) throws DaoException {
-        return personManager.getAllPersons();
+        if (subpack == null) {
+            throw new IllegalArgumentException("subpack is null");
+        }
+        if (subpack.getId() == null || subpack.getId() < 0) {
+            throw new IllegalArgumentException("subpack id is null");
+        }
+
+        List<Person> persons = new ArrayList<>();
+        for (Person p : personDao.getAll()) {
+            if (getSubpacksAssignedToPerson(p).contains(subpack)) {
+                persons.add(p);
+            }
+        }
+
+        return persons;
     }
 
     @Override
-    public void updatePersonsAssignment(Person person, List<Subpack> subpacks) {
+    public void updatePersonsAssignment(Person person, List<Subpack> subpacks) throws DaoException {
+        if (person == null) {
+            throw new IllegalArgumentException("person is null");
+        }
+        if (person.getId() == null || person.getId() < 0) {
+            throw new IllegalArgumentException("person id is null");
+        }
+        if (subpacks == null) {
+            throw new IllegalArgumentException("list of subpacks is null");
+        }
+        for (Subpack s : subpacks) {
+            if (s == null || s.getId() == null || s.getId() < 0) {
+                throw new ValidationException("Some subpack is null or its id is null or negative");
+            }
+        }
 
+        // TODO: definitely create new Dao method. something like: subpackDao.updateAssignment(Person, List<Subpacks>)
+        for (Subpack s : subpackDao.getAll()) {
+            if (subpacks.contains(s)) {
+                if (!s.getUsers().contains(person)) {
+                    s.getUsers().add(person);
+                    subpackDao.update(s);
+                }
+            } else {
+                if (s.getUsers().contains(person)) {
+                    s.getUsers().remove(person);
+                    subpackDao.update(s);
+                }
+            }
+        }
     }
 
     @Override
-    public void updateSubpacksAssignment(Subpack subpack, List<Person> persons) {
+    public void updateSubpacksAssignment(Subpack subpack, List<Person> persons) throws DaoException {
+        if (subpack == null) {
+            throw new IllegalArgumentException("subpack is null");
+        }
+        if (subpack.getId() == null || subpack.getId() < 0) {
+            throw new IllegalArgumentException("subpack id is null");
+        }
+        if (persons == null) {
+            throw new IllegalArgumentException("persons is null");
+        }
+        for (Person p : persons) {
+            if (p == null || p.getId() == null || p.getId() < 0) {
+                throw new ValidationException("Some person is null or its id is null or negative");
+            }
+        }
 
+        subpack.setUsers(persons);
+        subpackDao.update(subpack);
     }
 }

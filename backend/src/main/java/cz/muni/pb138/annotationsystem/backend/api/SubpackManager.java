@@ -21,8 +21,8 @@ public interface SubpackManager {
     List<Person> getPersonsAssignedToSubpack(Subpack subpack) throws DaoException;
 
 
-    void updatePersonsAssignment(Person person, List<Subpack> subpacks);
+    void updatePersonsAssignment(Person person, List<Subpack> subpacks) throws DaoException;
 
-    void updateSubpacksAssignment(Subpack subpack, List<Person> persons);
+    void updateSubpacksAssignment(Subpack subpack, List<Person> persons) throws DaoException;
 
 }

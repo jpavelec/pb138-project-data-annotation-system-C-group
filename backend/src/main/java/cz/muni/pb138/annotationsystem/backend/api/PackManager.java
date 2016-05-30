@@ -13,12 +13,12 @@ import java.util.List;
  */
 public interface PackManager {
 
-    void createPack(Pack pack, List<String> answers, List<String> noise, int numOfAnswersInSubpack);
+    void createPack(Pack pack, List<String> answers, List<String> noise, int numOfAnswersInSubpack) throws DaoException;
 
-    Pack getPackById(Long id);
+    Pack getPackById(Long id) throws DaoException;
 
-    List<Pack> getAllPacks();
+    List<Pack> getAllPacks() throws DaoException;
 
-    void deletePack(Pack pack);
+    void deletePack(Pack pack) throws DaoException;
 
 }

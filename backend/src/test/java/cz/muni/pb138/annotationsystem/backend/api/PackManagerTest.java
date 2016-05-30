@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -186,28 +187,28 @@ public class PackManagerTest {
     @Test(expected = ValidationException.class)
     public void createPackWithNullStringAsAnswer() throws Exception {
         Pack pack0 = TestUtils.getPack0();
-        List<String> answers = TestUtils.getAnswers0();
+        List<String> answers = new LinkedList<>(TestUtils.getAnswers0());
         answers.add(null);
         packManager.createPack(pack0, answers, TestUtils.getNoise0(), TestUtils.SUBPACK_SIZE_0);
     }
     @Test(expected = ValidationException.class)
     public void createPackWithEmptyStringAsAnswer() throws Exception {
         Pack pack0 = TestUtils.getPack0();
-        List<String> answers = TestUtils.getAnswers0();
+        List<String> answers = new LinkedList<>(TestUtils.getAnswers0());
         answers.add("");
         packManager.createPack(pack0, answers, TestUtils.getNoise0(), TestUtils.SUBPACK_SIZE_0);
     }
     @Test(expected = ValidationException.class)
     public void createPackWithNullStringAsNoise() throws Exception {
         Pack pack0 = TestUtils.getPack0();
-        List<String> noise = TestUtils.getNoise0();
+        List<String> noise = new LinkedList<>(TestUtils.getNoise0());
         noise.add(null);
         packManager.createPack(pack0, TestUtils.getAnswers0(), noise, TestUtils.SUBPACK_SIZE_0);
     }
     @Test(expected = ValidationException.class)
     public void createPackWithEmptyStringAsNoise() throws Exception {
         Pack pack0 = TestUtils.getPack0();
-        List<String> noise = TestUtils.getNoise0();
+        List<String> noise = new LinkedList<>(TestUtils.getNoise0());
         noise.add("");
         packManager.createPack(pack0, TestUtils.getAnswers0(), noise, TestUtils.SUBPACK_SIZE_0);
     }
