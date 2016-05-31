@@ -1,8 +1,7 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
+import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
-import cz.muni.pb138.annotationsystem.backend.common.EntityNotFoundException;
-import cz.muni.pb138.annotationsystem.backend.common.IllegalEntityException;
 import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
@@ -26,14 +25,13 @@ import javax.sql.DataSource;
 @Named
 public class EvaluationDaoImpl implements EvaluationDao {
 
+    @Inject
     private DataSource dataSource;
 
-    @Inject
-    public EvaluationDaoImpl(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public EvaluationDaoImpl() {
     }
-
-    public void setDataSource(DataSource dataSource) {
+    
+    public EvaluationDaoImpl(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -183,7 +181,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
         checkDataSource();
         validate(evaluation);
         if (evaluation.getId() == null) {
-            throw new IllegalEntityException("Evaluation id is null");
+            throw new ValidationException("Evaluation id is null");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
@@ -198,7 +196,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
 
             int count = st.executeUpdate();
             if (count == 0) {
-                throw new EntityNotFoundException("Evaluation " + evaluation + " was not found in database!");
+                throw new BeanNotExistsException("Evaluation " + evaluation + " was not found in database!");
             } else if (count != 1) {
                 throw new ServiceFailureException("Invalid updated rows count detected (one row should be updated): " + count);
             }
@@ -215,7 +213,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
             throw new IllegalArgumentException("Evaluation is null");
         }
         if (evaluation.getId() == null) {
-            throw new IllegalEntityException("Evaluation id is null");
+            throw new ValidationException("Evaluation id is null");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
@@ -225,7 +223,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
             
             int count = st.executeUpdate();
             if (count == 0) {
-                throw new EntityNotFoundException("Evaluation " + evaluation + " was not found in database!");
+                throw new BeanNotExistsException("Evaluation " + evaluation + " was not found in database!");
             } else if (count != 1) {
                 throw new ServiceFailureException("Invalid deleted rows count detected (one row should be updated): " + count);
             }

@@ -1,8 +1,7 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
+import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
-import cz.muni.pb138.annotationsystem.backend.common.EntityNotFoundException;
-import cz.muni.pb138.annotationsystem.backend.common.IllegalEntityException;
 import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
@@ -26,15 +25,14 @@ import javax.sql.DataSource;
 @Named
 public class AnswerDaoImpl implements AnswerDao {
 
-    private static final Logger logger = Logger.getLogger(
-            AnswerDao.class.getName());
-
+    @Inject
     private DataSource dataSource;
 
-    @Inject
     public AnswerDaoImpl(DataSource dataSource) {
         this.dataSource = dataSource;
     }
+    
+    public AnswerDaoImpl(){}
     
     private void checkDataSource() {
         if (dataSource == null) {
@@ -86,7 +84,7 @@ public class AnswerDaoImpl implements AnswerDao {
         validate(answer);
         checkDataSource();
         if (answer.getId() != null) {
-            throw new IllegalEntityException("Answer id is already set");
+            throw new ValidationException("Answer id is already set");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
@@ -126,6 +124,12 @@ public class AnswerDaoImpl implements AnswerDao {
     @Override
     public Answer getById(Long id) throws DaoException {
         checkDataSource();
+        if (id == null) {
+            throw new IllegalArgumentException("id is null");
+        }
+        if (id < 0) {
+            throw new IllegalArgumentException("id is negative");
+        }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
                 "SELECT id, subpackid, answervalue, isnoise FROM answer WHERE id = ?")) {
@@ -179,7 +183,7 @@ public class AnswerDaoImpl implements AnswerDao {
         checkDataSource();
         validate(answer);
         if (answer.getId() == null) {
-            throw new IllegalEntityException("Answer id is null");
+            throw new ValidationException("Answer id is null");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
@@ -192,7 +196,9 @@ public class AnswerDaoImpl implements AnswerDao {
 
             int count = st.executeUpdate();
             if (count == 0) {
-                throw new IllegalEntityException("Answer " + answer + " was not found in database!");
+                String msg = "Error when updating answer - answer with id " +
+                        answer.getId() +" was not found in DB";
+                throw new BeanNotExistsException(msg);
             } else if (count != 1) {
                 throw new ServiceFailureException("Invalid updated rows count detected (one row should be updated): " + count);
             }
@@ -209,7 +215,7 @@ public class AnswerDaoImpl implements AnswerDao {
             throw new IllegalArgumentException("Answer is null");
         }
         if (answer.getId() == null) {
-            throw new IllegalEntityException("Answer id is null");
+            throw new ValidationException("Answer id is null");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
@@ -219,7 +225,7 @@ public class AnswerDaoImpl implements AnswerDao {
 
             int count = st.executeUpdate();
             if (count == 0) {
-                throw new EntityNotFoundException("Answer " + answer + " was not found in database!");
+                throw new BeanNotExistsException("Answer " + answer + " was not found in database!");
             } else if (count != 1) {
                 throw new ServiceFailureException(
                         "Invalid deleted rows count detected (one row should be updated): " + count);
@@ -229,5 +235,6 @@ public class AnswerDaoImpl implements AnswerDao {
                     "Error when updating answer " + answer, ex);
         }
     }
+   
 
 }

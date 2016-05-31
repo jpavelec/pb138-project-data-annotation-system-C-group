@@ -7,6 +7,4 @@ import cz.muni.pb138.annotationsystem.backend.model.Answer;
  */
 public interface AnswerDao extends Dao<Answer> {
 
-
-
 }

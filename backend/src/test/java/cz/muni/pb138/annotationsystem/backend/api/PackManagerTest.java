@@ -293,6 +293,9 @@ public class PackManagerTest {
 
         Pack[] packs = TestUtils.createPacks(packManager);
 
+        /* TO DO
+        ... caused a violation of foreign key constraint.
+            Isn't there a subpack which references to parent pack to delete? */
         packManager.deletePack(packs[1]);
 
         List<Pack> all = packManager.getAllPacks();

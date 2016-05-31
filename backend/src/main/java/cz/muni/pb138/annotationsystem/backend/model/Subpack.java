@@ -2,7 +2,6 @@ package cz.muni.pb138.annotationsystem.backend.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
@@ -60,18 +59,6 @@ public class Subpack {
         this.users = users;
     }
 
-    @Override
-    public String toString() {
-        int countOfUsers;
-        if (users == null) {
-            countOfUsers = 0;
-        } else {
-            countOfUsers = users.size();
-        }
-        return "Subpack{" + "id=" + id + ", name=" + name +", from pack=" + 
-                parent.getName()  + ", annotates " + countOfUsers + " users}";
-    }
-    
     @Override
     public int hashCode() {
         return getId() != null ? getId().hashCode() : 0;

@@ -133,10 +133,16 @@ public class PersonManagerTest {
         personManager.getPersonByUsername("");
     }
 
+    /* PersonDao return null when username not exist
     @Test(expected = BeanNotExistsException.class)
     public void getPersonByUsernameUnknownUsername() throws Exception {
         Person[] persons = TestUtils.createPersons(personManager);
         personManager.getPersonByUsername("UNKNOWN_USERNAME");
+    }*/
+    
+    @Test
+    public void getPersonByUsernameUnknownUsername() throws Exception {
+        assertNull(personManager.getPersonByUsername("UNKNOWN_USERNAME"));
     }
 
 

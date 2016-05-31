@@ -1,8 +1,7 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
+import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
-import cz.muni.pb138.annotationsystem.backend.common.EntityNotFoundException;
-import cz.muni.pb138.annotationsystem.backend.common.IllegalEntityException;
 import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
@@ -24,13 +23,8 @@ import javax.sql.DataSource;
 @Named
 public class PackDaoImpl implements PackDao {
     
-    private static final Logger logger = Logger.getLogger(PackDaoImpl.class.getName());
-    
+    @Inject
     private DataSource dataSource;
-    
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
     
     private void checkDataSource() {
         if (dataSource == null) {
@@ -38,12 +32,14 @@ public class PackDaoImpl implements PackDao {
         }
     }
 
-    @Inject
+    public PackDaoImpl() {
+    }
+
     public PackDaoImpl(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    private void validate(Pack pack) throws IllegalArgumentException {
+    private void validate(Pack pack) {
         if (pack == null) {
             throw new IllegalArgumentException("Pack is null");
         }
@@ -53,17 +49,38 @@ public class PackDaoImpl implements PackDao {
         if (pack.getQuestion().isEmpty()) {
             throw new ValidationException("Pack question is empty");
         }
+        if (pack.getQuestion().length() > 250) {
+            throw new ValidationException("Pack question is too long ("+
+                    pack.getQuestion().length()+" characters and 250 characters is maximum");
+        }
         if (pack.getName() == null) {
             throw new ValidationException("Pack name is null");
         }
         if (pack.getName().isEmpty()) {
             throw new ValidationException("Pack name is empty");
         }
+        if (pack.getName().length() > 30) {
+            throw new ValidationException("Pack name is too long ("+
+                    pack.getName().length()+" characters and 30 characters is maximum");
+        }
         if (pack.getRepeatingRate() < 0 || pack.getRepeatingRate() > 100) {
             throw new ValidationException("Repeate ratio is out of interval");
         }
         if (pack.getNoiseRate() < 0 || pack.getNoiseRate() > 100) {
             throw new ValidationException("Noise ratio is out of interval");
+        }
+        
+        Double repeatingRate = pack.getRepeatingRate();
+        String[] splitRepeat = repeatingRate.toString().split("\\.");
+        if (splitRepeat[1].length() > 2) {
+            throw new ValidationException("Decimal part of repeating rate is to long ("
+                    + splitRepeat[1].length() + " and 2 is maximum).");
+        }
+        Double noiseRate = pack.getNoiseRate();
+        String[] splitNoise = noiseRate.toString().split("\\.");
+        if (splitNoise[1].length() > 2) {
+            throw new ValidationException("Decimal part of noise rate is to long ("
+                    + splitNoise[1].length() + " and 2 is maximum).");
         }
     }
     
@@ -93,8 +110,8 @@ public class PackDaoImpl implements PackDao {
         pack.setId(rs.getLong("id"));
         pack.setQuestion(rs.getString("question"));
         pack.setName(rs.getString("name"));
-        pack.setRepeatingRate(rs.getInt("repeat"));
-        pack.setNoiseRate(rs.getInt("noise"));
+        pack.setRepeatingRate(rs.getDouble("repeat"));
+        pack.setNoiseRate(rs.getDouble("noise"));
         return pack;
     }
     
@@ -103,7 +120,7 @@ public class PackDaoImpl implements PackDao {
         checkDataSource();
         validate(pack);
         if (pack.getId() != null) {
-            throw new IllegalEntityException("Pack id is already set");
+            throw new ValidationException("Pack id is already set");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
@@ -112,8 +129,8 @@ public class PackDaoImpl implements PackDao {
 
             st.setString(1, pack.getQuestion());
             st.setString(2, pack.getName());
-            st.setInt(3, (int) pack.getRepeatingRate());
-            st.setInt(4, (int) pack.getNoiseRate());
+            st.setDouble(3, pack.getRepeatingRate());
+            st.setDouble(4, pack.getNoiseRate());
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
                 throw new ServiceFailureException("Internal Error: More rows ("
@@ -125,12 +142,19 @@ public class PackDaoImpl implements PackDao {
             }
 
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new ServiceFailureException("Error when inserting pack " + pack, ex);
         }
     }
 
     @Override
-    public Pack getById(Long id) throws DaoException {
+    public Pack getById(Long id) throws DaoException, BeanNotExistsException {
+        if (id == null) {
+            throw new IllegalArgumentException("Id is null");
+        }
+        if (id < 0) {
+            throw new IllegalArgumentException("Id is negative");
+        }
         checkDataSource();
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
@@ -148,7 +172,8 @@ public class PackDaoImpl implements PackDao {
                     }
                     return pack;
                 } else {
-                    return null;
+                    String msg = "Pack with id "+id+"was not found in DB";
+                    throw new BeanNotExistsException(msg);
                 }
             }
         } catch (SQLException ex) {
@@ -182,7 +207,10 @@ public class PackDaoImpl implements PackDao {
         checkDataSource();
         validate(pack);
         if (pack.getId() == null) {
-            throw new IllegalEntityException("Pack id is null");
+            throw new ValidationException("Pack id is null");
+        }
+        if (pack.getId() < 0) {
+            throw new ValidationException("Pack id is negative");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
@@ -190,13 +218,15 @@ public class PackDaoImpl implements PackDao {
 
             st.setString(1, pack.getQuestion());
             st.setString(2, pack.getName());
-            st.setInt(3, (int) pack.getRepeatingRate());
-            st.setInt(4, (int) pack.getNoiseRate());
+            st.setDouble(3, pack.getRepeatingRate());
+            st.setDouble(4, pack.getNoiseRate());
             st.setLong(5, pack.getId());
 
             int count = st.executeUpdate();
             if (count == 0) {
-                throw new IllegalEntityException("Pack " + pack + " was not found in database!");
+                String msg = "Error when updating pack - pack with id " +
+                        pack.getId() +" was not found in DB";
+                throw new BeanNotExistsException(msg);
             } else if (count != 1) {
                 throw new ServiceFailureException("Invalid updated rows count detected (one row should be updated): " + count);
             }
@@ -213,7 +243,7 @@ public class PackDaoImpl implements PackDao {
             throw new IllegalArgumentException("Pack is null");
         }
         if (pack.getId() == null) {
-            throw new IllegalEntityException("Pack id is null");
+            throw new ValidationException("Pack id is null");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
@@ -223,13 +253,14 @@ public class PackDaoImpl implements PackDao {
 
             int count = st.executeUpdate();
             if (count == 0) {
-                throw new EntityNotFoundException("Pack " + pack + " was not found in database!");
+                throw new BeanNotExistsException("Pack " + pack + " was not found in database!");
             } else if (count != 1) {
                 throw new ServiceFailureException("Invalid deleted rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new ServiceFailureException(
-                "Error when updating pack " + pack, ex);
+                "Error when deleting pack " + pack, ex);
         }
     }
 
