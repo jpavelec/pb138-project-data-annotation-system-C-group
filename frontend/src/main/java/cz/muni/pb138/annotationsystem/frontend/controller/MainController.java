@@ -14,6 +14,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.ArrayList;
@@ -64,7 +66,7 @@ public class MainController {
     }
 
     @RequestMapping(value = "/upload", method = {RequestMethod.POST})
-    public @ResponseBody String doPost(RedirectAttributes redirectAttributes,
+    public String doPost(RedirectAttributes redirectAttributes,
                          ServletRequest req,
                          @RequestParam("file") MultipartFile[] files,
                          @RequestParam("value") String[] values)
@@ -84,7 +86,7 @@ public class MainController {
 
                 while ((nextLineAnswers = reader.readNext()) != null) {
                     for (int i = 0; i < nextLineAnswers.length; i++) {
-                        answersList.add(nextLineAnswers[i]);
+                        if (!nextLineAnswers[i].isEmpty()) answersList.add(nextLineAnswers[i]);
                     }
                 }
             } catch (IOException e) {
@@ -100,7 +102,7 @@ public class MainController {
 
                     while ((nextLineNoise = reader.readNext()) != null) {
                         for (int i = 0; i < nextLineNoise.length; i++) {
-                            noiseList.add(nextLineNoise[i]);
+                            if (!nextLineNoise[i].isEmpty()) noiseList.add(nextLineNoise[i]);
                         }
                     }
                 } catch (IOException e) {
@@ -111,8 +113,17 @@ public class MainController {
 
             Pack pack = new Pack(answersList.get(0),files[0].getOriginalFilename(),Double.parseDouble(values[0]),Double.parseDouble(values[1]));
 
+            List<String> helpList = new ArrayList<String>();
+
+            for (int i = 2; i < answersList.size(); i++)
+            {
+                helpList.add(answersList.get(i));
+            }
+
+            System.out.println(noiseList);
+
             try{
-            packManager.createPack(pack, answersList, noiseList, Integer.parseInt(values[2]));
+            packManager.createPack(pack, helpList, noiseList, Integer.parseInt(values[2]));
                 }
              catch (Exception e) {
                 req.setAttribute("error", e);
@@ -123,7 +134,7 @@ public class MainController {
 
             redirectAttributes.addFlashAttribute("pack", pack);
 
-            return "redirect:/view-assign/" + pack.getId();
+            return "redirect:/assign/" + pack.getId();
         } else {
             req.setAttribute("error", "File empty.");
             return "view-error";
@@ -132,10 +143,12 @@ public class MainController {
     }
 
     @RequestMapping("/packages")
-    public String packages(HttpSession session, ServletRequest req) {
+    public String packages(ServletRequest req, HttpServletRequest request) {
+
+        System.out.println(request.getRemoteUser());
 
         try {
-            req.setAttribute("subpacks", subpackManager.getSubpacksAssignedToPerson(personManager.getPersonById((long) 1)));
+            req.setAttribute("subpacks", subpackManager.getSubpacksAssignedToPerson(personManager.getPersonByUsername(request.getRemoteUser())));
             } catch (DaoException e) {
             return "redirect:/view-error";
         }
