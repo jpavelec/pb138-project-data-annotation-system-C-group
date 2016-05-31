@@ -33,20 +33,21 @@
             </br>
             </br>
             <div id="middle">
-                <label for="inputRepetition">Enter repetition in %</label>
-                <input class="form-control" id="inputRepetition" placeholder="percentage" required>
+                <label for="noiseRate">Enter repetition rate in %</label>
+                <input class="form-control" type="number" name="value" placeholder="percentage" required>
                 </br>
-                <label for="inputMax">Enter maximum size of one package</label>
-                <input class="form-control" id="inputMax" placeholder="number" required>
+                <label for="repeatingRate">Enter noise rate in %</label>
+                <input class="form-control" type="number" name="value" placeholder="percentage" required>
+                </br>
+                <label for="numOfAnswersInSubpack">Enter maximum size of one package</label>
+                <input class="form-control" type="number" name="value" placeholder="number" required>
                 </br>
             </div>
             <input type="submit" class="btn btn-lg btn-primary btn-block" value="Upload">
         </form>
     </div>
     </br>
-    <form action="<spring:url value="/"/>">
-        <input type="submit" class="btn btn-lg btn-primary btn-block" value="Go back">
-    </form>
+    <a href="<spring:url value="/"/>" class="btn btn-lg btn-primary btn-block">Go back</a>
 </div>
 </body>
 </html>
