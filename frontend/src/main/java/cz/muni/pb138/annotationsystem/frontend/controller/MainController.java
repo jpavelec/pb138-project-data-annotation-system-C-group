@@ -1,10 +1,12 @@
 package cz.muni.pb138.annotationsystem.frontend.controller;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.sun.javafx.collections.MappingChange;
 import cz.muni.pb138.annotationsystem.backend.api.*;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
+import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,18 +22,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @Controller
 @RequestMapping("/**")
 public class MainController {
+
+    @Inject
+    private PackManager packManager;
 
     @Inject
     private AnswerManager answerManager;
 
     @Inject
     private EvaluationManager evaluationManager;
-
-    @Inject
-    private PackManager packManager;
 
     @Inject
     private PersonManager personManager;
@@ -134,7 +137,7 @@ public class MainController {
 
         try {
             req.setAttribute("subpacks", subpackManager.getSubpacksAssignedToPerson(personManager.getPersonById((long) 1)));
-        } catch (DaoException e) {
+            } catch (DaoException e) {
             return "redirect:/view-error";
         }
 
@@ -160,8 +163,38 @@ public class MainController {
     @RequestMapping("/stats")
     public String stats(ServletRequest req) {
 
-        return "view-stats";
+            List<Pack> allPacks =  packManager.getAllPacks();
+            req.setAttribute("allPacks", allPacks);
 
+        return "view-stats";
+    }
+
+    @RequestMapping("/stats/{pack}")
+    public String stats(ServletRequest req, @PathVariable String pack) {
+        try {
+            Long longPack = Long.parseLong(pack);
+            Pack packObj = packManager.getPackById(longPack);
+            double width = statisticsManager.getProgressOfPack(packObj);
+            req.setAttribute("Pack", packObj);
+            req.setAttribute("width", width);
+            List<Subpack> allSubPacks =  subpackManager.getSubpacksInPack(packObj);
+            req.setAttribute("allSubPacks", allSubPacks);
+            Map statMap = new HashMap();
+
+             for (Subpack subPack: allSubPacks) {
+                List<Person> userList = subpackManager.getPersonsAssignedToSubpack(subPack);
+                Map subpackStat = new HashMap();
+                for (Person user: userList) {
+                    subpackStat.put(user, statisticsManager.getProgressOfSubpackForPerson(subPack, user));
+                }
+                statMap.put(subPack, subpackStat);
+            }
+            req.setAttribute("stats", statMap);
+
+        } catch (Exception e) {
+            return "redirect:/view-error";
+        }
+        return "view-statsPack";
     }
 
     @RequestMapping("/mark/{subpack}/{answer}")
@@ -178,11 +211,43 @@ public class MainController {
 
     }
 
-    @RequestMapping("/assign")
-    public String assign(ServletRequest req) {
+    @RequestMapping(value ="/assign/{packID}/{userID}", method = {RequestMethod.GET})
+    public String assignPackGet(ServletRequest req, @PathVariable String packID, @PathVariable String userID) {
+
+        try {
+            long longPackID = Long.parseLong(packID);
+            long longUserID = Long.parseLong(userID);
+
+            Pack pack = packManager.getPackById(longPackID);
+            List<Subpack> subpackList = subpackManager.getSubpacksInPack(pack);
+            Person user = personManager.getPersonById(longUserID);
+
+            req.setAttribute("user", user);
+            req.setAttribute("subPackList", subpackList);
+            req.setAttribute("pack", pack);
+        } catch (DaoException e) {
+            return "redirect:/view-error";
+        }
+        return "view-assignPack";
+    }
+
+
+    @RequestMapping("/assign/{id}")
+    public String assign(ServletRequest req, @PathVariable String id ) {
+        try {
+            long packID = Long.parseLong(id);
+            Pack pack = packManager.getPackById(packID);
+            List<Person> users = personManager.getAllPersons();
+            req.setAttribute("users", users);
+            req.setAttribute("pack", pack);
+
+        } catch (DaoException e) {
+            return "redirect:/view-error";
+        }
 
         return "view-assign";
 
     }
+
 
 }

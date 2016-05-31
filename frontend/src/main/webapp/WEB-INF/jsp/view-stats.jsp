@@ -14,8 +14,17 @@
 </head>
 <body>
     <div class="container">
-            <h3>Hello, I'm a young webpage and I would like to show <i><b>statistics</b></i> when I grow up. Please fulfill my wild dreams and code me!</h3>
+            <h3>Hello, I'm a young webpage and I would like to show <i><b>statisticsBla</b></i> when I grow up. Please fulfill my wild dreams and code me!</h3>
             </br>
+            <c:forEach items="${allPacks}" var="Pack">
+                <form action="<spring:url value="/stats/${Pack.id}"/>">
+                    <input type="submit" class="btn btn-lg btn-primary btn-block"   value="${Pack.name}">
+                </form>
+
+            </c:forEach>
+
+
+
         <form action="<spring:url value="/"/>">
             <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back">
         </form>

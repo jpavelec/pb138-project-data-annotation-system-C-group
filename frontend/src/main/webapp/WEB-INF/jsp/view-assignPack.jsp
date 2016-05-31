@@ -14,25 +14,26 @@
 </head>
 <body>
 
+
 <div class="container">
-    <h2>Assign users to package ${pack.name}</h2>
-    <form id="fileAssignForm" method="POST" enctype="multipart/form-data">
+    <h2>Assign ${user} to package ${pack}</h2>
     <div id="middle">
         <ul class="list-group">
-            <c:forEach items="${users}" var="person">
+            <c:forEach var="subpack" items="${subPackList}">
                 <li class="list-group-item">
-                    <a href="<spring:url value="/assign/${pack.id}/${person.id}"/>" type="submit" class="btn btn-link">${person.username}</a>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value=""><c:out value="${subpack.name}"/>
+                        </label>
+                    </div>
                 </li>
             </c:forEach>
-            <li class="list-group-item">
-                <a href="<spring:url value="/assign/3/1"/>" type="submit" class="btn btn-link">User1 </a>
-            </li>
         </ul>
+        <form action="<spring:url value="/assign/${pack}"/>">
+            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Assign packages">
+        </form>
     </div>
-    </form>
-    <form action="<spring:url value="/"/>">
-        <input type="submit" class="btn btn-lg btn-primary btn-block" value="Back to main menu">
-    </form>
+
 </div>
 </body>
 </html>
