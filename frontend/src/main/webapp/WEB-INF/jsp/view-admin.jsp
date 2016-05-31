@@ -18,7 +18,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>Ay you are an administrator so you have more options. What would you like to do?</h2>
+        <h2>As you are an administrator so you have more options. What would you like to do?</h2>
         </br>
         </br>
         <form action="<spring:url value="/upload"/>">
