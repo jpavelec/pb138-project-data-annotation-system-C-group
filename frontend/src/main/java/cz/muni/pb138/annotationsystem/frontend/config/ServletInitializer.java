@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.frontend.config;
 
+import cz.muni.pb138.annotationsystem.frontend.controller.RemoteUserFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
@@ -26,7 +27,8 @@ public class ServletInitializer extends AbstractAnnotationConfigDispatcherServle
     protected Filter[] getServletFilters() {
         CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter();
         encodingFilter.setEncoding("utf-8");
-        return new Filter[]{encodingFilter};
+        RemoteUserFilter remoteUserFilter = new RemoteUserFilter();
+        return new Filter[]{encodingFilter, remoteUserFilter};
     }
 
 }

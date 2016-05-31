@@ -11,6 +11,7 @@ import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +31,7 @@ public class AnswerManagerImpl implements AnswerManager {
     private EvaluationDao evaluationDao;
 
     @Override
+    @Transactional
     public Answer nextAnswer(Person person, Subpack subpack) throws DaoException {
         if (person == null) {
             throw new IllegalArgumentException("person is null");
@@ -56,6 +58,7 @@ public class AnswerManagerImpl implements AnswerManager {
     }
 
     @Override
+    @Transactional
     public Answer getAnswerById(Long id) throws DaoException {
         if (id == null || id < 0) {
             throw new IllegalArgumentException("id is null or negative");
@@ -65,6 +68,7 @@ public class AnswerManagerImpl implements AnswerManager {
     }
 
     @Override
+    @Transactional
     public List<Answer> getAnswersInSubpack(Subpack subpack) throws DaoException {
         if (subpack == null) {
             throw new IllegalArgumentException("subpack is null");
@@ -80,6 +84,7 @@ public class AnswerManagerImpl implements AnswerManager {
     }
 
     @Override
+    @Transactional
     public List<Answer> getAnswersInPack(Pack pack) throws DaoException {
         if (pack == null) {
             throw new IllegalArgumentException("pack is null");

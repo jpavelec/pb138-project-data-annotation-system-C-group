@@ -13,6 +13,8 @@ import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +37,7 @@ public class PackManagerImpl implements PackManager {
     private AnswerDao answerDao;
 
     @Override
+    @Transactional
     public void createPack(Pack pack, List<String> answers, List<String> noise, int numOfAnswersInSubpack) throws DaoException {
         if (pack == null) {
             throw new IllegalArgumentException("Pack is null");
@@ -99,6 +102,7 @@ public class PackManagerImpl implements PackManager {
     }
 
     @Override
+    @Transactional
     public Pack getPackById(Long id) throws DaoException {
         if (id == null || id < 0) {
             throw new IllegalArgumentException("id is null or negative");
@@ -108,12 +112,14 @@ public class PackManagerImpl implements PackManager {
     }
 
     @Override
+    @Transactional
     public List<Pack> getAllPacks() throws DaoException {
 
         return packDao.getAll();
     }
 
     @Override
+    @Transactional
     public void deletePack(Pack pack) throws DaoException {
         if (pack == null) {
             throw new IllegalArgumentException("Pack is null");

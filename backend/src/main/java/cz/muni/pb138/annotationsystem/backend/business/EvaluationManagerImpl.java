@@ -13,6 +13,7 @@ import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Rating;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +31,7 @@ public class EvaluationManagerImpl implements EvaluationManager {
 
 
     @Override
+    @Transactional
     public void eval(Evaluation evaluation) throws DaoException {
         if (evaluation == null) {
             throw new IllegalArgumentException("Evaluation is null");
@@ -54,6 +56,7 @@ public class EvaluationManagerImpl implements EvaluationManager {
     }
 
     @Override
+    @Transactional
     public Evaluation getEvaluationById(Long id) throws DaoException {
         if (id == null || id < 0) {
             throw new IllegalArgumentException("id is null or negative");
@@ -63,6 +66,7 @@ public class EvaluationManagerImpl implements EvaluationManager {
     }
 
     @Override
+    @Transactional
     public List<Evaluation> getEvaluationsOfPerson(Person person) throws DaoException {
         if (person == null) {
             throw new IllegalArgumentException("person is null");

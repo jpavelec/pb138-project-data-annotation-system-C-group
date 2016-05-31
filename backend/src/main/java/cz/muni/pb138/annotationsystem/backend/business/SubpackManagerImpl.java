@@ -15,6 +15,7 @@ import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,6 +35,7 @@ public class SubpackManagerImpl implements SubpackManager {
     private PersonDao personDao;
 
     @Override
+    @Transactional
     public Subpack getSubpackById(Long id) throws DaoException {
         if (id == null || id < 0) {
             throw new IllegalArgumentException("id is null or negative");
@@ -43,6 +45,7 @@ public class SubpackManagerImpl implements SubpackManager {
     }
 
     @Override
+    @Transactional
     public List<Subpack> getSubpacksInPack(Pack pack) throws DaoException {
         if (pack == null) {
             throw new IllegalArgumentException("pack is null");
@@ -62,6 +65,7 @@ public class SubpackManagerImpl implements SubpackManager {
     }
 
     @Override
+    @Transactional
     public List<Subpack> getSubpacksAssignedToPerson(Person person) throws DaoException {
         if (person == null) {
             throw new IllegalArgumentException("person is null");
@@ -81,6 +85,7 @@ public class SubpackManagerImpl implements SubpackManager {
     }
 
     @Override
+    @Transactional
     public List<Person> getPersonsAssignedToSubpack(Subpack subpack) throws DaoException {
         if (subpack == null) {
             throw new IllegalArgumentException("subpack is null");
@@ -100,6 +105,7 @@ public class SubpackManagerImpl implements SubpackManager {
     }
 
     @Override
+    @Transactional
     public void updatePersonsAssignment(Person person, List<Subpack> subpacks) throws DaoException {
         if (person == null) {
             throw new IllegalArgumentException("person is null");
@@ -133,6 +139,7 @@ public class SubpackManagerImpl implements SubpackManager {
     }
 
     @Override
+    @Transactional
     public void updateSubpacksAssignment(Subpack subpack, List<Person> persons) throws DaoException {
         if (subpack == null) {
             throw new IllegalArgumentException("subpack is null");

@@ -11,6 +11,7 @@ import cz.muni.pb138.annotationsystem.backend.dao.PersonDaoImpl;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,6 +28,7 @@ public class PersonManagerImpl implements PersonManager {
     private PersonDao personDao;
 
     @Override
+    @Transactional
     public void createPerson(Person person) throws DaoException {
         if (person == null) {
             throw new IllegalArgumentException("Created person is null");
@@ -44,6 +46,7 @@ public class PersonManagerImpl implements PersonManager {
     }
 
     @Override
+    @Transactional
     public Person getPersonByUsername(String username) throws DaoException {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username is null or empty");
@@ -52,6 +55,7 @@ public class PersonManagerImpl implements PersonManager {
     }
 
     @Override
+    @Transactional
     public Person getPersonById(Long id) throws DaoException {
         if (id == null || id < 0) {
             throw new IllegalArgumentException("Id is null or negative");
@@ -61,6 +65,7 @@ public class PersonManagerImpl implements PersonManager {
     }
 
     @Override
+    @Transactional
     public List<Person> getAllPersons() throws DaoException {
         List<Person> all = personDao.getAll();
         return all;
