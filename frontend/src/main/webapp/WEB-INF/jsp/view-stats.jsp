@@ -19,6 +19,7 @@
             <c:forEach items="${allPacks}" var="Pack">
                 <form action="<spring:url value="/stats/${Pack.id}"/>">
                     <input type="submit" class="btn btn-lg btn-primary btn-block"   value="${Pack.name}">
+                    </br>
                 </form>
 
             </c:forEach>
@@ -26,6 +27,7 @@
 
 
         <form action="<spring:url value="/"/>">
+            </br>
             <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back">
         </form>
     </div>
