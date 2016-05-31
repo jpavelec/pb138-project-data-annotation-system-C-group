@@ -16,8 +16,7 @@
     <div class="container">
         <h3>Hello, I'm a young webpage and I would like to make <i><b>assigning</b></i> of packages to specific users possible when I grow up. Please fulfill my wild dreams and code me!</h3>
         </br>
-        <p>CSV Content: ${csvContent}</p>
-        <p>CSV Length (number of answers): ${csvLength}</p>
+        <p>Just uploaded pack: ${pack}</p>
         </br>
         <form action="<spring:url value="/"/>">
             <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back">

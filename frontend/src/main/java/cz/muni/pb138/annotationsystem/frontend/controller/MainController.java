@@ -7,10 +7,7 @@ import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -65,22 +62,27 @@ public class MainController {
     }
 
     @RequestMapping(value = "/upload", method = {RequestMethod.POST})
-    public String doPost(ServletRequest req, @RequestParam MultipartFile file) {
+    public @ResponseBody String doPost(RedirectAttributes redirectAttributes,
+                         ServletRequest req,
+                         @RequestParam("file") MultipartFile[] files,
+                         @RequestParam("value") String[] values)
+                          {
 
-        if (!file.isEmpty()) {
+        if (!(files.length < 1)) {
 
-            List<String> mojecsv = new ArrayList<String>();
-            Integer counter = 0;
-            String[] nextLine;
+            List<String> answersList = new ArrayList<String>();
+            String[] nextLineAnswers;
+
+            List<String> noiseList = new ArrayList<String>();
+            String[] nextLineNoise;
 
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(file.getInputStream()));
-                CSVReader reader = new CSVReader(in);
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(files[0].getInputStream()));
+                CSVReader reader = new CSVReader(bufferedReader);
 
-                while ((nextLine = reader.readNext()) != null) {
-                    for (int i = 0; i < nextLine.length; i++) {
-                        counter++;
-                        mojecsv.add(nextLine[i]);
+                while ((nextLineAnswers = reader.readNext()) != null) {
+                    for (int i = 0; i < nextLineAnswers.length; i++) {
+                        answersList.add(nextLineAnswers[i]);
                     }
                 }
             } catch (IOException e) {
@@ -88,16 +90,38 @@ public class MainController {
                 return "view-error";
             }
 
-            req.setAttribute("csvContent", mojecsv);
-            req.setAttribute("csvLength", counter - 2);
-            try {
-                packManager.createPack(null, mojecsv, null, counter - 2);
-            } catch (DaoException e) {
-                req.setAttribute("error", "Dao exception.");
-                return "view-error";
+            if (files.length > 1) {
+
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(files[1].getInputStream()));
+                    CSVReader reader = new CSVReader(bufferedReader);
+
+                    while ((nextLineNoise = reader.readNext()) != null) {
+                        for (int i = 0; i < nextLineNoise.length; i++) {
+                            noiseList.add(nextLineNoise[i]);
+                        }
+                    }
+                } catch (IOException e) {
+                    req.setAttribute("error", e);
+                    return "view-error";
+                }
             }
 
-            return "view-assign";
+            Pack pack = new Pack(answersList.get(0),files[0].getOriginalFilename(),Double.parseDouble(values[0]),Double.parseDouble(values[1]));
+
+            try{
+            packManager.createPack(pack, answersList, noiseList, Integer.parseInt(values[2]));
+                }
+             catch (Exception e) {
+                req.setAttribute("error", e);
+                return "view-error";}
+
+            //System.out.println("AAAAAAAAAAAAAAAAAAAAAA" + pack + ".." + values[0] + ".." + values[1] );
+            //System.out.println("BBBBBBBBBBBBBBBBBBBBBB" + pack + ".." + answersList + ".." + noiseList + ".." + values[2] );
+
+            redirectAttributes.addFlashAttribute("pack", pack);
+
+            return "redirect:/view-assign/" + pack.getId();
         } else {
             req.setAttribute("error", "File empty.");
             return "view-error";
