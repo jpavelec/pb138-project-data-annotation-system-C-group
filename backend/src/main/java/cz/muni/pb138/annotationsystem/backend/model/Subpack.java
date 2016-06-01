@@ -12,13 +12,16 @@ public class Subpack {
 
     private Pack parent;
     private String name;
+    
+    // TO DO delete
     private List<Person> users;
 
     public Subpack() {
     }
 
     public Subpack(Pack parent, String name) {
-        this(parent, name, new ArrayList<Person>());
+        this.parent = parent;
+        this.name = name;
     }
 
     public Subpack(Pack parent, String name, List<Person> users) {
@@ -51,12 +54,14 @@ public class Subpack {
         this.name = name;
     }
 
+    // TO DO delete
     public List<Person> getUsers() {
-        return users;
+        return null;
     }
 
+    // TO DO delete
     public void setUsers(List<Person> users) {
-        this.users = users;
+        
     }
 
     @Override

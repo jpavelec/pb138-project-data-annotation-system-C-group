@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
+import cz.muni.pb138.annotationsystem.backend.common.BeanAlreadyExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
@@ -7,17 +8,13 @@ import cz.muni.pb138.annotationsystem.backend.config.TestConfig;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import javax.inject.Inject;
 import javax.sql.DataSource;
-import org.apache.derby.iapi.services.io.ArrayUtil;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -48,6 +45,7 @@ public class SubpackDaoImplTest {
     public void setUp() throws Exception {
         Resource create = new ClassPathResource("createTables.sql");
         ScriptUtils.executeSqlScript(dataSource.getConnection(), create);
+        prepareTestData();
     }
 
     @After
@@ -56,67 +54,59 @@ public class SubpackDaoImplTest {
         ScriptUtils.executeSqlScript(dataSource.getConnection(), drop);
     }
     
-    private PackBuilder sampleAnimalPack() {
-        return new PackBuilder()
-                .id(null)
-                .question("Is it an animal?")
-                .name("Animal")
-                .noiseRate(3.23)
-                .repeatingRate(2.94);
+    private Pack animalPack, thingPack, packNotInDB, packWithNullId;
+    private Person pepePerson, leonPerson, personNotInDB, personWithNullId;
+    
+    private void prepareTestData() throws Exception {
+        animalPack = new PackBuilder().question("Is it an animal?").name("animal").noiseRate(12.25).repeatingRate(5.5).build();
+        thingPack = new PackBuilder().question("Is it a thing?").name("thing").noiseRate(0).repeatingRate(0).build();
+        packNotInDB = new PackBuilder().id((long) 100).build();
+        packWithNullId = new PackBuilder().id(null).build();
+        packDao.create(animalPack);
+        packDao.create(thingPack);
+        
+        pepePerson = new PersonBuilder().username("Pepe").build();
+        leonPerson = new PersonBuilder().username("Leon").build();
+        personDao.create(pepePerson);
+        personDao.create(leonPerson);
+        personNotInDB = new PersonBuilder().id((long) 100).build();
+        personWithNullId = new PersonBuilder().id(null).build();
+        
+        try {
+            if (personDao.getById(personNotInDB.getId()) != null ||
+                packDao.getById(packNotInDB.getId()) != null) {
+                throw new BeanAlreadyExistsException("Test entity which shouldnt exist is in DB!");
+            }
+        } catch (BeanNotExistsException ex) {}
+        
+        
+        
     }
     
-    private PackBuilder sampleThingPack() {
-        return new PackBuilder()
-                .id(null)
-                .question("Is it a thing?")
-                .name("Thing")
-                .noiseRate(10.2)
-                .repeatingRate(15.06);
-    }
-    
-    private PersonBuilder sampleGeorgePerson() {
-        return new PersonBuilder()
-                .id(null)
-                .username("George");
-    }
-    
-    private PersonBuilder sampleAnastaciaPerson() {
-        return new PersonBuilder()
-                .id(null)
-                .username("Anastacia");
-    }
-    
-    private SubpackBuilder sampleAnimalSubpackWithUsersGeorgeAndAnastacia() throws DaoException {
-        Person userGeorge = sampleGeorgePerson().build();
-        personDao.create(userGeorge);
-        Person userAnastacia = sampleAnastaciaPerson().build();
-        personDao.create(userAnastacia);
-        List<Person> users = new ArrayList<>();
-        users.add(userGeorge);
-        users.add(userAnastacia);
-        Pack packAnimal = sampleAnimalPack().build();
-        packDao.create(packAnimal);
+    private SubpackBuilder sampleAnimal01Subpack() throws DaoException {
         return new SubpackBuilder()
                 .id(null)
                 .name("Animal_01")
-                .parent(packAnimal)
-                .users(users);
+                .parent(animalPack);
     }
     
-    private SubpackBuilder sampleThingSubpackWithNoUser() throws DaoException {
-        List<Person> users = new ArrayList<>();
-        Pack packThing = sampleThingPack().build();
-        packDao.create(packThing);
+    private SubpackBuilder sampleAnimal02Subpack() throws DaoException {
+        return new SubpackBuilder()
+                .id(null)
+                .name("Animal_02")
+                .parent(animalPack);
+    }
+    
+    private SubpackBuilder sampleThingSubpack() throws DaoException {
         return new SubpackBuilder()
                 .id(null)
                 .name("Thing_01")
-                .parent(packThing)
-                .users(users);
+                .parent(thingPack);
     }
         
     @Test
     public void createSubpack() throws Exception {
-        Subpack subpack = sampleAnimalSubpackWithUsersGeorgeAndAnastacia().build();
+        Subpack subpack = sampleAnimal01Subpack().build();
         subpackDao.create(subpack);
         Long subpackId = subpack.getId();
         assertThat(subpackId).isNotNull();
@@ -133,57 +123,101 @@ public class SubpackDaoImplTest {
     
     @Test(expected = ValidationException.class)
     public void createSubpackWithExistingId() throws Exception {
-        subpackDao.create(sampleAnimalSubpackWithUsersGeorgeAndAnastacia().id((long) 1).build());
+        subpackDao.create(sampleAnimal01Subpack().id((long) 1).build());
     }
     
     @Test(expected = ValidationException.class)
     public void createSubpackWithNullParent() throws Exception {
-        subpackDao.create(sampleAnimalSubpackWithUsersGeorgeAndAnastacia().parent(null).build());
+        subpackDao.create(sampleAnimal01Subpack().parent(null).build());
+    }
+    
+    @Test(expected = ValidationException.class)
+    public void createSubpackWithParentPackWithNullID() throws Exception {
+        subpackDao.create(sampleAnimal01Subpack().parent(packWithNullId).build());
     }
     
     @Test(expected = BeanNotExistsException.class)
     public void createSubpackWithNonExistingParent() throws Exception {
-        Pack packNotInDb = sampleAnimalPack().id((long) 25).build();
-        subpackDao.create(sampleAnimalSubpackWithUsersGeorgeAndAnastacia().parent(packNotInDb).build());
-    }
-    
-    @Test(expected = BeanNotExistsException.class)
-    public void createSubpackWithNonExistingUser() throws Exception {
-        Person personNotInDb = sampleAnastaciaPerson().id((long) 25).build();
-        subpackDao.create(sampleAnimalSubpackWithUsersGeorgeAndAnastacia().users(Arrays.asList(personNotInDb)).build());
-    }
-
-    @Test(expected = ValidationException.class)
-    public void createSubpackWithNullListOfUsers() throws Exception {
-        subpackDao.create(sampleAnimalSubpackWithUsersGeorgeAndAnastacia()
-                            .users(null)
-                            .build());
+        subpackDao.create(sampleAnimal01Subpack().parent(packNotInDB).build());
     }
     
     @Test(expected = ValidationException.class)
     public void createSubpackWithLongName() throws Exception {
-        subpackDao.create(sampleAnimalSubpackWithUsersGeorgeAndAnastacia()
+        subpackDao.create(sampleAnimal01Subpack()
                             .name("aaaaabbbbbcccccdddddeeeeefffffg")
                             .build());
     }
     
     @Test(expected = ValidationException.class)
     public void createSubpackWithEmptyName() throws Exception {
-        subpackDao.create(sampleAnimalSubpackWithUsersGeorgeAndAnastacia()
+        subpackDao.create(sampleAnimal01Subpack()
                             .name("")
                             .build());
     }
     
     @Test(expected = ValidationException.class)
     public void createSubpackWithNullName() throws Exception {
-        subpackDao.create(sampleAnimalSubpackWithUsersGeorgeAndAnastacia()
+        subpackDao.create(sampleAnimal01Subpack()
                             .name(null)
                             .build());
     }
     
     @Test
+    public void updateSubpack() throws Exception {
+        Subpack subpackForUpdate = sampleAnimal01Subpack().build();
+        Subpack anotherSubpack = sampleAnimal02Subpack().build();
+        subpackDao.create(subpackForUpdate);
+        subpackDao.create(anotherSubpack);
+        
+        subpackForUpdate.setName("Animal_001");
+        subpackDao.update(subpackForUpdate);
+
+        assertThat(subpackDao.getById(subpackForUpdate.getId()))
+                .isEqualToComparingFieldByField(subpackForUpdate);
+        assertThat(subpackDao.getById(anotherSubpack.getId()))
+                .isEqualToComparingFieldByField(anotherSubpack);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void updateNullSubpack() throws Exception {
+        subpackDao.update(null);
+    }
+    
+    @Test(expected = ValidationException.class)
+    public void updateSubpackNullName() throws Exception {
+        Subpack subpackForUpdate = sampleAnimal01Subpack().build();
+        subpackDao.create(subpackForUpdate);
+        subpackForUpdate.setName(null);
+        subpackDao.update(subpackForUpdate);
+    }
+    
+    @Test(expected = BeanNotExistsException.class)
+    public void updateNonexistingSubpack() throws Exception {
+        subpackDao.update(sampleAnimal02Subpack().id((long) 25).build());
+    }
+    
+    @Test(expected = ValidationException.class)
+    public void updateSubpackEmptyName() throws Exception {
+        Subpack subpackForUpdate = sampleAnimal01Subpack().build();
+        subpackDao.create(subpackForUpdate);
+        subpackForUpdate.setName("");
+        subpackDao.update(subpackForUpdate);
+    }
+    
+    @Test(expected = ValidationException.class)
+    public void updateSubpackNullId() throws Exception {
+        subpackDao.update(sampleAnimal01Subpack().id(null).build());
+    }
+    
+    @Test(expected = ValidationException.class)
+    public void updatePersonWithNegativeId() throws Exception {
+        Subpack subpackWithNegativeId = sampleAnimal01Subpack().id((long) -1).build();
+        subpackDao.update(subpackWithNegativeId);
+    }
+    
+    @Test
     public void getById() throws Exception {
-        Subpack subpack = sampleAnimalSubpackWithUsersGeorgeAndAnastacia().build();
+        Subpack subpack = sampleAnimal01Subpack().build();
         subpackDao.create(subpack);
         assertThat(subpackDao.getById(subpack.getId()))
                 .isNotNull()
@@ -192,8 +226,8 @@ public class SubpackDaoImplTest {
     
     @Test
     public void getAll() throws Exception {
-        Subpack subpackAnimal = sampleAnimalSubpackWithUsersGeorgeAndAnastacia().build();
-        Subpack subpackThing = sampleThingSubpackWithNoUser().build();
+        Subpack subpackAnimal = sampleAnimal01Subpack().build();
+        Subpack subpackThing = sampleThingSubpack().build();
         subpackDao.create(subpackAnimal);
         subpackDao.create(subpackThing);
         assertThat(subpackDao.getAll())
@@ -201,10 +235,114 @@ public class SubpackDaoImplTest {
                 .containsOnly(subpackAnimal, subpackThing);
     }
     
-    /*@Test
-    public void updateSubpack() throws Exception {
-        su
-    }*/
+    @Test(expected = IllegalArgumentException.class)
+    public void getByNullId() throws Exception {
+        subpackDao.getById(null);
+    }
     
+    @Test(expected = IllegalArgumentException.class)
+    public void getByNegativeId() throws Exception {
+        subpackDao.getById((long) -1);
+    }
+    
+    @Test(expected = BeanNotExistsException.class)
+    public void getByNonexistingId() throws Exception {
+        subpackDao.getById((long) 25);
+    }
+    
+    @Test
+    public void assignPersonToSubpack() throws Exception {
+        Subpack subpack = sampleAnimal01Subpack().build();
+        subpackDao.create(subpack);
+        subpackDao.assignPersonToSubpack(pepePerson, subpack);
+        assertThat(subpackDao.getPeopleAssignedToSubpack(subpack))
+                .usingFieldByFieldElementComparator()
+                .containsOnly(pepePerson);
+        
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void assignNullPersonToSubpack() throws Exception {
+        Subpack subpack = sampleAnimal01Subpack().build();
+        subpackDao.create(subpack);
+        subpackDao.assignPersonToSubpack(null, subpack);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void assignPersonToNullSubpack() throws Exception {
+        subpackDao.assignPersonToSubpack(pepePerson, null);
+    }
+    
+    @Test(expected = ValidationException.class)
+    public void assignPersonWithNullIdToSubpack() throws Exception {
+        Subpack subpack = sampleAnimal01Subpack().build();
+        subpackDao.create(subpack);
+        subpackDao.assignPersonToSubpack(personWithNullId, subpack);
+    }
+    
+    @Test(expected = ValidationException.class)
+    public void assignPersonToSubpackWithNullId() throws Exception {
+        Subpack subpack = sampleAnimal01Subpack().build();
+        subpackDao.assignPersonToSubpack(personWithNullId, subpack);
+    }
+    
+    @Test(expected = BeanNotExistsException.class)
+    public void assignNonexistingPersonToSubpack() throws Exception {
+        Subpack subpack = sampleAnimal01Subpack().build();
+        subpackDao.create(subpack);
+        subpackDao.assignPersonToSubpack(personNotInDB, subpack);
+    }
+    
+    @Test(expected = BeanNotExistsException.class)
+    public void assignPersonToNonexistingSubpack() throws Exception {
+        Subpack subpack = sampleAnimal01Subpack().build();
+        subpackDao.create(subpack);
+        subpack.setId((long) 100);
+        subpackDao.assignPersonToSubpack(personNotInDB, subpack);
+    }
+    
+    @Test
+    public void assignPeopleToSubpack() throws Exception {
+        Subpack subpack = sampleAnimal01Subpack().build();
+        subpackDao.create(subpack);
+        subpackDao.assignPersonToSubpack(pepePerson, subpack);
+        subpackDao.updateAssignment(subpack, Arrays.asList(leonPerson));
+        assertThat(subpackDao.getPeopleAssignedToSubpack(subpack))
+                .usingFieldByFieldElementComparator()
+                .containsOnly(leonPerson);
+    }
+
+    @Test
+    public void getSubpacksInPack() throws Exception {
+        Subpack subpack01 = sampleAnimal01Subpack().build();
+        Subpack subpack02 = sampleAnimal02Subpack().build();
+        subpackDao.create(subpack01);
+        subpackDao.create(subpack02);
+        assertThat(subpackDao.getSubpacksInPack(animalPack))
+                .usingFieldByFieldElementComparator()
+                .containsOnly(subpack01, subpack02);
+    }
+    
+    @Test
+    public void getNoSubpackInPack() throws Exception {
+        assertThat(subpackDao.getSubpacksInPack(thingPack))
+                .isEmpty();
+    }
+    
+    @Test(expected = BeanNotExistsException.class)
+    public void getSubpacksInUnknownPack() throws Exception {
+        subpackDao.getSubpacksInPack(packNotInDB);
+    }
+    
+    @Test(expected = ValidationException.class)
+    public void getSubpacksInPackWithNullId() throws Exception {
+        subpackDao.getSubpacksInPack(packWithNullId);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void getSubpacksInNullPack() throws Exception {
+        subpackDao.getSubpacksInPack(null);
+    }
+            
     
 }

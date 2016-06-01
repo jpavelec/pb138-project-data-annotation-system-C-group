@@ -14,7 +14,6 @@ public class SubpackBuilder {
 
     private Pack parent;
     private String name;
-    private List<Person> users;
     
     public SubpackBuilder id(Long id) {
         this.id = id;
@@ -31,17 +30,11 @@ public class SubpackBuilder {
         return this;
     }
     
-    public SubpackBuilder users(List<Person> users) {
-        this.users = users;
-        return this;
-    }
-    
     public Subpack build() {
         Subpack subpack = new Subpack();
         subpack.setId(id);
         subpack.setParent(parent);
         subpack.setName(name);
-        subpack.setUsers(users);
         return subpack;
     }
 
