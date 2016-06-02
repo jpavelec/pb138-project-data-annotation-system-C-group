@@ -51,7 +51,12 @@ public class PersonManagerImpl implements PersonManager {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username is null or empty");
         }
-        return personDao.getByUsername(username);
+        Person person = personDao.getByUsername(username);
+        if (person == null) {
+            person = new Person(username);
+            personDao.create(person);
+        }
+        return person;
     }
 
     @Override
