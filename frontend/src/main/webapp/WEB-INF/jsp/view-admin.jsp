@@ -18,22 +18,22 @@
 </head>
 <body>
     <div class="container">
-        <h2>As you are an administrator so you have more options. What would you like to do?</h2>
-        </br>
-        </br>
-        <form action="<spring:url value="/upload"/>">
-            <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Upload a new dictionary">
-        </form>
-        </br>
-        <form action="<spring:url value="/packages"/>">
-            <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Mark words">
-        </form>
-        </br>
-        <form action="<spring:url value="/stats"/>">
-            <input type="submit" class="btn btn-lg btn-primary btn-block"   value="View statistics">
-        </form>
-        </br>
-        <h2>Btw! Did you know that your person ID is: ${person}?  </h2>
+        <div id="wrap">
+            </br>
+            <center><h2>What would you like to do?</h2></center>
+            </br>
+            <form action="<spring:url value="/upload"/>">
+                <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Upload a new dictionary">
+            </form>
+            </br>
+            <form action="<spring:url value="/packages"/>">
+                <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Mark words">
+            </form>
+            </br>
+            <form action="<spring:url value="/stats"/>">
+                <input type="submit" class="btn btn-lg btn-primary btn-block"   value="View statistics">
+            </form>
+        </div>
     </div>
 </body>
 </html>

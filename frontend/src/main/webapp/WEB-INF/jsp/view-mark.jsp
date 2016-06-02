@@ -7,7 +7,7 @@
 -->
 
 <!DOCTYPE html>
-r<head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,19 +32,24 @@ r<head>
                 </br>
                 <span id="filename">Subpack name: ${thisSubpack.name}</span>
             </div>
-            <div id="ontology">Is the following word an animal?</div>
+            <div id="ontology">Is the following word an ${thisQuestion}?</div>
             <div id="np">${thisAnswer.answer}</div>
             </br>
             <div id="wrap">
-                <input type="button" value="Previous word" name="btnPrevious" />
-                <input type="button" value="Report this word" name="btnChangeContext" />
+                <form id="answerForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}/report" method="POST" enctype="multipart/form-data">
+                    <input type="button" value="Previous word" name="btnPrevious" />
+                    <input id="value" name="value" type="submit" value="Report this word" name="btnChangeContext" />
+                </form>
+
             </div>
         </div>
 
         <div id="left">
             <div class="column-in">
                 <div class="next" id="minus-next">
-                    <img src="<c:url value="/resources/images/no.svg" />" width="100%"/>
+                    <form id="answerForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}" method="POST" enctype="multipart/form-data">
+                        <input id="value" name="value" type="image" alt="no" value="0" src="<c:url value="/resources/images/no.svg" />" width="100%"/>
+                    </form>
                 </div>
             </div>
         </div>
@@ -52,7 +57,9 @@ r<head>
         <div id="right">
             <div class="column-in">
                 <div class="next" id="plus-next">
-                    <img src="<c:url value="/resources/images/yes.svg" />" width="100%"/>
+                    <form id="answerForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}" method="POST" enctype="multipart/form-data">
+                        <input id="value" name="value" type="image" alt="no" value="1" src="<c:url value="/resources/images/yes.svg" />" width="100%"/>
+                    </form>
                 </div>
             </div>
         </div>

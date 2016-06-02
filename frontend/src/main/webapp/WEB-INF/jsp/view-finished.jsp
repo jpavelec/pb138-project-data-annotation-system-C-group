@@ -9,6 +9,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="2;url=<spring:url value="/packages"/>">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
           integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link type="text/css" rel="stylesheet" href="<c:url value="/resources/css/style.css" />"/>
@@ -16,18 +17,11 @@
 </head>
 <body>
     <div class="container">
+       <div id="wrap">
         </br>
-        <h2>Select the subpack you wish to start marking:</h2>
-        <div class="list-group">
-            <c:forEach items = "${subpacks}" var="subpack">
-                <a href="/packages/${subpack.id}" class="list-group-item">ID: <b>${subpack.id}</b> NAME: <b>${subpack.name}</b></a>
-            </c:forEach>
+        <h2>You marked all the answers in this subpack.</h2>
+        <h2>Redirecting...</h2>
         </div>
-        </br>
-        <form action="<spring:url value="/"/>">
-            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Go back to main page">
-        </form>
-        </br>
     </div>
 </body>
 </html>
