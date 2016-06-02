@@ -12,9 +12,6 @@ public class Subpack {
 
     private Pack parent;
     private String name;
-    
-    // TO DO delete
-    private List<Person> users;
 
     public Subpack() {
     }
@@ -22,12 +19,6 @@ public class Subpack {
     public Subpack(Pack parent, String name) {
         this.parent = parent;
         this.name = name;
-    }
-
-    public Subpack(Pack parent, String name, List<Person> users) {
-        this.parent = parent;
-        this.name = name;
-        this.users = users;
     }
 
     public Long getId() {
@@ -52,16 +43,6 @@ public class Subpack {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    // TO DO delete
-    public List<Person> getUsers() {
-        return null;
-    }
-
-    // TO DO delete
-    public void setUsers(List<Person> users) {
-        
     }
 
     @Override

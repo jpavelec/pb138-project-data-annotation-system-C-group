@@ -86,7 +86,7 @@ public class PackManagerImpl implements PackManager {
 
         for (int i = 0; i < numOfSubpacks; i++) {
             String subpackName = String.format("%0"+String.valueOf(numOfSubpacks).length()+"d", i);
-            Subpack s = new Subpack(pack, subpackName, new ArrayList<Person>());
+            Subpack s = new Subpack(pack, subpackName);
             subpackDao.create(s);
 
             for (int j = 0; j < numOfAnswersInSubpack; j++) {

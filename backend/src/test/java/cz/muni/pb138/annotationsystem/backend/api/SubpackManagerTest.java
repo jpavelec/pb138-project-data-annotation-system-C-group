@@ -78,7 +78,6 @@ public class SubpackManagerTest {
         assertEquals(subpacks.get(0).getId(), result.getId());
         assertEquals(subpacks.get(0).getName(), result.getName());
         assertEquals(subpacks.get(0).getParent(), result.getParent());
-        assertEquals(new HashSet<>(subpacks.get(0).getUsers()), new HashSet<>(result.getUsers()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -151,15 +150,10 @@ public class SubpackManagerTest {
         List<Subpack> subpacks0 = subpackManager.getSubpacksInPack(packs[0]);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         subpacks.add(subpacks0.get(1));
-
         subpackManager.updatePersonsAssignment(persons[1], subpacks);
 
         List<Subpack> result = subpackManager.getSubpacksAssignedToPerson(persons[1]);
         assertEquals(new HashSet<>(subpacks), new HashSet<>(result));
-
-        for (Subpack subpack : subpacks) {
-            assertTrue(subpack.getUsers().contains(persons[1]));
-        }
     }
     @Test
     public void getSubpacksAssignedToPersonEmpty() throws Exception {

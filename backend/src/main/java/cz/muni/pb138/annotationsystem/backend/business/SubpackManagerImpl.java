@@ -74,14 +74,7 @@ public class SubpackManagerImpl implements SubpackManager {
             throw new IllegalArgumentException("person id is null");
         }
 
-        List<Subpack> subpacks = new ArrayList<>();
-        for (Subpack s : subpackDao.getAll()) {
-            if (s.getUsers().contains(person)) {
-                subpacks.add(s);
-            }
-        }
-
-        return subpacks;
+        return subpackDao.getSubpacksAssignedToPerson(person);
     }
 
     @Override
@@ -122,20 +115,7 @@ public class SubpackManagerImpl implements SubpackManager {
             }
         }
 
-        // TODO: definitely create new Dao method. something like: subpackDao.updateAssignment(Person, List<Subpacks>)
-        for (Subpack s : subpackDao.getAll()) {
-            if (subpacks.contains(s)) {
-                if (!s.getUsers().contains(person)) {
-                    s.getUsers().add(person);
-                    subpackDao.update(s);
-                }
-            } else {
-                if (s.getUsers().contains(person)) {
-                    s.getUsers().remove(person);
-                    subpackDao.update(s);
-                }
-            }
-        }
+        subpackDao.updateAssignment(person, subpacks);
     }
 
     @Override
@@ -156,7 +136,6 @@ public class SubpackManagerImpl implements SubpackManager {
             }
         }
 
-        subpack.setUsers(persons);
-        subpackDao.update(subpack);
+
     }
 }

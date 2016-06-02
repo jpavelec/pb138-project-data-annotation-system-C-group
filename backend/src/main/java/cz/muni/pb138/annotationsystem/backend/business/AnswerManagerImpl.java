@@ -30,6 +30,9 @@ public class AnswerManagerImpl implements AnswerManager {
     @Inject
     private EvaluationDao evaluationDao;
 
+    @Inject
+    private EvaluationManager evaluationManager;
+
     @Override
     @Transactional
     public Answer nextAnswer(Person person, Subpack subpack) throws DaoException {
@@ -39,19 +42,18 @@ public class AnswerManagerImpl implements AnswerManager {
         if (subpack == null) {
             throw new IllegalArgumentException("subpack is null");
         }
-        if (!subpack.getUsers().contains(person)) {
-            throw new IllegalArgumentException("person is not assigned to subpack");
-        }
 
         // TODO definitely create some Dao method. e.g. getUnevaluatedAnswers(person, subpack)
-        List<Evaluation> evaluations = evaluationDao.getAll();
-        for (Answer a : answerDao.getAll()) {
+        List<Evaluation> evaluations = evaluationManager.getEvaluationsOfPerson(person);
+        for (Answer a : this.getAnswersInSubpack(subpack)) {
+            boolean isEvaluated = false;
             for (Evaluation e : evaluations) {
-                if (!a.equals(e.getAnswer())) {
-                    if (e.getPerson().equals(person) && e.getAnswer().getFromSubpack().equals(subpack)) {
-                        return a;
-                    }
+                if (e.getAnswer().equals(a)) {
+                    isEvaluated = true;
                 }
+            }
+            if (!isEvaluated) {
+                return a;
             }
         }
         throw new IllegalStateException("No more answers left.");
