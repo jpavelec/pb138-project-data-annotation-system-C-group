@@ -47,10 +47,10 @@ public class MainController {
     private SubpackManager subpackManager;
 
     @RequestMapping("/")
-    public String primaryView(ServletRequest req) {
+    public String primaryView(ServletRequest req, HttpServletRequest httpReq) {
 
         try {
-            req.setAttribute("person", personManager.getPersonById((long) 1));
+            req.setAttribute("person", personManager.getPersonByUsername(httpReq.getRemoteUser()));
         } catch (DaoException e) {
             return "redirect:/view-error";
         }
@@ -143,12 +143,11 @@ public class MainController {
     }
 
     @RequestMapping("/packages")
-    public String packages(ServletRequest req, HttpServletRequest request) {
+    public String packages(ServletRequest req, HttpServletRequest httpReq) {
 
-        System.out.println(request.getRemoteUser());
 
         try {
-            req.setAttribute("subpacks", subpackManager.getSubpacksAssignedToPerson(personManager.getPersonByUsername(request.getRemoteUser())));
+            req.setAttribute("subpacks", subpackManager.getSubpacksAssignedToPerson(personManager.getPersonByUsername(httpReq.getRemoteUser())));
             } catch (DaoException e) {
             return "redirect:/view-error";
         }
