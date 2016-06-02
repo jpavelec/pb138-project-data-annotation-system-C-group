@@ -16,48 +16,70 @@ import java.util.List;
 public class TestUtils {
 
     static public final double EPSILON = 0.001;
-    static public final int SUBPACK_SIZE_0 = 2;
-    static public final int SUBPACK_SIZE_1 = 3;
-    static public final int SUBPACK_SIZE_2 = 2;
+    static public final int SUBPACK_SIZE_0 = 15;
+    static public final int SUBPACK_SIZE_1 = 12;
+    static public final int SUBPACK_SIZE_2 = 9;
 
 
     static public Pack getPack0() {
-        Pack pack = new Pack("Is it an animal?", "Animals", 12, 18);
+        Pack pack = new Pack("Is it an animal?", "Animals", 22, 28);
         return pack;
     }
 
     static public Pack getPack1() {
-        Pack pack = new Pack("Is it a correct word?", "Correct words", 6, 3);
+        Pack pack = new Pack("Is it a correct word?", "Correct words", 16, 23);
         return pack;
     }
 
     static public Pack getPack2() {
-        Pack pack = new Pack("Is it a name?", "Names", 8, 4);
+        Pack pack = new Pack("Is it a name?", "Names", 28, 14);
         return pack;
     }
 
     static public List<String> getAnswers0() {
-        return Arrays.asList("dog", "cat", "spoon", "mouse", "helicopter", "tiger", "monkey", "giraffe", "movie", "Lion");
+        return Arrays.asList(
+                "antelope", "armadillo", "bat", "hear", "beaver", "buffalo", "bull", "belt", "cow", "book",
+                "spoon", "ant", "bear", "bee", "bird", "camel", "cat", "cheetah", "chicken", "chimpanzee",
+                "smoke", "crocodile", "deer", "dog", "dolphin", "duck", "helicopter", "elephant", "fish", "fly",
+                "fox", "frog", "movie", "goat", "goldfish", "hamster", "hippopotamus", "horse", "kangaroo", "kitten",
+                "lion", "meal", "monkey", "octopus", "owl", "panda", "pig", "puppy", "rabbit", "rat"
+        );
     }
 
     static public List<String> getNoise0() {
-        return Arrays.asList("brown", "clip", "edge");
+        return Arrays.asList(
+                "brown", "clip", "edge", "alex", "casino", "cycle", "orange", "grill", "hammer", "thor");
     }
 
     static public List<String> getAnswers1() {
-        return Arrays.asList("journal", "brndrap", "halloween", "hill", "burger", "hjuvion", "park", "valley", "disk", "evgluph");
+        return Arrays.asList(
+                "upset", "handsome", "waste", "man", "knowing", "boil", "little", "fair", "shivering", "dark",
+                "hrdava", "terrible", "day", "abashed", "colorful", "pushy", "healthy", "complain", "produce", "can",
+                "trees", "scare", "work", "kunlum", "lucky", "left", "watch", "empty", "subtract", "bat",
+                "kimasa", "distance", "hands", "oiuha", "closed", "efficient", "worm", "health", "ugly", "milk",
+                "tra", "private", "obese", "melodic", "low", "guide", "acdobol", "pollution", "gardq", "ploccc"
+                );
     }
 
     static public List<String> getNoise1() {
-        return Arrays.asList("grpkac", "dupelin", "helekina");
+        return Arrays.asList(
+                "grpkac", "dupelin", "helekina", "heeuio", "hzard", "kolq", "ooddne", "odklmn", "poqertz", "pqodmst");
     }
 
     static public List<String> getAnswers2() {
-        return Arrays.asList("Felix", "Anna", "Vampire", "Clark", "Ben", "Hanna", "Mark", "Andrew", "London", "Obstacle");
+        return Arrays.asList(
+                "Willie", "Jose", "Barbara", "Richard", "Database", "Lillian", "First", "Margaret", "Phillip", "Ronald",
+                "Lawrence", "Carol", "Random", "Kenneth", "Beverly", "Cheryl", "Jason", "James", "Contains", "Lisa",
+                "The", "Cynthia", "Eugene", "Pamela", "Peter", "Carolyn", "Phyllis", "Generator", "Janice", "Steve",
+                "Lois", "Harry", "Jessica", "Todd", "Christina", "Samuel", "Laura", "Theresa", "Mildred", "Terry",
+                "Martha", "Nicole", "Frank", "On", "Justin", "Howard", "Sean", "Doris", "English", "Europe"
+        );
+
     }
 
     static public List<String> getNoise2() {
-        return Arrays.asList("People", "Dragon", "Happy");
+        return Arrays.asList(
+                "People", "Dragon", "Happy", "Heureka", "Hazard", "Coca-Cola", "Odyn", "Obey", "Ant", "Bridge");
     }
 
     static public Person getPerson0() {

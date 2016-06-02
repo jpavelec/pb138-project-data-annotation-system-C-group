@@ -192,7 +192,8 @@ public class AnswerManagerTest {
         assertTrue(TestUtils.SUBPACK_SIZE_1 <= answers.size());
 
         for (Answer answer : answers) {
-            assertTrue(TestUtils.getAnswers1().contains(answer.getAnswer()));
+            assertTrue(TestUtils.getAnswers1().contains(answer.getAnswer())
+            || TestUtils.getNoise1().contains(answer.getAnswer()));
         }
     }
     @Test(expected = IllegalArgumentException.class)

@@ -16,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
@@ -95,12 +97,19 @@ public class AnswerManagerImpl implements AnswerManager {
             throw new IllegalArgumentException("pack is null");
         }
 
-        List<Answer> answers = new ArrayList<>();
-        for (Answer a : answerDao.getAll()) {
+        Set<Answer> answers = new HashSet<>();
+        answerLoop: for (Answer a : answerDao.getAll()) {
             if (a.getFromSubpack().getParent().equals(pack)) {
-                answers.add(a);
+                if (!a.isIsNoise()) {
+                    for (Answer r : answers) {
+                        if (r.getAnswer().equals(a.getAnswer())) {
+                            continue answerLoop;
+                        }
+                    }
+                    answers.add(a);
+                }
             }
         }
-        return answers;
+        return new ArrayList<>(answers);
     }
 }
