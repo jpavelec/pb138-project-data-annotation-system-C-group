@@ -99,7 +99,7 @@ public class AnswerManagerTest {
 
         answerManager.nextAnswer(persons[1], subpacks.get(1));
     }
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void nextAnswerNotAssigned() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);

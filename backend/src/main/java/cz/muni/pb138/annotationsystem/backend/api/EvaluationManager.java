@@ -17,6 +17,8 @@ public interface EvaluationManager {
 
     void eval(Evaluation evaluation) throws DaoException;
 
+    void correct(Evaluation evaluation) throws DaoException;
+
     Evaluation getEvaluationById(Long id) throws DaoException;
 
     List<Evaluation> getEvaluationsOfPerson(Person person) throws DaoException;

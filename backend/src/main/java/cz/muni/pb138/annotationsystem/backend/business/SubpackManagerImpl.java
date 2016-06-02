@@ -71,7 +71,7 @@ public class SubpackManagerImpl implements SubpackManager {
             throw new IllegalArgumentException("person is null");
         }
         if (person.getId() == null || person.getId() < 0) {
-            throw new IllegalArgumentException("person id is null");
+            throw new ValidationException("person id is null");
         }
 
         return subpackDao.getSubpacksAssignedToPerson(person);
@@ -87,14 +87,7 @@ public class SubpackManagerImpl implements SubpackManager {
             throw new IllegalArgumentException("subpack id is null");
         }
 
-        List<Person> persons = new ArrayList<>();
-        for (Person p : personDao.getAll()) {
-            if (getSubpacksAssignedToPerson(p).contains(subpack)) {
-                persons.add(p);
-            }
-        }
-
-        return persons;
+        return subpackDao.getPeopleAssignedToSubpack(subpack);
     }
 
     @Override
@@ -136,6 +129,7 @@ public class SubpackManagerImpl implements SubpackManager {
             }
         }
 
+        subpackDao.updateAssignment(subpack, persons);
 
     }
 }

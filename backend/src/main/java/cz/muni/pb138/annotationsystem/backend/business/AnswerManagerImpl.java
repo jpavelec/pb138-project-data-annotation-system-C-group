@@ -28,7 +28,7 @@ public class AnswerManagerImpl implements AnswerManager {
     private AnswerDao answerDao;
 
     @Inject
-    private EvaluationDao evaluationDao;
+    private SubpackManager subpackManager;
 
     @Inject
     private EvaluationManager evaluationManager;
@@ -41,6 +41,9 @@ public class AnswerManagerImpl implements AnswerManager {
         }
         if (subpack == null) {
             throw new IllegalArgumentException("subpack is null");
+        }
+        if (!subpackManager.getSubpacksAssignedToPerson(person).contains(subpack)) {
+            throw new IllegalStateException("Person is not assigned to subpack");
         }
 
         // TODO definitely create some Dao method. e.g. getUnevaluatedAnswers(person, subpack)

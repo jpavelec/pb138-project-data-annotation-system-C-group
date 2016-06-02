@@ -84,8 +84,8 @@ public class EvaluationManagerTest {
         assertEquals(eval, evaluationManager.getEvaluationById(eval.getId()));
         assertTrue(evaluationManager.getEvaluationsOfPerson(persons[1]).contains(eval));
     }
-    @Test
-    public void evalCorrect() throws Exception {
+    @Test(expected = ValidationException.class)
+    public void evalWithId() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
@@ -93,23 +93,9 @@ public class EvaluationManagerTest {
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
 
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
+        eval.setId((long) 1);
 
         evaluationManager.eval(eval);
-
-        Evaluation correction = new Evaluation(persons[1], answerManager.getAnswerById(answer.getId()), Rating.NEGATIVE, 20);
-
-        evaluationManager.eval(correction);
-
-        assertNotNull(correction.getId());
-        assertEquals(eval.getId(), correction.getId());
-
-        Evaluation result = evaluationManager.getEvaluationById(eval.getId());
-
-        assertEquals(eval.getId(), result.getId());
-        assertEquals(Rating.NEGATIVE, result.getRating());
-        assertEquals(correction.getElapsedTime(), result.getElapsedTime());
-        assertTrue(evaluationManager.getEvaluationsOfPerson(persons[1]).contains(correction));
-        assertTrue(evaluationManager.getEvaluationsOfPerson(persons[1]).contains(result));
     }
     @Test(expected = IllegalStateException.class)
     public void evalNotAssigned() throws Exception {
@@ -180,6 +166,159 @@ public class EvaluationManagerTest {
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
 
         evaluationManager.eval(eval);
+    }
+
+
+    @Test
+    public void correct() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
+        Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
+        evaluationManager.eval(eval);
+
+        Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
+        correct.setRating(Rating.NEGATIVE);
+
+        evaluationManager.correct(correct);
+
+        Evaluation result = evaluationManager.getEvaluationById(eval.getId());
+
+        assertEquals(correct.getId(), result.getId());
+        assertEquals(Rating.NEGATIVE, result.getRating());
+        assertEquals(correct.getElapsedTime(), result.getElapsedTime());
+        assertTrue(evaluationManager.getEvaluationsOfPerson(persons[1]).contains(result));
+    }
+    @Test(expected = ValidationException.class)
+    public void correctWithoutId() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
+        Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
+        evaluationManager.eval(eval);
+
+        Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
+        correct.setRating(Rating.NEGATIVE);
+        correct.setId(null);
+
+        evaluationManager.correct(correct);
+    }
+    @Test(expected = BeanNotExistsException.class)
+    public void correctUnknownEval() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
+        Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
+        evaluationManager.eval(eval);
+
+        Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
+        correct.setRating(Rating.NEGATIVE);
+        correct.setId((long) 99);
+
+        evaluationManager.correct(correct);
+    }
+    @Test(expected = IllegalStateException.class)
+    public void correctNotAssigned() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
+        Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
+        evaluationManager.eval(eval);
+
+        Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
+        correct.setRating(Rating.NEGATIVE);
+
+        subpackManager.updatePersonsAssignment(persons[1], new ArrayList<Subpack>());
+
+        evaluationManager.correct(correct);
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void correctNullEval() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
+        Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
+        evaluationManager.eval(eval);
+
+        Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
+        correct.setRating(Rating.NEGATIVE);
+
+        evaluationManager.correct(null);
+
+    }
+    @Test(expected = ValidationException.class)
+    public void correctNullAnswer() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
+        Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
+        evaluationManager.eval(eval);
+
+        Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
+        correct.setRating(Rating.NEGATIVE);
+        correct.setAnswer(null);
+
+        evaluationManager.correct(correct);
+    }
+    @Test(expected = ValidationException.class)
+    public void correctNullPerson() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
+        Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
+        evaluationManager.eval(eval);
+
+        Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
+        correct.setRating(Rating.NEGATIVE);
+        correct.setPerson(null);
+
+        evaluationManager.correct(correct);
+    }
+    @Test(expected = ValidationException.class)
+    public void correctNonExistsAnswer() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
+        Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
+        evaluationManager.eval(eval);
+
+        Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
+        correct.setRating(Rating.NEGATIVE);
+        correct.getAnswer().setId((long) 99);
+
+        evaluationManager.correct(correct);
+    }
+    @Test(expected = ValidationException.class)
+    public void correctNonExistsPerson() throws Exception {
+        Pack[] packs = TestUtils.createPacks(packManager);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
+        Person[] persons = TestUtils.createPersons(personManager);
+        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
+        Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
+        evaluationManager.eval(eval);
+
+        Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
+        correct.setRating(Rating.NEGATIVE);
+        correct.getPerson().setId((long) 99);
+
+        evaluationManager.correct(correct);
     }
 
 
