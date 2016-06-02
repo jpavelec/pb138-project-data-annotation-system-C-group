@@ -82,6 +82,13 @@ public class PackManagerTest {
         assertTrue(packManager.getAllPacks().size() == 1);
 
         assertEquals(pack0, packManager.getPackById(pack0.getId()));
+    }
+
+    @Test
+    public void createPackAnswersCheck() throws Exception {
+
+        Pack pack0 = TestUtils.getPack0();
+        packManager.createPack(pack0, TestUtils.getAnswers0(), TestUtils.getNoise0(), TestUtils.SUBPACK_SIZE_0);
 
         List<Answer> answers = answerManager.getAnswersInPack(pack0);
 
@@ -89,6 +96,13 @@ public class PackManagerTest {
         for (Answer answer : answers) {
             assertTrue(TestUtils.getAnswers0().contains(answer.getAnswer()));
         }
+    }
+
+    @Test
+    public void createPackSubpacksCheck() throws Exception {
+
+        Pack pack0 = TestUtils.getPack0();
+        packManager.createPack(pack0, TestUtils.getAnswers0(), TestUtils.getNoise0(), TestUtils.SUBPACK_SIZE_0);
 
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(pack0);
 
@@ -116,6 +130,35 @@ public class PackManagerTest {
 
         assertTrue(lessThanSubpackSize <= 1);
     }
+
+
+    @Test
+    public void createPackNoiseCheck() throws Exception {
+
+        Pack pack0 = TestUtils.getPack0();
+        packManager.createPack(pack0, TestUtils.getAnswers0(), TestUtils.getNoise0(), TestUtils.SUBPACK_SIZE_0);
+
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(pack0);
+
+        assertTrue(subpacks.size() == Math.ceil(TestUtils.getAnswers0().size() / ((double)TestUtils.SUBPACK_SIZE_0)));
+
+        List<Answer> subanswers;
+        for (Subpack subpack : subpacks) {
+            subanswers = answerManager.getAnswersInSubpack(subpack);
+
+            int numOfNoise = 0;
+            for (Answer a : subanswers) {
+                if (a.isIsNoise()) {
+                    numOfNoise++;
+                    assertTrue(TestUtils.getNoise0().contains(a.getAnswer()));
+                }
+            }
+
+            int expectedNumOfNoise = (int) Math.ceil(subanswers.size()*pack0.getNoiseRate()/100);
+            assertEquals(expectedNumOfNoise, numOfNoise);
+        }
+    }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void createPackNullPack() throws Exception {

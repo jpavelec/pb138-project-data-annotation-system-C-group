@@ -1,6 +1,5 @@
 package cz.muni.pb138.annotationsystem.backend.business;
 
-import ch.qos.logback.classic.spi.PackagingDataCalculator;
 import cz.muni.pb138.annotationsystem.backend.api.PackManager;
 import cz.muni.pb138.annotationsystem.backend.api.SubpackManager;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
