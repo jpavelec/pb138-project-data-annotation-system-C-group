@@ -97,7 +97,6 @@ public class PackManagerTest {
             assertTrue(TestUtils.getAnswers0().contains(answer.getAnswer()));
         }
     }
-
     @Test
     public void createPackSubpacksCheck() throws Exception {
 
@@ -107,30 +106,58 @@ public class PackManagerTest {
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(pack0);
 
         assertTrue(subpacks.size() == Math.ceil(TestUtils.getAnswers0().size() / ((double)TestUtils.SUBPACK_SIZE_0)));
+    }
 
+    @Test
+    public void createPackSubpacksAnswersCheck() throws Exception {
+
+        Pack pack0 = TestUtils.getPack0();
+        packManager.createPack(pack0, TestUtils.getAnswers0(), TestUtils.getNoise0(), TestUtils.SUBPACK_SIZE_0);
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(pack0);
+
+        int expectedSubpackSize =
+                subpackSizeWithRepetitionAndNoise(TestUtils.SUBPACK_SIZE_0, pack0.getRepeatingRate(), pack0.getNoiseRate());
+
+        // Check number of answers in subpack
         int lessThanSubpackSize = 0;
-        List<Answer> previousSubanswers = null;
-        List<Answer> subanswers = null;
         for (Subpack subpack : subpacks) {
-            previousSubanswers = subanswers;
-            subanswers = answerManager.getAnswersInSubpack(subpack);
+            List<Answer> subanswers = answerManager.getAnswersInSubpack(subpack);
 
-            if (subanswers.size() < TestUtils.SUBPACK_SIZE_0) {
+            if (subanswers.size() < expectedSubpackSize) {
                 lessThanSubpackSize++;
+
+                int rest = TestUtils.getAnswers0().size() % TestUtils.SUBPACK_SIZE_0;
+
+                int expectedSubpackSizeRest =
+                        subpackSizeWithRepetitionAndNoise(rest, pack0.getRepeatingRate(), pack0.getNoiseRate());
+
+                assertEquals(expectedSubpackSizeRest, subanswers.size());
+            } else {
+
+                assertEquals(expectedSubpackSize, subanswers.size());
+
             }
 
+        }
+        assertTrue(lessThanSubpackSize <= 1);
+
+
+        // Check answer String and disjunctive of answers in subpack
+        List<Answer> subanswers = null;
+        for (Subpack subpack : subpacks) {
+            List<Answer> previousSubanswers = subanswers;
+            subanswers = answerManager.getAnswersInSubpack(subpack);
+
             for (Answer subanswer : subanswers) {
-                assertTrue(TestUtils.getAnswers0().contains(subanswer.getAnswer()));
+                assertTrue(TestUtils.getAnswers0().contains(subanswer.getAnswer())
+                || TestUtils.getNoise0().contains(subanswer.getAnswer()));
             }
 
             if (previousSubanswers != null) {
                 assertTrue(Collections.disjoint(previousSubanswers, subanswers));
             }
         }
-
-        assertTrue(lessThanSubpackSize <= 1);
     }
-
 
     @Test
     public void createPackNoiseCheck() throws Exception {
@@ -140,11 +167,8 @@ public class PackManagerTest {
 
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(pack0);
 
-        assertTrue(subpacks.size() == Math.ceil(TestUtils.getAnswers0().size() / ((double)TestUtils.SUBPACK_SIZE_0)));
-
-        List<Answer> subanswers;
         for (Subpack subpack : subpacks) {
-            subanswers = answerManager.getAnswersInSubpack(subpack);
+            List<Answer> subanswers = answerManager.getAnswersInSubpack(subpack);
 
             int numOfNoise = 0;
             for (Answer a : subanswers) {
@@ -154,11 +178,64 @@ public class PackManagerTest {
                 }
             }
 
-            int expectedNumOfNoise = (int) Math.ceil(subanswers.size()*pack0.getNoiseRate()/100);
-            assertEquals(expectedNumOfNoise, numOfNoise);
+            if (subanswers.size() < subpackSizeWithRepetitionAndNoise(TestUtils.SUBPACK_SIZE_0,
+                    pack0.getRepeatingRate(), pack0.getNoiseRate())) {
+
+                int subpackSizeRest = TestUtils.getAnswers0().size() % TestUtils.SUBPACK_SIZE_0;
+                int expectedNumOfNoise = (int) Math.ceil(subpackSizeRest*(pack0.getNoiseRate()/100));
+
+                assertEquals(expectedNumOfNoise, numOfNoise);
+
+            } else {
+
+                int expectedNumOfNoise = (int) Math.ceil(TestUtils.SUBPACK_SIZE_0*(pack0.getNoiseRate()/100));
+
+                assertEquals(expectedNumOfNoise, numOfNoise);
+
+            }
+
         }
     }
 
+    @Test
+    public void createPackRepetitionCheck() throws Exception {
+
+        Pack pack0 = TestUtils.getPack0();
+        packManager.createPack(pack0, TestUtils.getAnswers0(), TestUtils.getNoise0(), TestUtils.SUBPACK_SIZE_0);
+
+        List<Subpack> subpacks = subpackManager.getSubpacksInPack(pack0);
+
+        for (Subpack subpack : subpacks) {
+            List<Answer> subanswers = answerManager.getAnswersInSubpack(subpack);
+            Set<String> auxiliary = new HashSet<>();
+
+            int numOfRepetition = 0;
+            for (Answer a : subanswers) {
+                // Returns false if item already exists in the set
+                if (!auxiliary.add(a.getAnswer())) {
+                    numOfRepetition++;
+                    assertFalse(a.isIsNoise());
+                    assertTrue(TestUtils.getAnswers0().contains(a.getAnswer()));
+                }
+            }
+
+            if (subanswers.size() < subpackSizeWithRepetitionAndNoise(TestUtils.SUBPACK_SIZE_0,
+                    pack0.getRepeatingRate(), pack0.getNoiseRate())) {
+
+                int subpackSizeRest = TestUtils.getAnswers0().size() % TestUtils.SUBPACK_SIZE_0;
+                int expectedNumOfRepeating = (int) Math.ceil(subpackSizeRest*(pack0.getRepeatingRate()/100));
+
+                assertEquals(expectedNumOfRepeating, numOfRepetition);
+
+            } else {
+
+                int expectedNumOfRepeating = (int) Math.ceil(TestUtils.SUBPACK_SIZE_0*(pack0.getRepeatingRate()/100));
+
+                assertEquals(expectedNumOfRepeating, numOfRepetition);
+
+            }
+        }
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void createPackNullPack() throws Exception {
@@ -391,4 +468,12 @@ public class PackManagerTest {
 
 
 
+
+
+    private int subpackSizeWithRepetitionAndNoise(int subpacksize, double repeatingRate, double noiseRate) {
+        int expectedSubpackSize = subpacksize;
+        expectedSubpackSize += Math.ceil(subpacksize * noiseRate/100);
+        expectedSubpackSize += Math.ceil(subpacksize * repeatingRate/100);
+        return expectedSubpackSize;
+    }
 }

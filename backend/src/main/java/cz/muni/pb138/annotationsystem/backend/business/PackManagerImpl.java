@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.backend.business;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.StringStack;
 import cz.muni.pb138.annotationsystem.backend.api.PackManager;
 import cz.muni.pb138.annotationsystem.backend.api.SubpackManager;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
@@ -18,7 +19,12 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Stack;
 
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
@@ -83,19 +89,59 @@ public class PackManagerImpl implements PackManager {
 
         int numOfSubpacks = (int) Math.ceil(((double)answers.size())/((double)numOfAnswersInSubpack));
 
-        for (int i = 0; i < numOfSubpacks; i++) {
-            String subpackName = String.format("%0"+String.valueOf(numOfSubpacks).length()+"d", i);
-            Subpack s = new Subpack(pack, subpackName);
-            subpackDao.create(s);
 
-            for (int j = 0; j < numOfAnswersInSubpack; j++) {
-                int currentAnswer = i*numOfAnswersInSubpack + j;
-                if (currentAnswer >= answers.size()) {
-                    break;
-                }
-                Answer a = new Answer(s, answers.get(currentAnswer), false);
+        for (int i = 0; i < numOfSubpacks; i++) {
+
+
+            String subpackName = String.format("%0"+String.valueOf(numOfSubpacks).length()+"d", i);
+            Subpack subpack = new Subpack(pack, subpackName);
+            subpackDao.create(subpack);
+
+
+            int currentNumOfAnswersInSubpack = Math.min(numOfAnswersInSubpack, answers.size()-i*numOfAnswersInSubpack);
+            List<String> answersInSubpack = answers.subList(i*numOfAnswersInSubpack, i*numOfAnswersInSubpack + currentNumOfAnswersInSubpack);
+            for (String answer : answersInSubpack) {
+
+                Answer a = new Answer(subpack, answer, false);
                 answerDao.create(a);
+
             }
+
+            if (pack.getNoiseRate() > 0) {
+                int expectedNumOfNoise = (int) Math.ceil(currentNumOfAnswersInSubpack*(pack.getNoiseRate()/100));
+
+                int currentNumOfNoise = 0;
+                do {
+                    Collections.shuffle(noise);
+                    for (String grain : noise) {
+                        if (currentNumOfNoise >= expectedNumOfNoise) {
+                            break;
+                        }
+                        Answer g = new Answer(subpack, grain, true);
+                        answerDao.create(g);
+                        currentNumOfNoise ++;
+                    }
+                } while (currentNumOfNoise < expectedNumOfNoise);
+            }
+
+
+            if (pack.getRepeatingRate() > 0) {
+                int expectedNumOfRepeating = (int) Math.ceil(currentNumOfAnswersInSubpack*(pack.getRepeatingRate()/100));
+
+                int currentNumOfRepeating = 0;
+                do {
+                    Collections.shuffle(answersInSubpack);
+                    for (String repeating : answersInSubpack) {
+                        if (currentNumOfRepeating >= expectedNumOfRepeating) {
+                            break;
+                        }
+                        Answer r = new Answer(subpack, repeating, false);
+                        answerDao.create(r);
+                        currentNumOfRepeating ++;
+                    }
+                } while (currentNumOfRepeating < expectedNumOfRepeating);
+            }
+
         }
 
     }
