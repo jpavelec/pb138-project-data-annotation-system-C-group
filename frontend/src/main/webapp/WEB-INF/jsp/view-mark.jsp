@@ -47,7 +47,7 @@
         <div id="left">
             <div class="column-in">
                 <div class="next" id="minus-next">
-                    <form id="answerForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}" method="POST" enctype="multipart/form-data">
+                    <form id="answerForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}/${lStartTime}" method="POST" enctype="multipart/form-data">
                         <input id="value" name="value" type="image" alt="no" value="0" src="<c:url value="/resources/images/no.svg" />" width="100%"/>
                     </form>
                 </div>
@@ -57,7 +57,7 @@
         <div id="right">
             <div class="column-in">
                 <div class="next" id="plus-next">
-                    <form id="answerForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}" method="POST" enctype="multipart/form-data">
+                    <form id="answerForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}/${lStartTime}" method="POST" enctype="multipart/form-data">
                         <input id="value" name="value" type="image" alt="no" value="1" src="<c:url value="/resources/images/yes.svg" />" width="100%"/>
                     </form>
                 </div>

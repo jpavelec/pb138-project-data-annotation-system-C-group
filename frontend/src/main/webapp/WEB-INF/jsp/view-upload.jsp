@@ -34,13 +34,13 @@
             </br>
             <div id="middle">
                 <label for="noiseRate">Enter repetition rate in %</label>
-                <input class="form-control" type="number" name="value" placeholder="5" required>
+                <input class="form-control" type="number" name="value" value="5" required>
                 </br>
                 <label for="repeatingRate">Enter noise rate in %</label>
-                <input class="form-control" type="number" name="value" placeholder="5" required>
+                <input class="form-control" type="number" name="value" value="5" required>
                 </br>
                 <label for="numOfAnswersInSubpack">Enter maximum size of one package</label>
-                <input class="form-control" type="number" name="value" placeholder="200" required>
+                <input class="form-control" type="number" name="value" value="200" required>
                 </br>
             </div>
             <input type="submit" class="btn btn-lg btn-primary btn-block" value="Upload">
