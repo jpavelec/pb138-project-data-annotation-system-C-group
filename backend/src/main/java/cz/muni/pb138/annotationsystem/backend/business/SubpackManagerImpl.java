@@ -4,6 +4,7 @@ import cz.muni.pb138.annotationsystem.backend.api.AnswerManager;
 import cz.muni.pb138.annotationsystem.backend.api.PackManager;
 import cz.muni.pb138.annotationsystem.backend.api.PersonManager;
 import cz.muni.pb138.annotationsystem.backend.api.SubpackManager;
+import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.dao.AnswerDao;
@@ -32,6 +33,9 @@ public class SubpackManagerImpl implements SubpackManager {
     private SubpackDao subpackDao;
 
     @Inject
+    private PackDao packDao;
+
+    @Inject
     private PersonDao personDao;
 
     @Override
@@ -53,6 +57,9 @@ public class SubpackManagerImpl implements SubpackManager {
         if (pack.getId() == null || pack.getId() < 0) {
             throw new IllegalArgumentException("pack id is null");
         }
+        if (!packDao.doesExist(pack)) {
+            throw new BeanNotExistsException("given pack does not exist");
+        }
 
         List<Subpack> subpacks = new ArrayList<>();
         for (Subpack s : subpackDao.getAll()) {
@@ -73,6 +80,9 @@ public class SubpackManagerImpl implements SubpackManager {
         if (person.getId() == null || person.getId() < 0) {
             throw new ValidationException("person id is null");
         }
+        if (!personDao.doesExist(person)) {
+            throw new BeanNotExistsException("given person does not exist");
+        }
 
         return subpackDao.getSubpacksAssignedToPerson(person);
     }
@@ -85,6 +95,9 @@ public class SubpackManagerImpl implements SubpackManager {
         }
         if (subpack.getId() == null || subpack.getId() < 0) {
             throw new IllegalArgumentException("subpack id is null");
+        }
+        if (!subpackDao.doesExist(subpack)) {
+            throw new BeanNotExistsException("given subpack does not exist");
         }
 
         return subpackDao.getPeopleAssignedToSubpack(subpack);
@@ -99,12 +112,18 @@ public class SubpackManagerImpl implements SubpackManager {
         if (person.getId() == null || person.getId() < 0) {
             throw new IllegalArgumentException("person id is null");
         }
+        if (!personDao.doesExist(person)) {
+            throw new BeanNotExistsException("given person does not exist");
+        }
         if (subpacks == null) {
             throw new IllegalArgumentException("list of subpacks is null");
         }
         for (Subpack s : subpacks) {
             if (s == null || s.getId() == null || s.getId() < 0) {
                 throw new ValidationException("Some subpack is null or its id is null or negative");
+            }
+            if (!subpackDao.doesExist(s)) {
+                throw new BeanNotExistsException("one of given subpack does not exist");
             }
         }
 
@@ -120,12 +139,18 @@ public class SubpackManagerImpl implements SubpackManager {
         if (subpack.getId() == null || subpack.getId() < 0) {
             throw new IllegalArgumentException("subpack id is null");
         }
+        if (!subpackDao.doesExist(subpack)) {
+            throw new BeanNotExistsException("given subpack does not exist");
+        }
         if (persons == null) {
             throw new IllegalArgumentException("persons is null");
         }
         for (Person p : persons) {
             if (p == null || p.getId() == null || p.getId() < 0) {
                 throw new ValidationException("Some person is null or its id is null or negative");
+            }
+            if (!personDao.doesExist(p)) {
+                throw new BeanNotExistsException("one of given person does not exist");
             }
         }
 

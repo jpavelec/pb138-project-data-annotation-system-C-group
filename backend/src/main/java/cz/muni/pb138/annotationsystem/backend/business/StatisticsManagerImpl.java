@@ -34,12 +34,6 @@ public class StatisticsManagerImpl implements StatisticsManager {
 
     @Override
     @Transactional
-    public double getProgressOfPerson(Person person) {
-        return 0.4;
-    }
-
-    @Override
-    @Transactional
     public double getCohenKappa(Person person) {
         return 0.8;
     }
@@ -58,12 +52,6 @@ public class StatisticsManagerImpl implements StatisticsManager {
 
     @Override
     @Transactional
-    public double averageEvaluationTimeForPerson(Person person) {
-        return 30;
-    }
-
-    @Override
-    @Transactional
     public double averageEvaluationTimeOfSubpackForPerson(Subpack subpack, Person person) {
         return 60;
     }
@@ -74,9 +62,4 @@ public class StatisticsManagerImpl implements StatisticsManager {
         return 24563725;
     }
 
-    @Override
-    @Transactional
-    public double averageCompletionTimeForPerson(Person person) {
-        return 28563725;
-    }
 }

@@ -3,6 +3,7 @@ package cz.muni.pb138.annotationsystem.backend.business;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.util.StringStack;
 import cz.muni.pb138.annotationsystem.backend.api.PackManager;
 import cz.muni.pb138.annotationsystem.backend.api.SubpackManager;
+import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.dao.AnswerDao;
@@ -171,6 +172,9 @@ public class PackManagerImpl implements PackManager {
         }
         if (pack.getId() == null || pack.getId() < 0) {
             throw new IllegalArgumentException("id is null or negative");
+        }
+        if (!packDao.doesExist(pack)) {
+            throw new BeanNotExistsException("Given pack does not exists");
         }
 
         packDao.delete(pack);

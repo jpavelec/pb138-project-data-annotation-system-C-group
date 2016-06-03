@@ -42,6 +42,7 @@ public class PersonManagerImpl implements PersonManager {
         if (personDao.getByUsername(person.getUsername()) != null) {
             throw new BeanAlreadyExistsException("Person with name: "+person.getUsername()+" already exists.");
         }
+
         personDao.create(person);
     }
 
@@ -51,6 +52,7 @@ public class PersonManagerImpl implements PersonManager {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username is null or empty");
         }
+
         Person person = personDao.getByUsername(username);
         if (person == null) {
             person = new Person(username);
@@ -65,6 +67,7 @@ public class PersonManagerImpl implements PersonManager {
         if (id == null || id < 0) {
             throw new IllegalArgumentException("Id is null or negative");
         }
+
         Person p = personDao.getById(id);
         return p;
     }

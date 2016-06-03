@@ -4,11 +4,13 @@ import cz.muni.pb138.annotationsystem.backend.api.AnswerManager;
 import cz.muni.pb138.annotationsystem.backend.api.EvaluationManager;
 import cz.muni.pb138.annotationsystem.backend.api.PersonManager;
 import cz.muni.pb138.annotationsystem.backend.api.SubpackManager;
+import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.dao.AnswerDao;
 import cz.muni.pb138.annotationsystem.backend.dao.EvaluationDao;
 import cz.muni.pb138.annotationsystem.backend.dao.EvaluationDaoImpl;
+import cz.muni.pb138.annotationsystem.backend.dao.PersonDao;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
@@ -32,6 +34,9 @@ public class EvaluationManagerImpl implements EvaluationManager {
 
     @Inject
     private SubpackManager subpackManager;
+
+    @Inject
+    private PersonDao personDao;
 
     @Override
     @Transactional
@@ -67,8 +72,14 @@ public class EvaluationManagerImpl implements EvaluationManager {
         if (evaluation == null) {
             throw new IllegalArgumentException("Evaluation is null");
         }
-        if (evaluation.getId() == null) {
+        if (evaluation.getId() == null || evaluation.getId() < 0) {
             throw new ValidationException("Updated evaluation does not have id");
+        }
+        if (!evaluationDao.doesExist(evaluation)) {
+            throw new BeanNotExistsException("given evaluation does not exist");
+        }
+        if (!subpackManager.getSubpacksAssignedToPerson(evaluation.getPerson()).contains(evaluation.getAnswer().getFromSubpack())) {
+            throw new IllegalStateException("Person is not assigned to subpack");
         }
         if (evaluation.getRating() == null) {
             throw new ValidationException("Updated evaluation rating is null");
@@ -81,9 +92,6 @@ public class EvaluationManagerImpl implements EvaluationManager {
         }
         if (evaluation.getElapsedTime() < 0) {
             throw new ValidationException("Evaluation time is negative");
-        }
-        if (!subpackManager.getSubpacksAssignedToPerson(evaluation.getPerson()).contains(evaluation.getAnswer().getFromSubpack())) {
-            throw new IllegalStateException("Person is not assigned to subpack");
         }
 
         evaluationDao.update(evaluation);
@@ -105,8 +113,11 @@ public class EvaluationManagerImpl implements EvaluationManager {
         if (person == null) {
             throw new IllegalArgumentException("person is null");
         }
-        if (person.getId() == null) {
-            throw new IllegalArgumentException("person id is null");
+        if (person.getId() == null || person.getId() < 0) {
+            throw new IllegalArgumentException("person id is null or negative");
+        }
+        if (!personDao.doesExist(person)) {
+            throw new BeanNotExistsException("given person does not exist");
         }
 
         List<Evaluation> evals = new ArrayList<>();

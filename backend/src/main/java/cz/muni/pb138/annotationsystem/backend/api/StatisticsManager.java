@@ -12,16 +12,13 @@ public interface StatisticsManager {
     double getProgressOfPack(Pack pack);
     double getProgressOfSubpack(Subpack subpack);
     double getProgressOfSubpackForPerson(Subpack subpack, Person person);
-    double getProgressOfPerson(Person person);
 
     double getCohenKappa(Person person);
     double getCohenKappa(Person person, Subpack subpack);
 
     double averageEvaluationTimeOfSubpack(Subpack subpack);
-    double averageEvaluationTimeForPerson(Person person);
     double averageEvaluationTimeOfSubpackForPerson(Subpack subpack, Person person);
 
     double averageCompletionTimeOfSubpack(Subpack subpack);
-    double averageCompletionTimeForPerson(Person person);
 
 }
