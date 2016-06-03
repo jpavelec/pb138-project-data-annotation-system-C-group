@@ -18,5 +18,7 @@ public interface Dao<B extends Object> {
     void update(B bean) throws DaoException;
 
     void delete(B bean) throws DaoException;
+    
+    boolean doesExist(B bean) throws DaoException;
 
 }

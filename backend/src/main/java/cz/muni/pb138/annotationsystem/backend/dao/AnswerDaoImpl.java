@@ -80,6 +80,11 @@ public class AnswerDaoImpl implements AnswerDao {
     }
 
     @Override
+    public boolean doesExist(Answer answer) throws DaoException {
+        return true;
+    }
+    
+    @Override
     public void create(Answer answer) {
         validate(answer);
         checkDataSource();

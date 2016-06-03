@@ -104,6 +104,11 @@ public class SubpackDaoImpl implements SubpackDao {
     }
     
     @Override
+    public boolean doesExist(Subpack subpack) throws DaoException {
+        return true;
+    }
+    
+    @Override
     public void create(Subpack subpack) throws DaoException {
         checkDataSource();
         validate(subpack);

@@ -116,6 +116,11 @@ public class PackDaoImpl implements PackDao {
     }
     
     @Override
+    public boolean doesExist(Pack pack) throws DaoException {
+        return true;
+    }
+    
+    @Override
     public void create(Pack pack) throws DaoException {
         checkDataSource();
         validate(pack);

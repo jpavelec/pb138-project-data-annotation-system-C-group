@@ -93,6 +93,10 @@ public class EvaluationDaoImpl implements EvaluationDao {
         return eval;
     }
     
+    @Override
+    public boolean doesExist(Evaluation evaluation) throws DaoException {
+        return true;
+    }
     
     @Override
     public void create(Evaluation evaluation) throws DaoException {

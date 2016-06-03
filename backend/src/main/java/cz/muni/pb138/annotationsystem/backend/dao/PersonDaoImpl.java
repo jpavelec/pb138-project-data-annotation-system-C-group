@@ -92,6 +92,11 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     @Override
+    public boolean doesExist(Person person) throws DaoException {
+        return true;
+    }
+    
+    @Override
     public void create(Person person) throws DaoException {
         checkDataSource();
         validate(person);
