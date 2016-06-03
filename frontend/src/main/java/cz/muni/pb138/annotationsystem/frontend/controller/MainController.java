@@ -254,10 +254,10 @@ public class MainController {
             Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
 
             if (Integer.parseInt(value) == 1) {
-                Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, (int) (long) difference/1000);
+                Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, (int) (long) difference);
                 evaluationManager.eval(evaluation);
             } else {
-                Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NEGATIVE, (int) (long) difference/1000);
+                Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NEGATIVE, (int) (long) difference);
                 evaluationManager.eval(evaluation);
             }
 
@@ -290,7 +290,7 @@ public class MainController {
             Answer thisAnswer = answerManager.getAnswerById(Long.parseLong(answer));
             Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
 
-            Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NONSENSE, (int) (long) difference/1000);
+            Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NONSENSE, (int) (long) difference);
             evaluationManager.eval(evaluation);
 
             Long longSubpack = Long.parseLong(subpack);
