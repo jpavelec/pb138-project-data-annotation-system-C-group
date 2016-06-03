@@ -93,7 +93,7 @@ public class SubpackManagerTest {
     @Test(expected = BeanNotExistsException.class)
     public void getSubpackByIdUnknownId() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
-        subpackManager.getSubpackById((long) 99);
+        subpackManager.getSubpackById(TestUtils.UNKNOWN_ID);
     }
 
 
@@ -130,7 +130,7 @@ public class SubpackManagerTest {
     public void getSubpacksInPackUnknownPack() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
         Pack pack = TestUtils.getPack0();
-        pack.setId((long) 99);
+        pack.setId(TestUtils.UNKNOWN_ID);
         subpackManager.getSubpacksInPack(pack);
     }
     @Test(expected = IllegalArgumentException.class)
@@ -174,7 +174,7 @@ public class SubpackManagerTest {
     public void getSubpacksAssignedToPersonUnknownPerson() throws Exception {
         Person[] persons = TestUtils.createPersons(personManager);
         Person person = TestUtils.getPerson1();
-        person.setId((long) 99);
+        person.setId(TestUtils.UNKNOWN_ID);
         subpackManager.getSubpacksAssignedToPerson(person);
     }
     @Test(expected = ValidationException.class)
@@ -223,7 +223,7 @@ public class SubpackManagerTest {
 
         subpackManager.updateSubpacksAssignment(subpacks.get(1), persons);
 
-        subpacks.get(0).setId((long) 99);
+        subpacks.get(0).setId(TestUtils.UNKNOWN_ID);
 
         subpackManager.getPersonsAssignedToSubpack(subpacks.get(0));
     }
@@ -314,7 +314,7 @@ public class SubpackManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         Person[] persons = TestUtils.createPersons(personManager);
         Person person = TestUtils.getPerson1();
-        person.setId((long) 99);
+        person.setId(TestUtils.UNKNOWN_ID);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
 
         subpackManager.updatePersonsAssignment(person, subpacks);
@@ -390,7 +390,7 @@ public class SubpackManagerTest {
         Person[] personsAll = TestUtils.createPersons(personManager);
         List<Person> persons = Arrays.asList(personsAll);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[0]);
-        subpacks.get(0).setId((long) 99);
+        subpacks.get(0).setId(TestUtils.UNKNOWN_ID);
         subpackManager.updateSubpacksAssignment(subpacks.get(0), persons);
     }
 

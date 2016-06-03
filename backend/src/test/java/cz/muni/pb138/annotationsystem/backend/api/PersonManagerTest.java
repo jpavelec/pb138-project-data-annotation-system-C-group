@@ -126,7 +126,7 @@ public class PersonManagerTest {
     @Test(expected = BeanNotExistsException.class)
     public void getPersonByIdUnknownId() throws Exception {
         Person[] persons = TestUtils.createPersons(personManager);
-        personManager.getPersonById((long) 99);
+        personManager.getPersonById(TestUtils.UNKNOWN_ID);
     }
 
 

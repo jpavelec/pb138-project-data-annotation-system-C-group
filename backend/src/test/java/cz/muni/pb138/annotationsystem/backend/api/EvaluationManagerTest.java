@@ -150,7 +150,7 @@ public class EvaluationManagerTest {
         Person[] persons = TestUtils.createPersons(personManager);
         subpackManager.updatePersonsAssignment(persons[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
-        answer.setId((long) 99);
+        answer.setId(TestUtils.UNKNOWN_ID);
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
 
         evaluationManager.eval(eval);
@@ -162,7 +162,7 @@ public class EvaluationManagerTest {
         Person[] persons = TestUtils.createPersons(personManager);
         subpackManager.updatePersonsAssignment(persons[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
-        persons[1].setId((long) 99);
+        persons[1].setId(TestUtils.UNKNOWN_ID);
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
 
         evaluationManager.eval(eval);
@@ -219,7 +219,7 @@ public class EvaluationManagerTest {
 
         Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
         correct.setRating(Rating.NEGATIVE);
-        correct.setId((long) 99);
+        correct.setId(TestUtils.UNKNOWN_ID);
 
         evaluationManager.correct(correct);
     }
@@ -300,7 +300,7 @@ public class EvaluationManagerTest {
 
         Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
         correct.setRating(Rating.NEGATIVE);
-        correct.getAnswer().setId((long) 99);
+        correct.getAnswer().setId(TestUtils.UNKNOWN_ID);
 
         evaluationManager.correct(correct);
     }
@@ -316,7 +316,7 @@ public class EvaluationManagerTest {
 
         Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
         correct.setRating(Rating.NEGATIVE);
-        correct.getPerson().setId((long) 99);
+        correct.getPerson().setId(TestUtils.UNKNOWN_ID);
 
         evaluationManager.correct(correct);
     }
@@ -369,7 +369,7 @@ public class EvaluationManagerTest {
         subpackManager.updatePersonsAssignment(persons[1], subpacks);
         Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
 
-        evaluationManager.getEvaluationById((long) 99);
+        evaluationManager.getEvaluationById(TestUtils.UNKNOWN_ID);
     }
 
 
@@ -415,7 +415,7 @@ public class EvaluationManagerTest {
         Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
 
         Person person = TestUtils.getPerson1();
-        person.setId((long) 99);
+        person.setId(TestUtils.UNKNOWN_ID);
         evaluationManager.getEvaluationsOfPerson(person);
     }
 

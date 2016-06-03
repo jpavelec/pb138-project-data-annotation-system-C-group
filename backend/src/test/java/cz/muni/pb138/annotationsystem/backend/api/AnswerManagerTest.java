@@ -123,7 +123,7 @@ public class AnswerManagerTest {
         Person[] persons = TestUtils.createPersons(personManager);
         subpackManager.updatePersonsAssignment(persons[1], subpacks);
         Person person = TestUtils.getPerson0();
-        person.setId((long) 99);
+        person.setId(TestUtils.UNKNOWN_ID);
         answerManager.nextAnswer(person, subpacks.get(1));
     }
     @Test(expected = IllegalArgumentException.class)
@@ -141,7 +141,7 @@ public class AnswerManagerTest {
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
         subpackManager.updatePersonsAssignment(persons[1], subpacks);
-        subpacks.get(1).setId((long) 99);
+        subpacks.get(1).setId(TestUtils.UNKNOWN_ID);
         answerManager.nextAnswer(persons[1], subpacks.get(1));
     }
 
@@ -164,7 +164,7 @@ public class AnswerManagerTest {
     @Test(expected = BeanNotExistsException.class)
     public void getAnswerByIdUnknownId() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
-        answerManager.getAnswerById((long) 99);
+        answerManager.getAnswerById(TestUtils.UNKNOWN_ID);
     }
     @Test(expected = IllegalArgumentException.class)
     public void getAnswerByIdNullId() throws Exception {
@@ -205,7 +205,7 @@ public class AnswerManagerTest {
     public void getAnswersInSubpackUnknownSubpack() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
-        subpacks.get(0).setId((long) 99);
+        subpacks.get(0).setId(TestUtils.UNKNOWN_ID);
         answerManager.getAnswersInSubpack(subpacks.get(0));
     }
 
@@ -230,7 +230,7 @@ public class AnswerManagerTest {
     @Test(expected = BeanNotExistsException.class)
     public void getAnswersInPackUnknownPack() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
-        packs[1].setId((long) 99);
+        packs[1].setId(TestUtils.UNKNOWN_ID);
         answerManager.getAnswersInPack(packs[1]);
     }
 

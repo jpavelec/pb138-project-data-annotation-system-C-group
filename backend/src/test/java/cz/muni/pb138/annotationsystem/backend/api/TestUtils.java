@@ -19,6 +19,7 @@ public class TestUtils {
     static public final int SUBPACK_SIZE_0 = 15;
     static public final int SUBPACK_SIZE_1 = 12;
     static public final int SUBPACK_SIZE_2 = 9;
+    static public final long UNKNOWN_ID = 99999;
 
 
     static public Pack getPack0() {

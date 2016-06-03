@@ -381,7 +381,7 @@ public class PackManagerTest {
     @Test(expected = BeanNotExistsException.class)
     public void getPackByIdUnknownId() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
-        packManager.getPackById((long) 99);
+        packManager.getPackById(TestUtils.UNKNOWN_ID);
     }
 
 
@@ -455,7 +455,7 @@ public class PackManagerTest {
     public void deletePackUnknownPack() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
         Pack unknown = new Pack("Am I no one?", "Unknown", 0, 0);
-        unknown.setId((long) 99);
+        unknown.setId(TestUtils.UNKNOWN_ID);
         packManager.deletePack(unknown);
     }
     @Test(expected = IllegalArgumentException.class)
