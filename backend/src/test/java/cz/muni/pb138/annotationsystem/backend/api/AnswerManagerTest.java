@@ -116,7 +116,7 @@ public class AnswerManagerTest {
 
         answerManager.nextAnswer(null, subpacks.get(1));
     }
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = BeanNotExistsException.class)
     public void nextAnswerUnknownPerson() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
@@ -135,7 +135,7 @@ public class AnswerManagerTest {
 
         answerManager.nextAnswer(persons[1], null);
     }
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = BeanNotExistsException.class)
     public void nextAnswerUnknownSubpack() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);

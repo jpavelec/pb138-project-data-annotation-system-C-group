@@ -1,9 +1,6 @@
 package cz.muni.pb138.annotationsystem.backend.api;
 
-import cz.muni.pb138.annotationsystem.backend.common.BeanAlreadyExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
-import cz.muni.pb138.annotationsystem.backend.common.DaoException;
-import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.config.TestConfig;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import org.junit.After;
@@ -54,64 +51,11 @@ public class PersonManagerTest {
     }
 
 
-
-    @Test
-    public void createPerson() throws Exception {
-
-        Person person0 = TestUtils.getPerson0();
-        personManager.createPerson(person0);
-
-        assertNotNull(person0.getId());
-
-        assertTrue(personManager.getAllPersons().size() == 1);
-
-        assertEquals(person0, personManager.getPersonById(person0.getId()));
-
-        assertEquals(person0, personManager.getPersonByUsername(person0.getUsername()));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void createPersonWithoutPerson() throws Exception {
-        personManager.createPerson(null);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void createPersonWithId() throws Exception {
-        Person person0 = TestUtils.getPerson0();
-        person0.setId((long) 1);
-        personManager.createPerson(person0);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void createPersonWithoutUsername() throws Exception {
-        Person person0 = TestUtils.getPerson0();
-        person0.setUsername(null);
-        personManager.createPerson(person0);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void createPersonWithEmptyUsername() throws Exception {
-        Person person0 = TestUtils.getPerson0();
-        person0.setUsername("");
-        personManager.createPerson(person0);
-    }
-
-    @Test(expected = BeanAlreadyExistsException.class)
-    public void createPersonWithDuplicitUsername() throws Exception {
-        Person person0 = TestUtils.getPerson0();
-        personManager.createPerson(person0);
-
-        Person person1 = TestUtils.getPerson0();
-        personManager.createPerson(person1);
-    }
-
-
-
     @Test
     public void getPersonByUsername() throws Exception {
         Person[] persons = TestUtils.createPersons(personManager);
 
-        Person result = personManager.getPersonByUsername(persons[1].getUsername());
+        Person result = personManager.getOrCreatePersonByUsername(persons[1].getUsername());
 
         assertNotNull(result);
         assertNotNull(result.getId());
@@ -124,13 +68,13 @@ public class PersonManagerTest {
     @Test(expected = IllegalArgumentException.class)
     public void getPersonByUsernameWithoutUsername() throws Exception {
         Person[] persons = TestUtils.createPersons(personManager);
-        personManager.getPersonByUsername(null);
+        personManager.getOrCreatePersonByUsername(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void getPersonByUsernameWithEmptyUsername() throws Exception {
         Person[] persons = TestUtils.createPersons(personManager);
-        personManager.getPersonByUsername("");
+        personManager.getOrCreatePersonByUsername("");
     }
 
     @Test // if user is unknown create new one
@@ -138,7 +82,7 @@ public class PersonManagerTest {
         Person[] persons = TestUtils.createPersons(personManager);
         int numOfPersonsBefore = personManager.getAllPersons().size();
 
-        Person result = personManager.getPersonByUsername("UNKNOWN_USERNAME");
+        Person result = personManager.getOrCreatePersonByUsername("UNKNOWN_USERNAME");
 
         assertEquals(result.getUsername(), "UNKNOWN_USERNAME");
 
@@ -146,7 +90,7 @@ public class PersonManagerTest {
 
         assertEquals(result, personManager.getPersonById(result.getId()));
 
-        assertEquals(result, personManager.getPersonByUsername("UNKNOWN_USERNAME"));
+        assertEquals(result, personManager.getOrCreatePersonByUsername("UNKNOWN_USERNAME"));
 
     }
 

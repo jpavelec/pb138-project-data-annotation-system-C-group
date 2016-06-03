@@ -42,7 +42,7 @@ public class MainController {
     public String primaryView(ServletRequest req, HttpServletRequest httpReq) {
 
         try {
-            req.setAttribute("person", personManager.getPersonByUsername(httpReq.getRemoteUser()));
+            req.setAttribute("person", personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser()));
         } catch (DaoException e) {
             return "redirect:/view-error";
         }
@@ -114,7 +114,7 @@ public class MainController {
                 packManager.createPack(pack, helpList, noiseList, Integer.parseInt(values[2]));
 
                 //implicitne priradenie packu Karlikovi pre moznost testovania, lebo..
-                subpackManager.updatePersonsAssignment(personManager.getPersonByUsername("Karlik"), subpackManager.getSubpacksInPack(pack));
+                subpackManager.updatePersonsAssignment(personManager.getOrCreatePersonByUsername("Karlik"), subpackManager.getSubpacksInPack(pack));
 
             } catch (Exception e) {
                 req.setAttribute("error", e);
@@ -138,7 +138,7 @@ public class MainController {
     public String packages(ServletRequest req, HttpServletRequest httpReq) {
 
         try {
-            req.setAttribute("subpacks", subpackManager.getSubpacksAssignedToPerson(personManager.getPersonByUsername(httpReq.getRemoteUser())));
+            req.setAttribute("subpacks", subpackManager.getSubpacksAssignedToPerson(personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser())));
 
         } catch (DaoException e) {
             return "redirect:/view-error";
@@ -218,7 +218,7 @@ public class MainController {
             req.setAttribute("thisQuestion", question);
 
             try {
-                Answer answer = answerManager.nextAnswer(personManager.getPersonByUsername(httpReq.getRemoteUser()),
+                Answer answer = answerManager.nextAnswer(personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser()),
                         subpackManager.getSubpackById(Long.parseLong(subpack)));
                 req.setAttribute("thisAnswer", answer);
             } catch (IllegalStateException e) {
@@ -243,7 +243,7 @@ public class MainController {
         try {
 
             Answer thisAnswer = answerManager.getAnswerById(Long.parseLong(answer));
-            Person thisPerson = personManager.getPersonByUsername(httpReq.getRemoteUser());
+            Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
 
             if (Integer.parseInt(value) == 1) {
                 Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, 3);
@@ -275,7 +275,7 @@ public class MainController {
 
         try {
             Answer thisAnswer = answerManager.getAnswerById(Long.parseLong(answer));
-            Person thisPerson = personManager.getPersonByUsername(httpReq.getRemoteUser());
+            Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
 
             Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NONSENSE, 3);
             evaluationManager.eval(evaluation);

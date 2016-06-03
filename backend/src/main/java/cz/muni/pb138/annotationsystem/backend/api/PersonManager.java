@@ -11,9 +11,7 @@ import java.util.List;
  */
 public interface PersonManager {
 
-    void createPerson(Person person) throws DaoException;
-
-    Person getPersonByUsername(String username) throws DaoException;
+    Person getOrCreatePersonByUsername(String username) throws DaoException;
 
     Person getPersonById(Long id) throws DaoException;
 

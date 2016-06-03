@@ -29,26 +29,7 @@ public class PersonManagerImpl implements PersonManager {
 
     @Override
     @Transactional
-    public void createPerson(Person person) throws DaoException {
-        if (person == null) {
-            throw new IllegalArgumentException("Created person is null");
-        }
-        if (person.getId() != null) {
-            throw new ValidationException("Created person already has id: "+person);
-        }
-        if (person.getUsername() == null || person.getUsername().isEmpty()) {
-            throw new ValidationException("Created person has to have username: "+person);
-        }
-        if (personDao.getByUsername(person.getUsername()) != null) {
-            throw new BeanAlreadyExistsException("Person with name: "+person.getUsername()+" already exists.");
-        }
-
-        personDao.create(person);
-    }
-
-    @Override
-    @Transactional
-    public Person getPersonByUsername(String username) throws DaoException {
+    public Person getOrCreatePersonByUsername(String username) throws DaoException {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username is null or empty");
         }

@@ -111,14 +111,11 @@ public class TestUtils {
     }
 
     static public Person[] createPersons(PersonManager personManager) throws Exception {
-        Person person0 = getPerson0();
-        personManager.createPerson(person0);
+        Person person0 = personManager.getOrCreatePersonByUsername(getPerson0().getUsername());
 
-        Person person1 = getPerson1();
-        personManager.createPerson(person1);
+        Person person1 = personManager.getOrCreatePersonByUsername(getPerson1().getUsername());
 
-        Person person2 = getPerson2();
-        personManager.createPerson(person2);
+        Person person2 = personManager.getOrCreatePersonByUsername(getPerson2().getUsername());
 
         return new Person[]{person0, person1, person2};
     }
