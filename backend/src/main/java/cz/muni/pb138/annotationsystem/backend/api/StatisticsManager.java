@@ -14,12 +14,12 @@ public interface StatisticsManager {
     double getProgressOfSubpack(Subpack subpack) throws DaoException;
     double getProgressOfSubpackForPerson(Subpack subpack, Person person) throws DaoException;
 
-    double getCohenKappa(Person person) throws DaoException;
-    double getCohenKappa(Person person, Subpack subpack) throws DaoException;
+    Double getCohenKappa(Person person) throws DaoException;
+    Double getCohenKappa(Person person, Subpack subpack) throws DaoException;
 
-    double averageEvaluationTimeOfSubpack(Subpack subpack) throws DaoException;
-    double averageEvaluationTimeOfSubpackForPerson(Subpack subpack, Person person) throws DaoException;
+    Double averageEvaluationTimeOfSubpack(Subpack subpack) throws DaoException;
+    Double averageEvaluationTimeOfSubpackForPerson(Subpack subpack, Person person) throws DaoException;
 
-    double averageCompletionTimeOfSubpack(Subpack subpack) throws DaoException;
+    Double averageCompletionTimeOfSubpack(Subpack subpack) throws DaoException;
 
 }
