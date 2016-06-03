@@ -81,7 +81,36 @@ public class AnswerDaoImpl implements AnswerDao {
 
     @Override
     public boolean doesExist(Answer answer) throws DaoException {
-        return true;
+        checkDataSource();
+        validate(answer);
+        if (answer.getId() == null) {
+            throw new IllegalArgumentException("Answer id is null");
+        }
+        if (answer.getId() < 0) {
+            throw new IllegalArgumentException("Answer id is negative");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                    "SELECT id FROM answer WHERE id = ?")) {
+            
+            st.setLong(1, answer.getId());
+            
+            try (ResultSet rs = st.executeQuery()) {
+            
+                if (rs.next()) {
+                    if (rs.next()) {
+                        throw new DaoException(
+                            "Internal error: More entities with the same id found!");
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DaoException(
+                "Error when testing if answer " + answer + " is in DB", ex);
+        }
     }
     
     @Override

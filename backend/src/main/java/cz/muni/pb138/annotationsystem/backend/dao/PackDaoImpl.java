@@ -117,7 +117,36 @@ public class PackDaoImpl implements PackDao {
     
     @Override
     public boolean doesExist(Pack pack) throws DaoException {
-        return true;
+        checkDataSource();
+        validate(pack);
+        if (pack.getId() == null) {
+            throw new IllegalArgumentException("Pack id is null");
+        }
+        if (pack.getId() < 0) {
+            throw new IllegalArgumentException("Pack id is negative");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                    "SELECT id FROM pack WHERE id = ?")) {
+            
+            st.setLong(1, pack.getId());
+            
+            try (ResultSet rs = st.executeQuery()) {
+            
+                if (rs.next()) {
+                    if (rs.next()) {
+                        throw new DaoException(
+                            "Internal error: More entities with the same id found!");
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DaoException(
+                "Error when testing if pack " + pack + " is in DB", ex);
+        }
     }
     
     @Override

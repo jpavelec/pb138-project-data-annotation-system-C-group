@@ -93,7 +93,36 @@ public class PersonDaoImpl implements PersonDao {
 
     @Override
     public boolean doesExist(Person person) throws DaoException {
-        return true;
+        checkDataSource();
+        validate(person);
+        if (person.getId() == null) {
+            throw new IllegalArgumentException("Person id is null");
+        }
+        if (person.getId() < 0) {
+            throw new IllegalArgumentException("Person id is negative");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                    "SELECT id, username FROM person WHERE id = ?")) {
+            
+            st.setLong(1, person.getId());
+            
+            try (ResultSet rs = st.executeQuery()) {
+            
+                if (rs.next()) {
+                    if (rs.next()) {
+                        throw new DaoException(
+                            "Internal error: More entities with the same id found!");
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DaoException(
+                "Error when testing if person " + person + " is in DB", ex);
+        }
     }
     
     @Override

@@ -95,7 +95,36 @@ public class EvaluationDaoImpl implements EvaluationDao {
     
     @Override
     public boolean doesExist(Evaluation evaluation) throws DaoException {
-        return true;
+        checkDataSource();
+        validate(evaluation);
+        if (evaluation.getId() == null) {
+            throw new IllegalArgumentException("Evaluation id is null");
+        }
+        if (evaluation.getId() < 0) {
+            throw new IllegalArgumentException("Evaluation id is negative");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                    "SELECT id FROM evaluation WHERE id = ?")) {
+            
+            st.setLong(1, evaluation.getId());
+            
+            try (ResultSet rs = st.executeQuery()) {
+            
+                if (rs.next()) {
+                    if (rs.next()) {
+                        throw new DaoException(
+                            "Internal error: More entities with the same id found!");
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DaoException(
+                "Error when testing if evaluation " + evaluation + " is in DB", ex);
+        }
     }
     
     @Override
