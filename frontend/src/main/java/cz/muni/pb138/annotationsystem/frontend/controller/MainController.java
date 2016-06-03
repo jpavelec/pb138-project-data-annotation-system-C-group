@@ -209,6 +209,9 @@ public class MainController {
     public String markGet(ServletRequest req, @PathVariable String subpack, HttpServletRequest httpReq) {
 
         try {
+
+            req.setAttribute("lStartTime", System.currentTimeMillis());
+
             Long longSubpack = Long.parseLong(subpack);
             Subpack thisSubpack = subpackManager.getSubpackById(longSubpack);
             req.setAttribute("thisSubpack", thisSubpack);
@@ -236,20 +239,25 @@ public class MainController {
 
     }
 
-    @RequestMapping(value = "/mark/{subpack}/{answer}", method = {RequestMethod.POST})
+    @RequestMapping(value = "/mark/{subpack}/{answer}/{time}", method = {RequestMethod.POST})
     public String markPost(RedirectAttributes redirectAttributes, @RequestParam String value,
-                           @PathVariable String subpack, @PathVariable String answer, HttpServletRequest httpReq) {
+                           @PathVariable String subpack, @PathVariable String answer,
+                           @PathVariable String time, HttpServletRequest httpReq) {
 
         try {
+
+            long lEndTime = System.currentTimeMillis();
+
+            long difference = lEndTime - Long.parseLong(time);
 
             Answer thisAnswer = answerManager.getAnswerById(Long.parseLong(answer));
             Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
 
             if (Integer.parseInt(value) == 1) {
-                Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, 3);
+                Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, (int) (long) difference);
                 evaluationManager.eval(evaluation);
             } else {
-                Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NEGATIVE, 3);
+                Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NEGATIVE, (int) (long) difference);
                 evaluationManager.eval(evaluation);
             }
 
@@ -269,15 +277,20 @@ public class MainController {
 
     }
 
-    @RequestMapping(value = "/mark/{subpack}/{answer}/report", method = {RequestMethod.POST})
-    public String markReport(RedirectAttributes redirectAttributes, @RequestParam String value,
+    @RequestMapping(value = "/mark/{subpack}/{answer}/report/{time}", method = {RequestMethod.POST})
+    public String markReport(RedirectAttributes redirectAttributes, @PathVariable String time,
                              @PathVariable String subpack, @PathVariable String answer, HttpServletRequest httpReq) {
 
         try {
+
+            long lEndTime = System.currentTimeMillis();
+
+            long difference = lEndTime - Long.parseLong(time);
+
             Answer thisAnswer = answerManager.getAnswerById(Long.parseLong(answer));
             Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
 
-            Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NONSENSE, 3);
+            Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NONSENSE, (int) (long) difference);
             evaluationManager.eval(evaluation);
 
             Long longSubpack = Long.parseLong(subpack);
