@@ -51,7 +51,6 @@ public class AnswerManagerImpl implements AnswerManager {
     @Override
     @Transactional
     public Answer nextAnswer(Person person, Subpack subpack) throws DaoException {
-        long begin = System.currentTimeMillis();
         if (person == null) {
             throw new IllegalArgumentException("person is null");
         }
@@ -71,7 +70,7 @@ public class AnswerManagerImpl implements AnswerManager {
             throw new BeanNotExistsException("given subpack does not exist");
         }
         if (!subpackManager.getSubpacksAssignedToPerson(person).contains(subpack)) {
-            throw new IllegalStateException("Person is not assigned to subpack");
+            throw new IllegalStateException("Person "+person.getUsername()+" is not assigned to subpack "+subpack.getParent().getName()+"/"+subpack.getName());
         }
 
         // TODO definitely create some Dao method. e.g. getUnevaluatedAnswers(person, subpack)
@@ -84,7 +83,6 @@ public class AnswerManagerImpl implements AnswerManager {
                 }
             }
             if (!isEvaluated) {
-                System.out.println(System.currentTimeMillis()-begin);
                 return a;
             }
         }

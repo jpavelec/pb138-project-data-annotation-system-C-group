@@ -22,7 +22,7 @@ public class RemoteUserFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(req);
-        mutableRequest.setRemoteUser("Karlik", HttpServletRequest.BASIC_AUTH);
+        mutableRequest.setRemoteUser("carl", HttpServletRequest.BASIC_AUTH);
         chain.doFilter(mutableRequest, response);
     }
 

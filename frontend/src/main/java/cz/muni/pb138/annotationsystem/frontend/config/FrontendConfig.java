@@ -1,6 +1,7 @@
 package cz.muni.pb138.annotationsystem.frontend.config;
 
 import cz.muni.pb138.annotationsystem.backend.config.BackendConfig;
+import cz.muni.pb138.annotationsystem.backend.config.TestDataConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @EnableWebMvc
 @Configuration
-@Import(BackendConfig.class)
+@Import(TestDataConfig.class)
 @ComponentScan(basePackages = {
         "cz.muni.pb138.annotationsystem.frontend.controller"
 })
