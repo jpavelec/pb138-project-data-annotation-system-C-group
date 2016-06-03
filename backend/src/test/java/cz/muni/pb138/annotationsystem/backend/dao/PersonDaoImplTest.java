@@ -227,6 +227,14 @@ public class PersonDaoImplTest {
                 .containsOnly(personJane);
     }
     
+    @Test
+    public void doesExist() throws Exception {
+        Person existingPerson = sampleJanePersonBuilder().build();
+        personDao.create(existingPerson);
+        assertTrue(personDao.doesExist(existingPerson));
+        assertFalse(personDao.doesExist(sampleJanePersonBuilder().id((long) 250).build()));
+    }
+    
     
 
 }

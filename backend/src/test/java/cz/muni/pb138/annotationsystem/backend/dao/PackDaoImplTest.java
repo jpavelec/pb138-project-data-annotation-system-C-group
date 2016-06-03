@@ -345,4 +345,12 @@ public class PackDaoImplTest {
             .containsOnly(packAnimal, packThing);
     }
     
+    @Test
+    public void doesExist() throws Exception {
+        Pack existingPack = sampleAnimalPack().build();
+        packDao.create(existingPack);
+        assertTrue(packDao.doesExist(existingPack));
+        assertFalse(packDao.doesExist(sampleAnimalPack().id((long) 250).build()));
+    }
+    
 }
