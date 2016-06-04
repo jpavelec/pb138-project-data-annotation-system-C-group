@@ -124,7 +124,7 @@ public class StatisticsManagerImpl implements StatisticsManager {
         }
 
 
-        int total = answerManager.getAnswersInSubpack(subpack).size() * subpackManager.getPersonsAssignedToSubpack(subpack).size();
+        int total = answerManager.getAnswersInSubpack(subpack).size();
 
         int evaluated = 0;
         for (Evaluation evaluation : evaluationDao.getAll()) {
