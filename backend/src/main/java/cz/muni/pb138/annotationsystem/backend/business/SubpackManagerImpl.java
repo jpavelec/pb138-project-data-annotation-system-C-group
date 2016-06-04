@@ -61,14 +61,7 @@ public class SubpackManagerImpl implements SubpackManager {
             throw new BeanNotExistsException("given pack does not exist");
         }
 
-        List<Subpack> subpacks = new ArrayList<>();
-        for (Subpack s : subpackDao.getAll()) {
-            if (s.getParent().equals(pack)) {
-                subpacks.add(s);
-            }
-        }
-
-        return subpacks;
+        return subpackDao.getSubpacksInPack(pack);
     }
 
     @Override

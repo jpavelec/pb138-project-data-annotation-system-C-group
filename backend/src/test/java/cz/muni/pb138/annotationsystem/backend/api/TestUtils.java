@@ -39,7 +39,7 @@ public class TestUtils {
 
     static public List<String> getAnswers0() {
         return Arrays.asList(
-                "antelope", "armadillo", "bat", "hear", "beaver", "buffalo", "bull", "belt", "cow", "book",
+                "antelope", "bat", "bat", "hear", "beaver", "buffalo", "bull", "belt", "cow", "book",
                 "spoon", "ant", "bear", "bee", "bird", "camel", "cat", "cheetah", "chicken", "chimpanzee",
                 "smoke", "crocodile", "deer", "dog", "dolphin", "duck", "helicopter", "elephant", "fish", "fly",
                 "fox", "frog", "movie", "goat", "goldfish", "hamster", "hippopotamus", "horse", "kangaroo", "kitten",

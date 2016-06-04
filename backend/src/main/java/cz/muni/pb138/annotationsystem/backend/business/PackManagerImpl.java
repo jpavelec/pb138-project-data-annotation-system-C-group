@@ -101,11 +101,12 @@ public class PackManagerImpl implements PackManager {
 
             int currentNumOfAnswersInSubpack = Math.min(numOfAnswersInSubpack, answers.size()-i*numOfAnswersInSubpack);
             List<String> answersInSubpack = answers.subList(i*numOfAnswersInSubpack, i*numOfAnswersInSubpack + currentNumOfAnswersInSubpack);
+            List<Answer> answersInSubpackCreated = new LinkedList<>();
             for (String answer : answersInSubpack) {
 
                 Answer a = new Answer(subpack, answer, false);
                 answerDao.create(a);
-
+                answersInSubpackCreated.add(a);
             }
 
             if (pack.getNoiseRate() > 0) {
@@ -131,13 +132,12 @@ public class PackManagerImpl implements PackManager {
 
                 int currentNumOfRepeating = 0;
                 do {
-                    Collections.shuffle(answersInSubpack);
-                    for (String repeating : answersInSubpack) {
+                    Collections.shuffle(answersInSubpackCreated);
+                    for (Answer repeating : answersInSubpackCreated) {
                         if (currentNumOfRepeating >= expectedNumOfRepeating) {
                             break;
                         }
-                        Answer r = new Answer(subpack, repeating, false);
-                        answerDao.create(r);
+                        subpackDao.createRepeatingAnswer(repeating);
                         currentNumOfRepeating ++;
                     }
                 } while (currentNumOfRepeating < expectedNumOfRepeating);

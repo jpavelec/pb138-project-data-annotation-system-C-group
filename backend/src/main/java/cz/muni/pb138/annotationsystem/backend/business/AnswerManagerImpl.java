@@ -20,7 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -75,18 +79,28 @@ public class AnswerManagerImpl implements AnswerManager {
 
         // TODO definitely create some Dao method. e.g. getUnevaluatedAnswers(person, subpack)
         List<Evaluation> evaluations = evaluationManager.getEvaluationsOfPerson(person);
-        for (Answer a : this.getAnswersInSubpack(subpack)) {
-            boolean isEvaluated = false;
-            for (Evaluation e : evaluations) {
-                if (e.getAnswer().equals(a)) {
-                    isEvaluated = true;
-                }
-            }
-            if (!isEvaluated) {
-                return a;
+        List<Answer> evaluated = new LinkedList<>();
+
+        for (Evaluation e : evaluations) {
+            evaluated.add(e.getAnswer());
+        }
+
+        List<Answer> unevaluated = subpackDao.getAnswersInSubpack(subpack);
+        Iterator<Answer> i = unevaluated.iterator();
+        while (i.hasNext()) {
+            Answer a = i.next();
+            if (evaluated.contains(a)) {
+                i.remove();
+                evaluated.remove(a);
             }
         }
-        throw new IllegalStateException("No more answers left.");
+
+        if (unevaluated.size() == 0) {
+            throw new IllegalStateException("No more answers left.");
+        }
+
+        Collections.shuffle(unevaluated);
+        return unevaluated.get(0);
     }
 
     @Override
@@ -112,13 +126,7 @@ public class AnswerManagerImpl implements AnswerManager {
             throw new BeanNotExistsException("given subpack does not exist");
         }
 
-        List<Answer> answers = new ArrayList<>();
-        for (Answer a : answerDao.getAll()) {
-            if (a.getFromSubpack().equals(subpack)) {
-                answers.add(a);
-            }
-        }
-        return answers;
+        return subpackDao.getAnswersInSubpack(subpack);
     }
 
     @Override
@@ -134,19 +142,14 @@ public class AnswerManagerImpl implements AnswerManager {
             throw new BeanNotExistsException("given pack does not exist");
         }
 
-        Set<Answer> answers = new HashSet<>();
-        answerLoop: for (Answer a : answerDao.getAll()) {
+        List<Answer> answers = new ArrayList<>();
+        for (Answer a : answerDao.getAll()) {
             if (a.getFromSubpack().getParent().equals(pack)) {
                 if (!a.isIsNoise()) {
-                    for (Answer r : answers) {
-                        if (r.getAnswer().equals(a.getAnswer())) {
-                            continue answerLoop;
-                        }
-                    }
                     answers.add(a);
                 }
             }
         }
-        return new ArrayList<>(answers);
+        return answers;
     }
 }

@@ -207,12 +207,12 @@ public class PackManagerTest {
 
         for (Subpack subpack : subpacks) {
             List<Answer> subanswers = answerManager.getAnswersInSubpack(subpack);
-            Set<String> auxiliary = new HashSet<>();
+            Set<Answer> auxiliary = new HashSet<>();
 
             int numOfRepetition = 0;
             for (Answer a : subanswers) {
                 // Returns false if item already exists in the set
-                if (!auxiliary.add(a.getAnswer())) {
+                if (!auxiliary.add(a)) {
                     numOfRepetition++;
                     assertFalse(a.isIsNoise());
                     assertTrue(TestUtils.getAnswers0().contains(a.getAnswer()));
