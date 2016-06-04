@@ -387,13 +387,12 @@ public class SubpackDaoImplTest {
         answerDao.create(answerBird);
         answerDao.create(answerRabit);
         
-        subpackDao.createRepeatingAnswer(answerDog);
-        subpackDao.createRepeatingAnswer(answerDog);
-        subpackDao.createRepeatingAnswer(answerElephant);
-        subpackDao.createRepeatingAnswer(answerRabit);
+        answerDao.createRepeatingAnswer(answerDog);
+        answerDao.createRepeatingAnswer(answerDog);
+        answerDao.createRepeatingAnswer(answerElephant);
+        answerDao.createRepeatingAnswer(answerRabit);
         
         assertThat(subpackDao.getAnswersInSubpack(subpack01))
                     .hasSize(8+3);
-        
     }
 }

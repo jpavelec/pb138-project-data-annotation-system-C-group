@@ -24,8 +24,6 @@ public interface SubpackDao extends Dao<Subpack> {
 
     public List<Subpack> getSubpacksInPack(Pack pack) throws DaoException;
     
-    public void createRepeatingAnswer(Answer answer) throws DaoException;
-    
     public List<Answer> getAnswersInSubpack(Subpack subpack) throws DaoException;
     
     public List<Answer> getUnevaluatedAnswers(Subpack subpack, Person person) throws DaoException;

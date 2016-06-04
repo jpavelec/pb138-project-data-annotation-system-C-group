@@ -618,47 +618,6 @@ public class SubpackDaoImpl implements SubpackDao {
     }
 
     @Override
-    public void createRepeatingAnswer(Answer answer) throws DaoException {
-        if (answer == null) {
-            throw new IllegalArgumentException("Answer is null");
-        }
-        if (answer.getId() == null || answer.getId() < 0) {
-            throw new ValidationException("Answer id is null");
-        }
-        if (!answerDao.doesExist(answer)) {
-            throw new BeanNotExistsException("Answer with id "+answer.getId()+" is not in DB!");
-        }
-        if (answer.getFromSubpack() == null) {
-            throw new ValidationException("Answer fromSubpack is null");
-        }
-        if (!doesExist(answer.getFromSubpack())) {
-            throw new BeanNotExistsException("Subpack "+answer.getFromSubpack()+" is not in DB!");
-        }
-        if (answer.isIsNoise() == null) {
-            throw new ValidationException("Answer isNoise is null");
-        }
-        if (answer.getAnswer() == null || answer.getAnswer().isEmpty()) {
-            throw new ValidationException("Answer answer is null or empty");
-        }
-        checkDataSource();
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement st = conn.prepareStatement(
-             "INSERT INTO REPEATANSWER values (?,?)")) {
-            
-            st.setLong(1, answer.getFromSubpack().getId());
-            st.setLong(2, answer.getId());
-            
-            int rows = st.executeUpdate();
-            if (rows != 1) {
-                throw new DaoException("DB error - more rows was inserted when inserting repeat answer");
-            }
-            
-        } catch (SQLException ex) {
-            throw new DaoException("DB error when insert repeat answer", ex);
-        }
-    }
-
-    @Override
     public List<Answer> getUnevaluatedAnswers(Subpack subpack, Person person) throws DaoException {
         List<Answer> unevaluatedAnswers = new ArrayList<>();
         unevaluatedAnswers = getAnswersInSubpack(subpack);

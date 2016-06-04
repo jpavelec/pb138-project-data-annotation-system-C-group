@@ -137,7 +137,7 @@ public class PackManagerImpl implements PackManager {
                         if (currentNumOfRepeating >= expectedNumOfRepeating) {
                             break;
                         }
-                        subpackDao.createRepeatingAnswer(repeating);
+                        answerDao.createRepeatingAnswer(repeating);
                         currentNumOfRepeating ++;
                     }
                 } while (currentNumOfRepeating < expectedNumOfRepeating);
