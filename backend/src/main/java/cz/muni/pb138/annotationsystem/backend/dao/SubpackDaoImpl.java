@@ -658,5 +658,50 @@ public class SubpackDaoImpl implements SubpackDao {
         }
     }
 
+    @Override
+    public List<Answer> getUnevaluatedAnswers(Subpack subpack, Person person) throws DaoException {
+        List<Answer> unevaluatedAnswers = new ArrayList<>();
+        unevaluatedAnswers = getAnswersInSubpack(subpack);
+        unevaluatedAnswers.removeAll(getEvaluatedAnswers(subpack, person));
+        return unevaluatedAnswers;
+    }
+    
+    @Override
+    public List<Answer> getEvaluatedAnswers(Subpack subpack, Person person) throws DaoException {
+        checkDataSource();
+        validate(subpack);
+        if (subpack.getId() == null || subpack.getId() < 0) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        if (person == null) {
+            throw new IllegalArgumentException("Person is null");
+        }
+        if (person.getId() == null || person.getId() < 0) {
+            throw new ValidationException("Person id is null or negative");
+        }
+        List<Answer> evaluatedAnswers = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+            PreparedStatement st = conn.prepareStatement(
+            "SELECT answer.id, subpackid, answervalue, isnoise "+
+            "FROM answer INNER JOIN evaluation ON answer.id = evaluation.answerid "+
+            "WHERE subpackid = ? AND personid = ?");) {
+            
+            st.setLong(1, subpack.getId());
+            st.setLong(2, person.getId());
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    evaluatedAnswers.add(answerDao.resultSetToAnswer(rs));
+                }
+            }
+            return evaluatedAnswers;
+        } catch (SQLException ex) {
+            throw new DaoException(
+                "Error when retriving evaluated answers from subpack " + subpack +
+                "for person "+person, ex);
+        }
+    }
+    
+   
+
         
 }
