@@ -1,6 +1,7 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
+import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
@@ -22,4 +23,8 @@ public interface SubpackDao extends Dao<Subpack> {
     public void assignPersonToSubpack(Person person, Subpack subpack) throws DaoException;
 
     public List<Subpack> getSubpacksInPack(Pack pack) throws DaoException;
+    
+    public void createRepeatingAnswer(Answer answer) throws DaoException;
+    
+    public List<Answer> getAnswersInSubpack(Subpack subpack) throws DaoException;
 }

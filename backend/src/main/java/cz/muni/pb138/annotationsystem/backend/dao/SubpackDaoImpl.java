@@ -4,6 +4,7 @@ import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
+import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
@@ -14,6 +15,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.sql.DataSource;
@@ -29,6 +32,9 @@ public class SubpackDaoImpl implements SubpackDao {
     
     @Inject
     private PersonDaoImpl personDao;
+    
+    @Inject
+    private AnswerDaoImpl answerDao;
     
     @Inject
     private PackDaoImpl packDao;
@@ -65,9 +71,9 @@ public class SubpackDaoImpl implements SubpackDao {
         if (subpack.getName().isEmpty()) {
             throw new ValidationException("Subpack name is empty");
         }
-        if (subpack.getName().length() > 30) {
+        if (subpack.getName().length() > 60) {
             throw new ValidationException("Subpack name is too long (" +
-                    subpack.getName().length() + " chars but 30 is maximum");
+                    subpack.getName().length() + " chars but 60 is maximum");
         }
     }
     
@@ -105,7 +111,38 @@ public class SubpackDaoImpl implements SubpackDao {
     
     @Override
     public boolean doesExist(Subpack subpack) throws DaoException {
-        return true;
+        checkDataSource();
+        if (subpack == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (subpack.getId() == null) {
+            throw new ValidationException("Subpack id is null");
+        }
+        if (subpack.getId() < 0) {
+            throw new ValidationException("Pack id is negative");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                    "SELECT id FROM subpack WHERE id = ?")) {
+            
+            st.setLong(1, subpack.getId());
+            
+            try (ResultSet rs = st.executeQuery()) {
+            
+                if (rs.next()) {
+                    if (rs.next()) {
+                        throw new DaoException(
+                            "Internal error: More entities with the same id found!");
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DaoException(
+                "Error when testing if subpack " + subpack + " is in DB", ex);
+        }
     }
     
     @Override
@@ -461,6 +498,101 @@ public class SubpackDaoImpl implements SubpackDao {
         } catch (SQLException ex) {
             String msg = "Error when retriving subpacks with parent pack with id "+pack.getId();
             throw new ServiceFailureException(msg, ex);
+        }
+    }
+    
+    /*private List<Answer> getRepeatAnswerInSubpack(Subpack subpack) throws DaoException {
+        checkDataSource();
+        validate(subpack);
+        if (subpack.getId() == null || subpack.getId() < 0) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        List<Answer> repeatAnswersInSubpack = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement st = conn.prepareStatement(
+             "SELECT answer.id, answer.subpackid, answervalue, isnoise FROM answer INNER JOIN " +
+             "repeatanswer ON answer.id=repeatanswer.answerid WHERE answer.subpackid = ?");) {
+            st.setLong(1, subpack.getId());
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                repeatAnswersInSubpack.add(answerDao.resultSetToAnswer(rs));
+            }
+            return repeatAnswersInSubpack;
+         
+        } catch (SQLException ex) {
+            String msg = "DB error when retriving repeat answers from subpack " + subpack;
+            throw new DaoException(msg, ex);
+        } 
+    }*/
+
+    @Override
+    public List<Answer> getAnswersInSubpack(Subpack subpack) throws DaoException {
+        checkDataSource();
+        validate(subpack);
+        if (subpack.getId() == null || subpack.getId() < 0) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        List<Answer> answersInSubpack = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement st = conn.prepareStatement(
+             "SELECT answer.id, answer.subpackid, answervalue, isnoise FROM answer " +
+             "WHERE answer.subpackid = ? " +
+             "UNION ALL "+
+             "SELECT answer.id, answer.subpackid, answervalue, isnoise FROM answer INNER JOIN " +
+             "repeatanswer ON answer.id=repeatanswer.answerid WHERE answer.subpackid = ?");) {
+            
+            st.setLong(1, subpack.getId());
+            st.setLong(2, subpack.getId());
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                answersInSubpack.add(answerDao.resultSetToAnswer(rs));
+            }
+            return answersInSubpack;
+         
+        } catch (SQLException ex) {
+            String msg = "DB error when retriving answers from subpack " + subpack;
+            throw new DaoException(msg, ex);
+        } 
+    }
+
+    @Override
+    public void createRepeatingAnswer(Answer answer) throws DaoException {
+        if (answer == null) {
+            throw new IllegalArgumentException("Answer is null");
+        }
+        if (answer.getId() == null || answer.getId() < 0) {
+            throw new ValidationException("Answer id is null");
+        }
+        if (!answerDao.doesExist(answer)) {
+            throw new BeanNotExistsException("Answer with id "+answer.getId()+" is not in DB!");
+        }
+        if (answer.getFromSubpack() == null) {
+            throw new ValidationException("Answer fromSubpack is null");
+        }
+        if (!doesExist(answer.getFromSubpack())) {
+            throw new BeanNotExistsException("Subpack "+answer.getFromSubpack()+" is not in DB!");
+        }
+        if (answer.isIsNoise() == null) {
+            throw new ValidationException("Answer isNoise is null");
+        }
+        if (answer.getAnswer() == null || answer.getAnswer().isEmpty()) {
+            throw new ValidationException("Answer answer is null or empty");
+        }
+        checkDataSource();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement st = conn.prepareStatement(
+             "INSERT INTO REPEATANSWER values (?,?)")) {
+            
+            st.setLong(1, answer.getFromSubpack().getId());
+            st.setLong(2, answer.getId());
+            
+            int rows = st.executeUpdate();
+            if (rows != 1) {
+                throw new DaoException("DB error - more rows was inserted when inserting repeat answer");
+            }
+            
+        } catch (SQLException ex) {
+            throw new DaoException("DB error when insert repeat answer", ex);
         }
     }
 
