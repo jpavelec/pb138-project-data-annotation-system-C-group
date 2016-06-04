@@ -96,12 +96,14 @@ public class EvaluationDaoImpl implements EvaluationDao {
     @Override
     public boolean doesExist(Evaluation evaluation) throws DaoException {
         checkDataSource();
-        validate(evaluation);
+        if (evaluation == null) {
+            throw new IllegalArgumentException("Evaluation is null");
+        }
         if (evaluation.getId() == null) {
-            throw new IllegalArgumentException("Evaluation id is null");
+            throw new ValidationException("Evaluation id is null");
         }
         if (evaluation.getId() < 0) {
-            throw new IllegalArgumentException("Evaluation id is negative");
+            throw new ValidationException("Evaluation id is negative");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(

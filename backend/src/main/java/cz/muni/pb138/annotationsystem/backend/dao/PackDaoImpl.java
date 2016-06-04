@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.sql.DataSource;
@@ -59,28 +58,15 @@ public class PackDaoImpl implements PackDao {
         if (pack.getName().isEmpty()) {
             throw new ValidationException("Pack name is empty");
         }
-        if (pack.getName().length() > 30) {
+        if (pack.getName().length() > 60) {
             throw new ValidationException("Pack name is too long ("+
-                    pack.getName().length()+" characters and 30 characters is maximum");
+                    pack.getName().length()+" characters and 60 characters is maximum");
         }
         if (pack.getRepeatingRate() < 0 || pack.getRepeatingRate() > 100) {
             throw new ValidationException("Repeate ratio is out of interval");
         }
         if (pack.getNoiseRate() < 0 || pack.getNoiseRate() > 100) {
             throw new ValidationException("Noise ratio is out of interval");
-        }
-        
-        Double repeatingRate = pack.getRepeatingRate();
-        String[] splitRepeat = repeatingRate.toString().split("\\.");
-        if (splitRepeat[1].length() > 2) {
-            throw new ValidationException("Decimal part of repeating rate is to long ("
-                    + splitRepeat[1].length() + " and 2 is maximum).");
-        }
-        Double noiseRate = pack.getNoiseRate();
-        String[] splitNoise = noiseRate.toString().split("\\.");
-        if (splitNoise[1].length() > 2) {
-            throw new ValidationException("Decimal part of noise rate is to long ("
-                    + splitNoise[1].length() + " and 2 is maximum).");
         }
     }
     
@@ -118,12 +104,14 @@ public class PackDaoImpl implements PackDao {
     @Override
     public boolean doesExist(Pack pack) throws DaoException {
         checkDataSource();
-        validate(pack);
+        if (pack == null) {
+            throw new IllegalArgumentException("Pack is null");
+        }
         if (pack.getId() == null) {
-            throw new IllegalArgumentException("Pack id is null");
+            throw new ValidationException("Pack id is null");
         }
         if (pack.getId() < 0) {
-            throw new IllegalArgumentException("Pack id is negative");
+            throw new ValidationException("Pack id is negative");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(

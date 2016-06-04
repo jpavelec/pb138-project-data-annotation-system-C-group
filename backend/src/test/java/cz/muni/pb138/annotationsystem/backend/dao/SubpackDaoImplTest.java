@@ -5,6 +5,7 @@ import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.config.TestConfig;
+import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
@@ -15,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -37,6 +40,9 @@ public class SubpackDaoImplTest {
     
     @Inject
     private PersonDaoImpl personDao;
+    
+    @Inject
+    private AnswerDaoImpl answerDao;
     
     @Inject
     private SubpackDaoImpl subpackDao;
@@ -144,7 +150,7 @@ public class SubpackDaoImplTest {
     @Test(expected = ValidationException.class)
     public void createSubpackWithLongName() throws Exception {
         subpackDao.create(sampleAnimal01Subpack()
-                            .name("aaaaabbbbbcccccdddddeeeeefffffg")
+                            .name("aaaaabbbbbcccccdddddeeeeefffffaaaaabbbbbcccccdddddeeeeefffffg")
                             .build());
     }
     
@@ -342,6 +348,53 @@ public class SubpackDaoImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void getSubpacksInNullPack() throws Exception {
         subpackDao.getSubpacksInPack(null);
+    }
+    
+    @Test
+    public void doesExist() throws Exception {
+        Subpack existingSubpack = sampleAnimal01Subpack().build();
+        subpackDao.create(existingSubpack);
+        assertTrue(subpackDao.doesExist(existingSubpack));
+        assertFalse(subpackDao.doesExist(sampleAnimal01Subpack().id((long) 250).build()));
+    }
+    
+    @Test
+    public void createRepeatAnswer() throws Exception {
+        Subpack subpack01 = sampleAnimal01Subpack().build();
+        Subpack subpack02 = sampleAnimal02Subpack().build();
+        subpackDao.create(subpack01);
+        subpackDao.create(subpack02);
+        Answer answerDog = new Answer(subpack01, "dog", Boolean.FALSE);
+        Answer answerElephant = new Answer(subpack01, "elephant", Boolean.FALSE);
+        Answer answerCat = new Answer(subpack01, "cat", Boolean.FALSE);
+        Answer answerChicken = new Answer(subpack01, "chicken", Boolean.FALSE);
+        Answer answerFrog = new Answer(subpack01, "frog", Boolean.FALSE);
+        Answer answerKangoo = new Answer(subpack01, "kangoo", Boolean.FALSE);
+        Answer answerDeer = new Answer(subpack01, "deer", Boolean.FALSE);
+        Answer answerNoise = new Answer(subpack01, "adfadf", Boolean.TRUE);
+        Answer answerPig = new Answer(subpack02, "pig", Boolean.FALSE);
+        Answer answerBird = new Answer(subpack02, "bird", Boolean.FALSE);
+        Answer answerRabit = new Answer(subpack02, "rabit", Boolean.FALSE);
+        answerDao.create(answerDog);
+        answerDao.create(answerElephant);
+        answerDao.create(answerCat);
+        answerDao.create(answerChicken);
+        answerDao.create(answerFrog);
+        answerDao.create(answerKangoo);
+        answerDao.create(answerDeer);
+        answerDao.create(answerNoise);
+        answerDao.create(answerPig);
+        answerDao.create(answerBird);
+        answerDao.create(answerRabit);
+        
+        subpackDao.createRepeatingAnswer(answerDog);
+        subpackDao.createRepeatingAnswer(answerDog);
+        subpackDao.createRepeatingAnswer(answerElephant);
+        subpackDao.createRepeatingAnswer(answerRabit);
+        
+        assertThat(subpackDao.getAnswersInSubpack(subpack01))
+                    .hasSize(8+3);
+        
     }
             
     

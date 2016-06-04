@@ -70,8 +70,8 @@ public class PackDaoImplTest {
         Long packId = pack.getId();
         assertThat(packId).isNotNull();
         assertThat(packDao.getById(packId))
-                .isNotSameAs(pack)
-                .isEqualToComparingFieldByField(pack);
+                .isNotSameAs(pack);
+        assertEquals(pack, packDao.getById(packId));
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -82,18 +82,6 @@ public class PackDaoImplTest {
     @Test(expected = ValidationException.class)
     public void createPackWithExistingId() throws Exception {
         Pack pack = sampleAnimalPack().id((long) 1).build();
-        packDao.create(pack);
-    }
-    
-    @Test(expected = ValidationException.class)
-    public void createPackLongDecimalPartNoiseRating() throws Exception {
-        Pack pack = sampleAnimalPack().noiseRate(2.347).build();
-        packDao.create(pack);
-    }
-    
-    @Test(expected = ValidationException.class)
-    public void createPackLongDecimalPartRepeatRating() throws Exception {
-        Pack pack = sampleAnimalPack().repeatingRate(3.845).build();
         packDao.create(pack);
     }
     
@@ -159,7 +147,7 @@ public class PackDaoImplTest {
     @Test(expected = ValidationException.class)
     public void createPackWithLongName() throws Exception {
         Pack pack = sampleAnimalPack().name(
-            "aaaaabbbbbcccccdddddeeeeefffffg").build();
+            "aaaaabbbbbcccccdddddeeeeefffffaaaaabbbbbcccccdddddeeeeefffffg").build();
         packDao.create(pack);
     }
     
@@ -174,10 +162,8 @@ public class PackDaoImplTest {
         packForUpdate.setRepeatingRate(5.25);
         packDao.update(packForUpdate);
         
-        assertThat(packDao.getById(packForUpdate.getId()))
-                .isEqualToComparingFieldByField(packForUpdate);
-        assertThat(packDao.getById(anotherPack.getId()))
-                .isEqualToComparingFieldByField(anotherPack);
+        assertEquals(packForUpdate, packDao.getById(packForUpdate.getId()));
+        assertEquals(anotherPack, packDao.getById(anotherPack.getId()));
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -264,22 +250,6 @@ public class PackDaoImplTest {
         packDao.update(packToUpdate);
     }
     
-    @Test(expected = ValidationException.class)
-    public void updatePackLongDecimalPartNoiseRating() throws Exception {
-        Pack packToUpdate = sampleAnimalPack().build();
-        packDao.create(packToUpdate);
-        packToUpdate.setNoiseRate(1.002);
-        packDao.update(packToUpdate);
-    }
-    
-    @Test(expected = ValidationException.class)
-    public void updatePackLongDecimalPartRepeatingRatio() throws Exception {
-        Pack packToUpdate = sampleAnimalPack().build();
-        packDao.create(packToUpdate);
-        packToUpdate.setRepeatingRate(2.238);
-        packDao.update(packToUpdate);
-    }
-    
     @Test(expected = IllegalArgumentException.class)
     public void deleteNullPack() throws Exception {
         packDao.delete(null);
@@ -303,7 +273,6 @@ public class PackDaoImplTest {
         packDao.create(packThing);
         packDao.delete(packAnimal);
         assertThat(packDao.getAll())
-                .usingFieldByFieldElementComparator()
                 .containsOnly(packThing);
     }
     
@@ -313,8 +282,7 @@ public class PackDaoImplTest {
         Pack packThing = sampleThingPack().build();
         packDao.create(packAnimal);
         packDao.create(packThing);
-        assertThat(packDao.getById(packAnimal.getId()))
-                .isEqualToComparingFieldByField(packAnimal);
+        assertEquals(packAnimal, packDao.getById(packAnimal.getId()));
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -341,7 +309,6 @@ public class PackDaoImplTest {
         packDao.create(packThing);
         assertFalse(packDao.getAll().isEmpty());
         assertThat(packDao.getAll())
-            .usingFieldByFieldElementComparator()
             .containsOnly(packAnimal, packThing);
     }
     

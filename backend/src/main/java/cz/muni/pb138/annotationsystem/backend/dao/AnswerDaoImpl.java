@@ -82,12 +82,14 @@ public class AnswerDaoImpl implements AnswerDao {
     @Override
     public boolean doesExist(Answer answer) throws DaoException {
         checkDataSource();
-        validate(answer);
+        if (answer == null) {
+            throw new IllegalArgumentException("Answer is null");
+        }
         if (answer.getId() == null) {
-            throw new IllegalArgumentException("Answer id is null");
+            throw new ValidationException("Answer id is null");
         }
         if (answer.getId() < 0) {
-            throw new IllegalArgumentException("Answer id is negative");
+            throw new ValidationException("Answer id is negative");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
@@ -143,15 +145,15 @@ public class AnswerDaoImpl implements AnswerDao {
         }
     }
 
-    private Answer resultSetToAnswer(ResultSet rs) throws SQLException, DaoException {
+    public Answer resultSetToAnswer(ResultSet rs) throws SQLException, DaoException {
         Answer answer = new Answer();
-        answer.setId(rs.getLong("id"));
+        answer.setId(rs.getLong(1)); // id
         Subpack subpack = new Subpack();
         SubpackDaoImpl subpackDao = new SubpackDaoImpl(dataSource);
-        subpack = subpackDao.getById(rs.getLong("subpackid"));
+        subpack = subpackDao.getById(rs.getLong(2)); // subpackid
         answer.setFromSubpack(subpack);
-        answer.setAnswer(rs.getString("answervalue"));
-        answer.setIsNoise(rs.getBoolean("isnoise"));
+        answer.setAnswer(rs.getString(3)); // answervalue
+        answer.setIsNoise(rs.getBoolean(4)); // isnoise
         return answer;
     }
 

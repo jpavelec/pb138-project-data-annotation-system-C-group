@@ -94,12 +94,14 @@ public class PersonDaoImpl implements PersonDao {
     @Override
     public boolean doesExist(Person person) throws DaoException {
         checkDataSource();
-        validate(person);
+        if (person == null) {
+            throw new IllegalArgumentException("Person is null");
+        }
         if (person.getId() == null) {
-            throw new IllegalArgumentException("Person id is null");
+            throw new ValidationException("Person id is null");
         }
         if (person.getId() < 0) {
-            throw new IllegalArgumentException("Person id is negative");
+            throw new ValidationException("Person id is negative");
         }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
