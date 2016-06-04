@@ -15,8 +15,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.sql.DataSource;
@@ -295,10 +293,98 @@ public class SubpackDaoImpl implements SubpackDao {
             
         } catch (SQLException ex) {
             throw new ServiceFailureException(
-                    "Error when updating subpack " + subpack, ex);
+                    "Error when deleting subpack " + subpack, ex);
         }
         
     }
+    
+   /* private int countSubpackInPack(Pack pack) throws DaoException {
+        checkDataSource();
+        if (pack == null) {
+            throw new IllegalArgumentException("Pack is null");
+        }
+        if (pack.getId() == null || pack.getId() < 0) {
+            throw new ValidationException("Pack id is null or negative ");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "SELECT COUNT(*) as numOfSubpacks FROM subpack WHERE packid = ?" )) {
+            
+            st.setLong(1, pack.getId());
+            
+            
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            throw new DaoException(
+                    "Error when retriving count subpacks in pack " + pack, ex);
+        }
+    }*/
+    
+   /* @Override
+    public void deleteSubpacksFromPack(Pack pack) throws DaoException {
+        checkDataSource();
+        if (pack == null) {
+            throw new IllegalArgumentException("Pack is null");
+        }
+        if (pack.getId() == null || pack.getId() < 0) {
+            throw new ValidationException("Pack id is null or negative ");
+        }
+        
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "DELETE FROM subpack WHERE packid = ?" )) {
+            
+            st.setLong(1, pack.getId());
+            
+            int countDeleted = st.executeUpdate();
+            /*if (countDeleted == 0) {
+                throw new BeanNotExistsException(
+                    "There isn't any subpack with packid " + pack.getId() + " to delete!");
+            } else if (countDeleted != countSubpacksToDelete) {
+                throw new ServiceFailureException(
+                        "Invalid deleted rows count detected! " + countSubpacksToDelete + 
+                        " should be deleted but was " + countDeleted);
+            }
+            
+        } catch (SQLException ex) {
+            throw new ServiceFailureException(
+                    "Error when deleting subpacks from pack " + pack, ex);
+        }
+    }
+    
+    /*@Override
+    public void deleteAssignedPeopleToSubpack(Subpack subpack) throws DaoException {
+        checkDataSource();
+        if (subpack == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (subpack.getId() == null || subpack.getId() < 0) {
+            throw new ValidationException("Subpack id is null or negative ");
+        }
+        //int countSubpacksToDelete = countSubpackInPack(pack);
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "DELETE FROM ASSIGNEDPERSON WHERE subpackid = ?" )) {
+            
+            st.setLong(1, subpack.getId());
+            
+            int countDeleted = st.executeUpdate();
+            /*if (countDeleted == 0) {
+                throw new BeanNotExistsException(
+                    "There isn't any subpack with packid " + pack.getId() + " to delete!");
+            } else if (countDeleted != countSubpacksToDelete) {
+                throw new ServiceFailureException(
+                        "Invalid deleted rows count detected! " + countSubpacksToDelete + 
+                        " should be deleted but was " + countDeleted);
+            }
+            
+        } catch (SQLException ex) {
+            throw new DaoException(
+                    "Error when deleting assigment people to subpack " + subpack, ex);
+        }
+    }*/
 
     @Override
     public List<Person> getPeopleAssignedToSubpack(Subpack subpack) throws DaoException {
@@ -501,30 +587,6 @@ public class SubpackDaoImpl implements SubpackDao {
         }
     }
     
-    /*private List<Answer> getRepeatAnswerInSubpack(Subpack subpack) throws DaoException {
-        checkDataSource();
-        validate(subpack);
-        if (subpack.getId() == null || subpack.getId() < 0) {
-            throw new ValidationException("Subpack id is null or negative");
-        }
-        List<Answer> repeatAnswersInSubpack = new ArrayList<>();
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement st = conn.prepareStatement(
-             "SELECT answer.id, answer.subpackid, answervalue, isnoise FROM answer INNER JOIN " +
-             "repeatanswer ON answer.id=repeatanswer.answerid WHERE answer.subpackid = ?");) {
-            st.setLong(1, subpack.getId());
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                repeatAnswersInSubpack.add(answerDao.resultSetToAnswer(rs));
-            }
-            return repeatAnswersInSubpack;
-         
-        } catch (SQLException ex) {
-            String msg = "DB error when retriving repeat answers from subpack " + subpack;
-            throw new DaoException(msg, ex);
-        } 
-    }*/
-
     @Override
     public List<Answer> getAnswersInSubpack(Subpack subpack) throws DaoException {
         checkDataSource();
