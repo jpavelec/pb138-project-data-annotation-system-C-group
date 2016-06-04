@@ -396,6 +396,4 @@ public class SubpackDaoImplTest {
                     .hasSize(8+3);
         
     }
-            
-    
 }

@@ -25,6 +25,9 @@ public class PackDaoImpl implements PackDao {
     @Inject
     private DataSource dataSource;
     
+    @Inject
+    private SubpackDaoImpl subpackDao;
+    
     private void checkDataSource() {
         if (dataSource == null) {
             throw new IllegalStateException("DataSource is not set");
@@ -267,16 +270,21 @@ public class PackDaoImpl implements PackDao {
         if (pack.getId() == null) {
             throw new ValidationException("Pack id is null");
         }
+        if (!doesExist(pack)) {
+            throw new BeanNotExistsException(
+                    "Pakc with id " + pack.getId() + " not found in DB!");
+        }
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                "DELETE FROM pack WHERE id = ?")) {
+                "DELETE FROM pack WHERE id = ?" )) {
 
             st.setLong(1, pack.getId());
-
+            
             int count = st.executeUpdate();
             if (count == 0) {
                 throw new BeanNotExistsException("Pack " + pack + " was not found in database!");
-            } else if (count != 1) {
+            } else 
+                if (count != 1) {
                 throw new ServiceFailureException("Invalid deleted rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {

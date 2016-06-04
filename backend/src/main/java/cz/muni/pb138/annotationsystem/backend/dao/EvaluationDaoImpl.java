@@ -182,7 +182,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
                     }
                     return eval;
                 } else {
-                    return null;
+                    throw new BeanNotExistsException("Evaluation with id "+id+" is not in DB");
                 }
             }
         } catch (SQLException ex) {
@@ -264,8 +264,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
             }
         } catch (SQLException ex) {
             throw new ServiceFailureException(
-                    "Error when updating evaluation " + evaluation, ex);
+                    "Error when deleting evaluation " + evaluation, ex);
         }
     }
-
 }

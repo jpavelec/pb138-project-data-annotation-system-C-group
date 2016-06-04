@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.sql.DataSource;
@@ -28,6 +27,9 @@ public class AnswerDaoImpl implements AnswerDao {
     @Inject
     private DataSource dataSource;
 
+    @Inject
+    private EvaluationDao evalDao;
+    
     public AnswerDaoImpl(DataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -185,7 +187,7 @@ public class AnswerDaoImpl implements AnswerDao {
 
                     return answer;
                 } else {
-                    return null;
+                    throw new BeanNotExistsException("Answer with id "+id+" is not in DB");
                 }
             }
         } catch (SQLException ex) {
@@ -245,7 +247,7 @@ public class AnswerDaoImpl implements AnswerDao {
     }
 
     @Override
-    public void delete(Answer answer) {
+    public void delete(Answer answer) throws DaoException {
         checkDataSource();
         if (answer == null) {
             throw new IllegalArgumentException("Answer is null");
@@ -268,9 +270,8 @@ public class AnswerDaoImpl implements AnswerDao {
             }
         } catch (SQLException ex) {
             throw new ServiceFailureException(
-                    "Error when updating answer " + answer, ex);
+                    "Error when deleting answer " + answer, ex);
         }
     }
-   
 
 }
