@@ -618,45 +618,49 @@ public class SubpackDaoImpl implements SubpackDao {
     }
 
     @Override
-    public void createRepeatingAnswer(Answer answer) throws DaoException {
-        if (answer == null) {
-            throw new IllegalArgumentException("Answer is null");
-        }
-        if (answer.getId() == null || answer.getId() < 0) {
-            throw new ValidationException("Answer id is null");
-        }
-        if (!answerDao.doesExist(answer)) {
-            throw new BeanNotExistsException("Answer with id "+answer.getId()+" is not in DB!");
-        }
-        if (answer.getFromSubpack() == null) {
-            throw new ValidationException("Answer fromSubpack is null");
-        }
-        if (!doesExist(answer.getFromSubpack())) {
-            throw new BeanNotExistsException("Subpack "+answer.getFromSubpack()+" is not in DB!");
-        }
-        if (answer.isIsNoise() == null) {
-            throw new ValidationException("Answer isNoise is null");
-        }
-        if (answer.getAnswer() == null || answer.getAnswer().isEmpty()) {
-            throw new ValidationException("Answer answer is null or empty");
-        }
+    public List<Answer> getUnevaluatedAnswers(Subpack subpack, Person person) throws DaoException {
+        List<Answer> unevaluatedAnswers = new ArrayList<>();
+        unevaluatedAnswers = getAnswersInSubpack(subpack);
+        unevaluatedAnswers.removeAll(getEvaluatedAnswers(subpack, person));
+        return unevaluatedAnswers;
+    }
+    
+    @Override
+    public List<Answer> getEvaluatedAnswers(Subpack subpack, Person person) throws DaoException {
         checkDataSource();
+        validate(subpack);
+        if (subpack.getId() == null || subpack.getId() < 0) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        if (person == null) {
+            throw new IllegalArgumentException("Person is null");
+        }
+        if (person.getId() == null || person.getId() < 0) {
+            throw new ValidationException("Person id is null or negative");
+        }
+        List<Answer> evaluatedAnswers = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement st = conn.prepareStatement(
-             "INSERT INTO REPEATANSWER values (?,?)")) {
+            PreparedStatement st = conn.prepareStatement(
+            "SELECT answer.id, subpackid, answervalue, isnoise "+
+            "FROM answer INNER JOIN evaluation ON answer.id = evaluation.answerid "+
+            "WHERE subpackid = ? AND personid = ?");) {
             
-            st.setLong(1, answer.getFromSubpack().getId());
-            st.setLong(2, answer.getId());
-            
-            int rows = st.executeUpdate();
-            if (rows != 1) {
-                throw new DaoException("DB error - more rows was inserted when inserting repeat answer");
+            st.setLong(1, subpack.getId());
+            st.setLong(2, person.getId());
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    evaluatedAnswers.add(answerDao.resultSetToAnswer(rs));
+                }
             }
-            
+            return evaluatedAnswers;
         } catch (SQLException ex) {
-            throw new DaoException("DB error when insert repeat answer", ex);
+            throw new DaoException(
+                "Error when retriving evaluated answers from subpack " + subpack +
+                "for person "+person, ex);
         }
     }
+    
+   
 
         
 }

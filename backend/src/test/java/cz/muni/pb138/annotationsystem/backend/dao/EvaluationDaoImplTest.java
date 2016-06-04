@@ -118,12 +118,13 @@ public class EvaluationDaoImplTest {
         answerDao.create(glassAnswer);
         answerDao.create(cupAnswer);
         
-        frankEvalDogAnswer = new Evaluation(frankPerson, dogAnswer, Rating.NEGATIVE, 2500);
-        frankEvalDeerAnswer = new Evaluation(frankPerson, deerAnswer, Rating.NEGATIVE, 2500);
-        frankEvalCatAnswer = new Evaluation(frankPerson, catAnswer, Rating.NEGATIVE, 2500);
-        janeEvalDogAnswer = new Evaluation(janePerson, dogAnswer, Rating.NEGATIVE, 2500);
-        janeEvalWindowAnswer = new Evaluation(janePerson, windowAnswer, Rating.NEGATIVE, 2500);
-        janeEvalGlassAnswer = new Evaluation(janePerson, glassAnswer, Rating.NEGATIVE, 2500);
+        frankEvalDogAnswer = new Evaluation(frankPerson, dogAnswer, Rating.NEGATIVE, 2500);//a01
+        frankEvalDeerAnswer = new Evaluation(frankPerson, deerAnswer, Rating.NEGATIVE, 2500);//a01
+        frankEvalCatAnswer = new Evaluation(frankPerson, catAnswer, Rating.NEGATIVE, 2500);//a02
+        
+        janeEvalDogAnswer = new Evaluation(janePerson, dogAnswer, Rating.NEGATIVE, 2500);//a01
+        janeEvalWindowAnswer = new Evaluation(janePerson, windowAnswer, Rating.NEGATIVE, 2500);//t02
+        janeEvalGlassAnswer = new Evaluation(janePerson, glassAnswer, Rating.NEGATIVE, 2500);//t03
         evalDao.create(frankEvalDogAnswer);
         evalDao.create(frankEvalDeerAnswer);
         evalDao.create(frankEvalCatAnswer);
@@ -143,8 +144,10 @@ public class EvaluationDaoImplTest {
     }
     
     @Test
-    public void testDeletePack() throws Exception {
+    public void deletePack() throws Exception {
         assertThat(evalDao.getAll())
+                .hasSize(6);
+        assertThat(subpackDao.getAll())
                 .hasSize(6);
         evalDao.delete(frankEvalCatAnswer);
         assertThat(evalDao.getAll())
@@ -156,7 +159,68 @@ public class EvaluationDaoImplTest {
                 .hasSize(11);
         assertThat(evalDao.getAll())
                 .hasSize(3);
+        personDao.delete(janePerson);
+        assertThat(evalDao.getAll())
+                .hasSize(1);
+        subpackDao.delete(thingSubpack01);
+        subpackDao.delete(thingSubpack02);
+        assertThat(subpackDao.getAll())
+                .hasSize(4);
+        assertThat(packDao.getAll())
+                .hasSize(2);
+        packDao.delete(thingPack);
+        packDao.delete(animalPack);
+        assertThat(packDao.getAll())
+                .hasSize(0);
+        assertThat(subpackDao.getAll())
+                .hasSize(0);
+        assertThat(answerDao.getAll())
+                .hasSize(0);
+        assertThat(evalDao.getAll())
+                .hasSize(0);
                 
+    }
+    
+    @Test
+    public void getEvaluatedAnswersInSubpackForPerson() throws Exception {
+        assertThat(subpackDao.getEvaluatedAnswers(animalSubpack01, janePerson))
+                .hasSize(1);
+        assertThat(subpackDao.getEvaluatedAnswers(thingSubpack02, janePerson))
+                .hasSize(1);
+        assertThat(subpackDao.getEvaluatedAnswers(thingSubpack03, janePerson))
+                .hasSize(1);
+        assertThat(subpackDao.getEvaluatedAnswers(animalSubpack01, frankPerson))
+                .hasSize(2);
+        assertThat(subpackDao.getEvaluatedAnswers(thingSubpack01, frankPerson))
+                .hasSize(0);
+    }
+    
+    @Test
+    public void getUnevaluatedAnswersInSubpackForPerson() throws Exception {
+        assertThat(subpackDao.getUnevaluatedAnswers(animalSubpack01, frankPerson))
+                .hasSize(0);
+        assertThat(subpackDao.getUnevaluatedAnswers(animalSubpack02, frankPerson))
+                .hasSize(1);
+        assertThat(subpackDao.getUnevaluatedAnswers(animalSubpack03, frankPerson))
+                .hasSize(2);
+        assertThat(subpackDao.getUnevaluatedAnswers(thingSubpack01, frankPerson))
+                .hasSize(2);
+        assertThat(subpackDao.getUnevaluatedAnswers(thingSubpack02, frankPerson))
+                .hasSize(2);
+        assertThat(subpackDao.getUnevaluatedAnswers(thingSubpack03, frankPerson))
+                .hasSize(2);
+        assertThat(subpackDao.getUnevaluatedAnswers(animalSubpack01, janePerson))
+                .hasSize(1);
+        assertThat(subpackDao.getUnevaluatedAnswers(animalSubpack02, janePerson))
+                .hasSize(2);
+        assertThat(subpackDao.getUnevaluatedAnswers(animalSubpack03, janePerson))
+                .hasSize(2);
+        assertThat(subpackDao.getUnevaluatedAnswers(thingSubpack01, janePerson))
+                .hasSize(2);
+        assertThat(subpackDao.getUnevaluatedAnswers(thingSubpack02, janePerson))
+                .hasSize(1);
+        assertThat(subpackDao.getUnevaluatedAnswers(thingSubpack03, janePerson))
+                .hasSize(1);
     }
 
 }
