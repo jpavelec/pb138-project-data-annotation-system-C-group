@@ -5,6 +5,7 @@ import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
+import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,6 +34,9 @@ public class AnswerDaoImpl implements AnswerDao {
     
     @Inject
     private SubpackDaoImpl subpackDao;
+    
+    @Inject
+    private PersonDaoImpl personDao;
     
     public AnswerDaoImpl(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -315,6 +320,99 @@ public class AnswerDaoImpl implements AnswerDao {
             
         } catch (SQLException ex) {
             throw new DaoException("DB error when insert repeat answer", ex);
+        }
+    }
+    
+    @Override
+    public List<Answer> getAnswersInSubpack(Subpack subpack) throws DaoException {
+        checkDataSource();
+        if (subpack == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (subpack.getId() == null || subpack.getId() < 0) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        if (!subpackDao.doesExist(subpack)) {
+            throw new BeanNotExistsException("Subpack " + subpack + " not found in DB!");
+        }
+        List<Answer> answersInSubpack = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement st = conn.prepareStatement(
+             "SELECT answer.id, answer.subpackid, answervalue, isnoise FROM answer " +
+             "WHERE answer.subpackid = ? " +
+             "UNION ALL "+
+             "SELECT answer.id, answer.subpackid, answervalue, isnoise FROM answer INNER JOIN " +
+             "repeatanswer ON answer.id=repeatanswer.answerid WHERE answer.subpackid = ?");) {
+            
+            st.setLong(1, subpack.getId());
+            st.setLong(2, subpack.getId());
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                answersInSubpack.add(resultSetToAnswer(rs));
+            }
+            return answersInSubpack;
+         
+        } catch (SQLException ex) {
+            String msg = "DB error when retriving answers from subpack " + subpack;
+            throw new DaoException(msg, ex);
+        } 
+    }
+
+    @Override
+    public List<Answer> getUnevaluatedAnswers(Subpack subpack, Person person) throws DaoException {
+        List<Answer> unevaluatedAnswers = getAnswersInSubpack(subpack);
+        List<Answer> evaluatedAnswers = getEvaluatedAnswers(subpack, person);
+        Iterator<Answer> i = unevaluatedAnswers.iterator();
+        while (i.hasNext()) {
+            Answer a = i.next();
+            if (evaluatedAnswers.contains(a)) {
+                i.remove();
+                unevaluatedAnswers.remove(a);
+            }
+        }
+        return unevaluatedAnswers;
+    }
+    
+    @Override
+    public List<Answer> getEvaluatedAnswers(Subpack subpack, Person person) throws DaoException {
+        checkDataSource();
+        if (subpack == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (subpack.getId() == null || subpack.getId() < 0) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        if (!subpackDao.doesExist(subpack)) {
+            throw new BeanNotExistsException("Subpack " + subpack + " not found in DB!");
+        }
+        if (person == null) {
+            throw new IllegalArgumentException("Person is null");
+        }
+        if (person.getId() == null || person.getId() < 0) {
+            throw new ValidationException("Person id is null or negative");
+        }
+        if (!personDao.doesExist(person)) {
+            throw new BeanNotExistsException("Person " + person + " not found in DB!");
+        }
+        List<Answer> evaluatedAnswers = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+            PreparedStatement st = conn.prepareStatement(
+            "SELECT answer.id, subpackid, answervalue, isnoise "+
+            "FROM answer INNER JOIN evaluation ON answer.id = evaluation.answerid "+
+            "WHERE subpackid = ? AND personid = ?");) {
+            
+            st.setLong(1, subpack.getId());
+            st.setLong(2, person.getId());
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    evaluatedAnswers.add(resultSetToAnswer(rs));
+                }
+            }
+            return evaluatedAnswers;
+        } catch (SQLException ex) {
+            throw new DaoException(
+                "Error when retriving evaluated answers from subpack " + subpack +
+                "for person "+person, ex);
         }
     }
 

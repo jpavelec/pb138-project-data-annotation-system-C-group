@@ -13,7 +13,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -297,94 +300,6 @@ public class SubpackDaoImpl implements SubpackDao {
         }
         
     }
-    
-   /* private int countSubpackInPack(Pack pack) throws DaoException {
-        checkDataSource();
-        if (pack == null) {
-            throw new IllegalArgumentException("Pack is null");
-        }
-        if (pack.getId() == null || pack.getId() < 0) {
-            throw new ValidationException("Pack id is null or negative ");
-        }
-        try (Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement(
-                "SELECT COUNT(*) as numOfSubpacks FROM subpack WHERE packid = ?" )) {
-            
-            st.setLong(1, pack.getId());
-            
-            
-            try (ResultSet rs = st.executeQuery()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException ex) {
-            throw new DaoException(
-                    "Error when retriving count subpacks in pack " + pack, ex);
-        }
-    }*/
-    
-   /* @Override
-    public void deleteSubpacksFromPack(Pack pack) throws DaoException {
-        checkDataSource();
-        if (pack == null) {
-            throw new IllegalArgumentException("Pack is null");
-        }
-        if (pack.getId() == null || pack.getId() < 0) {
-            throw new ValidationException("Pack id is null or negative ");
-        }
-        
-        try (Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement(
-                "DELETE FROM subpack WHERE packid = ?" )) {
-            
-            st.setLong(1, pack.getId());
-            
-            int countDeleted = st.executeUpdate();
-            /*if (countDeleted == 0) {
-                throw new BeanNotExistsException(
-                    "There isn't any subpack with packid " + pack.getId() + " to delete!");
-            } else if (countDeleted != countSubpacksToDelete) {
-                throw new ServiceFailureException(
-                        "Invalid deleted rows count detected! " + countSubpacksToDelete + 
-                        " should be deleted but was " + countDeleted);
-            }
-            
-        } catch (SQLException ex) {
-            throw new ServiceFailureException(
-                    "Error when deleting subpacks from pack " + pack, ex);
-        }
-    }
-    
-    /*@Override
-    public void deleteAssignedPeopleToSubpack(Subpack subpack) throws DaoException {
-        checkDataSource();
-        if (subpack == null) {
-            throw new IllegalArgumentException("Subpack is null");
-        }
-        if (subpack.getId() == null || subpack.getId() < 0) {
-            throw new ValidationException("Subpack id is null or negative ");
-        }
-        //int countSubpacksToDelete = countSubpackInPack(pack);
-        try (Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement(
-                "DELETE FROM ASSIGNEDPERSON WHERE subpackid = ?" )) {
-            
-            st.setLong(1, subpack.getId());
-            
-            int countDeleted = st.executeUpdate();
-            /*if (countDeleted == 0) {
-                throw new BeanNotExistsException(
-                    "There isn't any subpack with packid " + pack.getId() + " to delete!");
-            } else if (countDeleted != countSubpacksToDelete) {
-                throw new ServiceFailureException(
-                        "Invalid deleted rows count detected! " + countSubpacksToDelete + 
-                        " should be deleted but was " + countDeleted);
-            }
-            
-        } catch (SQLException ex) {
-            throw new DaoException(
-                    "Error when deleting assigment people to subpack " + subpack, ex);
-        }
-    }*/
 
     @Override
     public List<Person> getPeopleAssignedToSubpack(Subpack subpack) throws DaoException {
@@ -452,9 +367,11 @@ public class SubpackDaoImpl implements SubpackDao {
             deleteAssignmentToPerson(person);
             for (Subpack subpack : assignedSubpacks) {
                 try (PreparedStatement st = connection.prepareStatement(
-                        "INSERT INTO assignedperson (subpackid, personid) VALUES (?,?)")) {
+                        "INSERT INTO assignedperson (subpackid, personid, starttime) VALUES (?,?,?)")) {
                     st.setLong(1, subpack.getId());
                     st.setLong(2, person.getId());
+                    Calendar calendar = Calendar.getInstance();
+                    st.setTimestamp(3, new java.sql.Timestamp(calendar.getTime().getTime()));
                     int addedRows = st.executeUpdate();
                     if (addedRows != 1) {
                         throw new ServiceFailureException("Internal Error: More rows ("
@@ -473,9 +390,11 @@ public class SubpackDaoImpl implements SubpackDao {
             deleteAssignmentToSubpack(subpack);
             for (Person person : assignedPeople) {
                 try (PreparedStatement st = connection.prepareStatement(
-                        "INSERT INTO assignedperson (subpackid, personid) VALUES (?,?)")) {
+                        "INSERT INTO assignedperson (subpackid, personid, starttime) VALUES (?,?,?)")) {
                     st.setLong(1, subpack.getId());
                     st.setLong(2, person.getId());
+                    Calendar calendar = Calendar.getInstance();
+                    st.setTimestamp(3, new java.sql.Timestamp(calendar.getTime().getTime()));
                     int addedRows = st.executeUpdate();
                     if (addedRows != 1) {
                         throw new ServiceFailureException("Internal Error: More rows ("
@@ -540,9 +459,11 @@ public class SubpackDaoImpl implements SubpackDao {
         this.getById(subpack.getId());
         try (Connection connection = dataSource.getConnection(); 
             PreparedStatement st = connection.prepareStatement(
-                "INSERT INTO assignedperson (subpackid, personid) VALUES (?,?)")) {
+                "INSERT INTO assignedperson (subpackid, personid, starttime) VALUES (?,?,?)")) {
                 st.setLong(1, subpack.getId());
                 st.setLong(2, person.getId());
+                Calendar calendar = Calendar.getInstance();
+                st.setTimestamp(3, new java.sql.Timestamp(calendar.getTime().getTime()));
                 int addedRows = st.executeUpdate();
                 if (addedRows != 1) {
                     throw new ServiceFailureException("Internal Error: More rows ("
@@ -553,6 +474,55 @@ public class SubpackDaoImpl implements SubpackDao {
             throw new ServiceFailureException("Error when insert assignment person "
                             + person +" to subpack " + subpack, ex);
         }
+    }
+    
+    @Override
+    public Timestamp getAssignationTime(Subpack subpack, Person person) throws DaoException {
+        checkDataSource();
+        if (person == null) {
+            throw new IllegalArgumentException("Person is null");
+        }
+        if (person.getId() == null || person.getId() < 1) {
+            throw new ValidationException("Person id is null or negative");
+        }
+        if (subpack == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (subpack.getId() == null || subpack.getId() < 1) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        if (!doesExist(subpack)) {
+            throw new BeanNotExistsException("Subpack with id " + subpack.getId()+" is not in DB!");
+        }
+        if (!personDao.doesExist(person)) {
+            throw new BeanNotExistsException("Person with id " + person.getId()+" is not in DB!");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "SELECT starttime FROM assignedperson WHERE subpackid = ? AND personid = ?")) {
+            
+            st.setLong(1, subpack.getId());
+            st.setLong(2, person.getId());
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                    Timestamp startTime = rs.getTimestamp(1);
+                    if (rs.next()) {
+                        throw new ServiceFailureException(
+                            "Internal error: More entities with the same subpackid and personid found " +
+                            "in assignment subpacks and people");
+                    }
+                    return startTime;
+                } else {
+                    String msg = "Assignation person "+person+" to subpack " + subpack + " not found!";
+                    throw new BeanNotExistsException(msg);
+                }
+            
+        } catch (SQLException ex) {
+            String msg = "Error when retriving start time for assignation person " +
+            person + " to subpack " + subpack;
+            throw new ServiceFailureException(msg, ex);
+        }
+        
     }
     
     @Override
@@ -586,81 +556,4 @@ public class SubpackDaoImpl implements SubpackDao {
             throw new ServiceFailureException(msg, ex);
         }
     }
-    
-    @Override
-    public List<Answer> getAnswersInSubpack(Subpack subpack) throws DaoException {
-        checkDataSource();
-        validate(subpack);
-        if (subpack.getId() == null || subpack.getId() < 0) {
-            throw new ValidationException("Subpack id is null or negative");
-        }
-        List<Answer> answersInSubpack = new ArrayList<>();
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement st = conn.prepareStatement(
-             "SELECT answer.id, answer.subpackid, answervalue, isnoise FROM answer " +
-             "WHERE answer.subpackid = ? " +
-             "UNION ALL "+
-             "SELECT answer.id, answer.subpackid, answervalue, isnoise FROM answer INNER JOIN " +
-             "repeatanswer ON answer.id=repeatanswer.answerid WHERE answer.subpackid = ?");) {
-            
-            st.setLong(1, subpack.getId());
-            st.setLong(2, subpack.getId());
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                answersInSubpack.add(answerDao.resultSetToAnswer(rs));
-            }
-            return answersInSubpack;
-         
-        } catch (SQLException ex) {
-            String msg = "DB error when retriving answers from subpack " + subpack;
-            throw new DaoException(msg, ex);
-        } 
-    }
-
-    @Override
-    public List<Answer> getUnevaluatedAnswers(Subpack subpack, Person person) throws DaoException {
-        List<Answer> unevaluatedAnswers = new ArrayList<>();
-        unevaluatedAnswers = getAnswersInSubpack(subpack);
-        unevaluatedAnswers.removeAll(getEvaluatedAnswers(subpack, person));
-        return unevaluatedAnswers;
-    }
-    
-    @Override
-    public List<Answer> getEvaluatedAnswers(Subpack subpack, Person person) throws DaoException {
-        checkDataSource();
-        validate(subpack);
-        if (subpack.getId() == null || subpack.getId() < 0) {
-            throw new ValidationException("Subpack id is null or negative");
-        }
-        if (person == null) {
-            throw new IllegalArgumentException("Person is null");
-        }
-        if (person.getId() == null || person.getId() < 0) {
-            throw new ValidationException("Person id is null or negative");
-        }
-        List<Answer> evaluatedAnswers = new ArrayList<>();
-        try (Connection conn = dataSource.getConnection();
-            PreparedStatement st = conn.prepareStatement(
-            "SELECT answer.id, subpackid, answervalue, isnoise "+
-            "FROM answer INNER JOIN evaluation ON answer.id = evaluation.answerid "+
-            "WHERE subpackid = ? AND personid = ?");) {
-            
-            st.setLong(1, subpack.getId());
-            st.setLong(2, person.getId());
-            try (ResultSet rs = st.executeQuery()) {
-                while (rs.next()) {
-                    evaluatedAnswers.add(answerDao.resultSetToAnswer(rs));
-                }
-            }
-            return evaluatedAnswers;
-        } catch (SQLException ex) {
-            throw new DaoException(
-                "Error when retriving evaluated answers from subpack " + subpack +
-                "for person "+person, ex);
-        }
-    }
-    
-   
-
-        
 }

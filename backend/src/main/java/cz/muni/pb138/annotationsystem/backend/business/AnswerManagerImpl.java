@@ -85,7 +85,7 @@ public class AnswerManagerImpl implements AnswerManager {
             evaluated.add(e.getAnswer());
         }
 
-        List<Answer> unevaluated = subpackDao.getAnswersInSubpack(subpack);
+        List<Answer> unevaluated = answerDao.getAnswersInSubpack(subpack);
         Iterator<Answer> i = unevaluated.iterator();
         while (i.hasNext()) {
             Answer a = i.next();
@@ -126,7 +126,7 @@ public class AnswerManagerImpl implements AnswerManager {
             throw new BeanNotExistsException("given subpack does not exist");
         }
 
-        return subpackDao.getAnswersInSubpack(subpack);
+        return answerDao.getAnswersInSubpack(subpack);
     }
 
     @Override

@@ -392,7 +392,7 @@ public class SubpackDaoImplTest {
         answerDao.createRepeatingAnswer(answerElephant);
         answerDao.createRepeatingAnswer(answerRabit);
         
-        assertThat(subpackDao.getAnswersInSubpack(subpack01))
+        assertThat(answerDao.getAnswersInSubpack(subpack01))
                     .hasSize(8+3);
     }
 }
