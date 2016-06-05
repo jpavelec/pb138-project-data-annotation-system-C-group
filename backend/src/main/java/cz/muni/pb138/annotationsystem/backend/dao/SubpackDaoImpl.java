@@ -477,7 +477,7 @@ public class SubpackDaoImpl implements SubpackDao {
     }
     
     @Override
-    public Timestamp getAssignationTime(Subpack subpack, Person person) throws DaoException {
+    public long getAssignationTime(Subpack subpack, Person person) throws DaoException {
         checkDataSource();
         if (person == null) {
             throw new IllegalArgumentException("Person is null");
@@ -511,7 +511,7 @@ public class SubpackDaoImpl implements SubpackDao {
                             "Internal error: More entities with the same subpackid and personid found " +
                             "in assignment subpacks and people");
                     }
-                    return startTime;
+                    return startTime.getTime();
                 } else {
                     String msg = "Assignation person "+person+" to subpack " + subpack + " not found!";
                     throw new BeanNotExistsException(msg);

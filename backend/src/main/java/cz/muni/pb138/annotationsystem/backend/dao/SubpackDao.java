@@ -25,5 +25,5 @@ public interface SubpackDao extends Dao<Subpack> {
 
     public List<Subpack> getSubpacksInPack(Pack pack) throws DaoException;
     
-    public Timestamp getAssignationTime(Subpack subpack, Person person) throws DaoException;
+    public long getAssignationTime(Subpack subpack, Person person) throws DaoException;
 }
