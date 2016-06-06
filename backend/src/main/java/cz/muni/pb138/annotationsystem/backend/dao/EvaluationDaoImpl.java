@@ -2,7 +2,6 @@ package cz.muni.pb138.annotationsystem.backend.dao;
 
 import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
-import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
@@ -67,22 +66,22 @@ public class EvaluationDaoImpl implements EvaluationDao {
         }
     }
     
-    private Long getKey(ResultSet keyRS, Evaluation evaluation) throws ServiceFailureException, SQLException {
+    private Long getKey(ResultSet keyRS, Evaluation evaluation) throws DaoException, SQLException {
         if (keyRS.next()) {
             if (keyRS.getMetaData().getColumnCount() != 1) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert evaluation " + evaluation
                         + " - wrong key fields count: " + keyRS.getMetaData().getColumnCount());
             }
             Long result = keyRS.getLong(1);
             if (keyRS.next()) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert evaluation " + evaluation
                         + " - more keys found");
             }
             return result;
         } else {
-            throw new ServiceFailureException("Internal Error: Generated key"
+            throw new DaoException("Internal Error: Generated key"
                     + "retriving failed when trying to insert evaluation " + evaluation
                     + " - no key found");
         }
@@ -164,7 +163,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
             st.setInt(4, evaluation.getElapsedTime());
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
-                throw new ServiceFailureException("Internal Error: More rows ("
+                throw new DaoException("Internal Error: More rows ("
                         + addedRows + ") inserted when trying to insert evaluation " + evaluation);
             }
             
@@ -179,7 +178,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
         }
             
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when inserting evaluation " + evaluation, ex);
+            throw new DaoException("Error when inserting evaluation " + evaluation, ex);
         }
     }
     
@@ -217,14 +216,14 @@ public class EvaluationDaoImpl implements EvaluationDao {
             if (count == 0) {
                 throw new BeanNotExistsException("Invalid records in assignedperson");
             } else if (count != 1) {
-                throw new ServiceFailureException(
+                throw new DaoException(
                 "Invalid updated rows count detected (one row should be updated): " + count);
             }
             
         } catch (SQLException ex) {
             String msg = "Error when inserting completation time for assignation person " +
             person + " to subpack " + subpack;
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
     }
 
@@ -243,7 +242,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
                     Evaluation eval = resultSetToEvaluation(rs);
 
                     if (rs.next()) {
-                        throw new ServiceFailureException(
+                        throw new DaoException(
                             "Internal error: More entities with the same id found " +
                             "(source id: " + id + ", found " + eval + 
                             " and " + resultSetToEvaluation(rs));
@@ -254,7 +253,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
                 }
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                 "Error when retriving evaluation with id " + id, ex);
         }
     }
@@ -275,7 +274,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
             
         } catch (SQLException ex) {
             String msg = "Error when getting all evaluations from DB";
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
     }
 
@@ -301,10 +300,10 @@ public class EvaluationDaoImpl implements EvaluationDao {
             if (count == 0) {
                 throw new BeanNotExistsException("Evaluation " + evaluation + " was not found in database!");
             } else if (count != 1) {
-                throw new ServiceFailureException("Invalid updated rows count detected (one row should be updated): " + count);
+                throw new DaoException("Invalid updated rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                 "Error when updating evaluation " + evaluation, ex);
         }
     }
@@ -328,10 +327,10 @@ public class EvaluationDaoImpl implements EvaluationDao {
             if (count == 0) {
                 throw new BeanNotExistsException("Evaluation " + evaluation + " was not found in database!");
             } else if (count != 1) {
-                throw new ServiceFailureException("Invalid deleted rows count detected (one row should be updated): " + count);
+                throw new DaoException("Invalid deleted rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                     "Error when deleting evaluation " + evaluation, ex);
         }
     }

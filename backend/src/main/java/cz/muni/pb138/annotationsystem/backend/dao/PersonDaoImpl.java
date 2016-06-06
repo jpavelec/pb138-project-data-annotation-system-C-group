@@ -3,7 +3,6 @@ package cz.muni.pb138.annotationsystem.backend.dao;
 import cz.muni.pb138.annotationsystem.backend.common.BeanAlreadyExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
-import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import java.sql.Connection;
@@ -13,7 +12,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
+import javax.inject.Inject;import cz.muni.pb138.annotationsystem.backend.common.DaoException;
+
 import javax.inject.Named;
 import javax.sql.DataSource;
 
@@ -57,28 +57,30 @@ public class PersonDaoImpl implements PersonDao {
         }
         
     }
-    private void checkIfUsernameDoesntExist(String username) {
+    
+    private void checkIfUsernameDoesntExist(String username) throws DaoException {
         if (this.getByUsername(username) != null) {
             throw new BeanAlreadyExistsException("User with username  " + 
                     username+" already exists");
         }
     }
-    private Long getKey(ResultSet keyRS, Person person) throws ServiceFailureException, SQLException {
+    
+    private Long getKey(ResultSet keyRS, Person person) throws DaoException, SQLException {
         if (keyRS.next()) {
             if (keyRS.getMetaData().getColumnCount() != 1) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert user " + person
                         + " - wrong key fields count: " + keyRS.getMetaData().getColumnCount());
             }
             Long result = keyRS.getLong(1);
             if (keyRS.next()) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert user " + person
                         + " - more keys found");
             }
             return result;
         } else {
-            throw new ServiceFailureException("Internal Error: Generated key"
+            throw new DaoException("Internal Error: Generated key"
                     + "retriving failed when trying to insert user " + person
                     + " - no key found");
         }
@@ -144,7 +146,7 @@ public class PersonDaoImpl implements PersonDao {
             st.setString(1, person.getUsername());
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
-                throw new ServiceFailureException("Internal Error: More rows ("
+                throw new DaoException("Internal Error: More rows ("
                         + addedRows + ") inserted when trying to insert user " + person);
             }
             
@@ -153,7 +155,7 @@ public class PersonDaoImpl implements PersonDao {
             }    
             
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when inserting user " + person, ex);
+            throw new DaoException("Error when inserting user " + person, ex);
         }
     }
 
@@ -180,10 +182,10 @@ public class PersonDaoImpl implements PersonDao {
             if (count == 0) {
                 throw new BeanNotExistsException("User " + person + " was not found in database!");
             } else if (count != 1) {
-                throw new ServiceFailureException("Invalid updated rows count detected (one row should be updated): " + count);
+                throw new DaoException("Invalid updated rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                     "Error when updating user " + person, ex);
         }
     }
@@ -207,10 +209,10 @@ public class PersonDaoImpl implements PersonDao {
             if (count == 0) {
                 throw new BeanNotExistsException("User " + person + " was not found in database!");
             } else if (count != 1) {
-                throw new ServiceFailureException("Invalid deleted rows count detected (one row should be updated): " + count);
+                throw new DaoException("Invalid deleted rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                     "Error when updating user " + person, ex);
         }
     }
@@ -236,7 +238,7 @@ public class PersonDaoImpl implements PersonDao {
                     Person person = resultSetToPerson(rs);
                 
                     if (rs.next()) {
-                        throw new ServiceFailureException(
+                        throw new DaoException(
                             "Internal error: More entities with the same id found " +
                             "(source id: " + id + ", found " + person + 
                             " and " + resultSetToPerson(rs));
@@ -249,13 +251,13 @@ public class PersonDaoImpl implements PersonDao {
                 }
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                 "Error when retriving user with id " + id, ex);
         }
     }
 
     @Override
-    public Person getByUsername(String username) {
+    public Person getByUsername(String username) throws DaoException {
         checkDataSource();
         if (username == null) {
             throw new IllegalArgumentException("Username is null");
@@ -275,7 +277,7 @@ public class PersonDaoImpl implements PersonDao {
                     Person person = resultSetToPerson(rs);
                 
                     if (rs.next()) {
-                        throw new ServiceFailureException(
+                        throw new DaoException(
                             "Internal error: More entities with the same username found " +
                             "(source username: " + username + ", found " + person + 
                             " and " + resultSetToPerson(rs));
@@ -292,7 +294,7 @@ public class PersonDaoImpl implements PersonDao {
                 }
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                 "Error when retriving user with username " + username, ex);
         }
     }
@@ -315,7 +317,7 @@ public class PersonDaoImpl implements PersonDao {
             
         } catch (SQLException ex) {
             String msg = "Error when getting all users from DB";
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
     }
 

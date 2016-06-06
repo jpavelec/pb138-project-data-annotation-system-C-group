@@ -2,7 +2,6 @@ package cz.muni.pb138.annotationsystem.backend.dao;
 
 import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
-import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import java.sql.Connection;
@@ -73,22 +72,22 @@ public class PackDaoImpl implements PackDao {
         }
     }
     
-    private Long getKey(ResultSet keyRS, Pack pack) throws ServiceFailureException, SQLException {
+    private Long getKey(ResultSet keyRS, Pack pack) throws DaoException, SQLException {
         if (keyRS.next()) {
             if (keyRS.getMetaData().getColumnCount() != 1) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert pack " + pack
                         + " - wrong key fields count: " + keyRS.getMetaData().getColumnCount());
             }
             Long result = keyRS.getLong(1);
             if (keyRS.next()) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert pack " + pack
                         + " - more keys found");
             }
             return result;
         } else {
-            throw new ServiceFailureException("Internal Error: Generated key"
+            throw new DaoException("Internal Error: Generated key"
                     + "retriving failed when trying to insert pack " + pack
                     + " - no key found");
         }
@@ -158,7 +157,7 @@ public class PackDaoImpl implements PackDao {
             st.setDouble(4, pack.getNoiseRate());
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
-                throw new ServiceFailureException("Internal Error: More rows ("
+                throw new DaoException("Internal Error: More rows ("
                         + addedRows + ") inserted when trying to insert pack " + pack);
             }
 
@@ -168,7 +167,7 @@ public class PackDaoImpl implements PackDao {
 
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new ServiceFailureException("Error when inserting pack " + pack, ex);
+            throw new DaoException("Error when inserting pack " + pack, ex);
         }
     }
 
@@ -191,7 +190,7 @@ public class PackDaoImpl implements PackDao {
                 if (rs.next()) {
                     Pack pack = resultSetToPack(rs);
                     if (rs.next()) {
-                        throw new ServiceFailureException(
+                        throw new DaoException(
                             "Internal error: More entities with the same id found " +
                             "(source id: " + id + ", found " + pack + " and " + resultSetToPack(rs));
                     }
@@ -202,7 +201,7 @@ public class PackDaoImpl implements PackDao {
                 }
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                 "Error when retrieving pack with id " + id, ex);
         }
     }
@@ -223,7 +222,7 @@ public class PackDaoImpl implements PackDao {
             
         } catch (SQLException ex) {
             String msg = "Error when getting all packs from DB";
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
     }
 
@@ -253,10 +252,10 @@ public class PackDaoImpl implements PackDao {
                         pack.getId() +" was not found in DB";
                 throw new BeanNotExistsException(msg);
             } else if (count != 1) {
-                throw new ServiceFailureException("Invalid updated rows count detected (one row should be updated): " + count);
+                throw new DaoException("Invalid updated rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                     "Error when updating pack " + pack, ex);
         }
     }
@@ -285,11 +284,11 @@ public class PackDaoImpl implements PackDao {
                 throw new BeanNotExistsException("Pack " + pack + " was not found in database!");
             } else 
                 if (count != 1) {
-                throw new ServiceFailureException("Invalid deleted rows count detected (one row should be updated): " + count);
+                throw new DaoException("Invalid deleted rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new ServiceFailureException(
+            throw new DaoException(
                 "Error when deleting pack " + pack, ex);
         }
     }

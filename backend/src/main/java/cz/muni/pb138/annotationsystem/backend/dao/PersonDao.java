@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
+import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 
 /**
@@ -7,6 +8,6 @@ import cz.muni.pb138.annotationsystem.backend.model.Person;
  */
 public interface PersonDao extends Dao<Person> {
     
-    public Person getByUsername(String username);
+    public Person getByUsername(String username) throws DaoException;
         
 }

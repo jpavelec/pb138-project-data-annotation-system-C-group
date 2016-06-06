@@ -2,7 +2,6 @@ package cz.muni.pb138.annotationsystem.backend.dao;
 
 import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
-import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
@@ -68,22 +67,22 @@ public class AnswerDaoImpl implements AnswerDao {
         }
     }
 
-    private Long getKey(ResultSet keyRS, Answer answer) throws ServiceFailureException, SQLException {
+    private Long getKey(ResultSet keyRS, Answer answer) throws DaoException, SQLException {
         if (keyRS.next()) {
             if (keyRS.getMetaData().getColumnCount() != 1) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert answer " + answer
                         + " - wrong key fields count: " + keyRS.getMetaData().getColumnCount());
             }
             Long result = keyRS.getLong(1);
             if (keyRS.next()) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert answer " + answer
                         + " - more keys found");
             }
             return result;
         } else {
-            throw new ServiceFailureException("Internal Error: Generated key"
+            throw new DaoException("Internal Error: Generated key"
                     + "retriving failed when trying to insert answer " + answer
                     + " - no key found");
         }
@@ -126,7 +125,7 @@ public class AnswerDaoImpl implements AnswerDao {
     }
     
     @Override
-    public void create(Answer answer) {
+    public void create(Answer answer) throws DaoException {
         validate(answer);
         checkDataSource();
         if (answer.getId() != null) {
@@ -142,7 +141,7 @@ public class AnswerDaoImpl implements AnswerDao {
             st.setBoolean(3, answer.isIsNoise());
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
-                throw new ServiceFailureException("Internal Error: More rows ("
+                throw new DaoException("Internal Error: More rows ("
                         + addedRows + ") inserted when trying to insert answer " + answer);
             }
 
@@ -151,7 +150,7 @@ public class AnswerDaoImpl implements AnswerDao {
             }
 
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when inserting answer " + answer, ex);
+            throw new DaoException("Error when inserting answer " + answer, ex);
         }
     }
 
@@ -187,7 +186,7 @@ public class AnswerDaoImpl implements AnswerDao {
                     Answer answer = resultSetToAnswer(rs);
 
                     if (rs.next()) {
-                        throw new ServiceFailureException(
+                        throw new DaoException(
                                 "Internal error: More entities with the same id found "
                                 + "(source id: " + id + ", found " + answer + " and "
                                 + resultSetToAnswer(rs));
@@ -199,7 +198,7 @@ public class AnswerDaoImpl implements AnswerDao {
                 }
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                     "Error when retrieving subpack with id " + id, ex);
         }
     }
@@ -220,12 +219,12 @@ public class AnswerDaoImpl implements AnswerDao {
             
         } catch (SQLException ex) {
             String msg = "Error when getting all answers from DB";
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
     }
 
     @Override
-    public void update(Answer answer) {
+    public void update(Answer answer) throws DaoException {
         checkDataSource();
         validate(answer);
         if (answer.getId() == null) {
@@ -246,10 +245,10 @@ public class AnswerDaoImpl implements AnswerDao {
                         answer.getId() +" was not found in DB";
                 throw new BeanNotExistsException(msg);
             } else if (count != 1) {
-                throw new ServiceFailureException("Invalid updated rows count detected (one row should be updated): " + count);
+                throw new DaoException("Invalid updated rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                     "Error when updating answer " + answer, ex);
         }
     }
@@ -273,11 +272,11 @@ public class AnswerDaoImpl implements AnswerDao {
             if (count == 0) {
                 throw new BeanNotExistsException("Answer " + answer + " was not found in database!");
             } else if (count != 1) {
-                throw new ServiceFailureException(
+                throw new DaoException(
                         "Invalid deleted rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                     "Error when deleting answer " + answer, ex);
         }
     }
