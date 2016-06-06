@@ -26,17 +26,17 @@
         </div>
 
         <div class="column-in">
-            <div id="counter">1/1000</div>
+            <div id="counter">${progress} % finished.</div>
             <div>
                 <span id="fileid">Subpack id: ${thisSubpack.id}</span>
                 </br>
                 <span id="filename">Subpack name: ${thisSubpack.name}</span>
             </div>
-            <div id="ontology">Is the following word an ${thisQuestion}?</div>
+            <div id="ontology">Is the following word ${thisQuestion}?</div>
             <div id="np">${thisAnswer.answer}</div>
             </br>
             <div id="wrap">
-                <form id="answerForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}/report" method="POST" enctype="multipart/form-data">
+                <form id="answerForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}/${lStartTime}/report" method="POST" enctype="multipart/form-data">
                     <input type="button" value="Previous word" name="btnPrevious" />
                     <input id="value" name="value" type="submit" value="Report this word" name="btnChangeContext" />
                 </form>

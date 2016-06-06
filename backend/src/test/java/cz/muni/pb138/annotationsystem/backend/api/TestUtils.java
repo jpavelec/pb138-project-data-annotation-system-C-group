@@ -23,17 +23,17 @@ public class TestUtils {
 
 
     static public Pack getPack0() {
-        Pack pack = new Pack("Is it an animal?", "Animals", 22, 28);
+        Pack pack = new Pack("an animal", "Animals", 22, 28);
         return pack;
     }
 
     static public Pack getPack1() {
-        Pack pack = new Pack("Is it a correct word?", "Correct words", 16, 23);
+        Pack pack = new Pack("a correct word", "Correct words", 16, 23);
         return pack;
     }
 
     static public Pack getPack2() {
-        Pack pack = new Pack("Is it a name?", "Names", 28, 14);
+        Pack pack = new Pack("a name", "Names", 28, 14);
         return pack;
     }
 
