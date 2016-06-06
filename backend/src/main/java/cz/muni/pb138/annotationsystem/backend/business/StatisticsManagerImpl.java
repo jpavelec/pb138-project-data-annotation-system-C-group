@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -319,8 +320,18 @@ public class StatisticsManagerImpl implements StatisticsManager {
         if (!subpackDao.doesExist(subpack)) {
             throw new BeanNotExistsException("given subpack does not exist");
         }
+        List<Person> usersOnSubpack = subpackDao.getPeopleAssignedToSubpack(subpack);
+        long sumOfTimes = 0;
+        for (Person p : usersOnSubpack) {
+            if (subpackDao.getCompletationTime(subpack, p) == null) {
+                return null;
+            }
+            sumOfTimes += subpackDao.getAssignationTime(subpack, p) - 
+                          subpackDao.getCompletationTime(subpack, p);
+        }
+        
 
-        return 24563725.0;
+        return  1.0*sumOfTimes/usersOnSubpack.size();
     }
 
 }

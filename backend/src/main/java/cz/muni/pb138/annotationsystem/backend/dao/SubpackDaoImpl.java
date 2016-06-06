@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
+import cz.muni.pb138.annotationsystem.backend.common.BeanAlreadyExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
@@ -438,9 +439,9 @@ public class SubpackDaoImpl implements SubpackDao {
                     "Error when deleting assignment subpacks to perrson " + person, ex);
         }
     }
-
-    @Override
-    public void assignPersonToSubpack(Person person, Subpack subpack) throws DaoException {
+    
+    private boolean isPersonAssignedToSubpack(Person person, Subpack subpack) throws DaoException {
+        checkDataSource();
         if (person == null) {
             throw new IllegalArgumentException("Person is null");
         }
@@ -455,6 +456,48 @@ public class SubpackDaoImpl implements SubpackDao {
         }
         personDao.getById(person.getId());
         this.getById(subpack.getId());
+        try (Connection connection = dataSource.getConnection(); 
+            PreparedStatement st = connection.prepareStatement(
+                "SELECT * FROM assignedperson WHERE subpackid = ? AND personid = ?")) {
+                st.setLong(1, subpack.getId());
+                st.setLong(2, person.getId());
+                try (ResultSet rs = st.executeQuery()) {
+                    if (rs.next()) {
+                        if (rs.next()) {
+                            throw new BeanAlreadyExistsException(
+                                    "More records in assignedperson for one subpack and one person");
+                        }
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+        } catch (SQLException ex) {
+            throw new ServiceFailureException("Error when insert assignment person "
+                            + person +" to subpack " + subpack, ex);
+        }
+    }
+
+    @Override
+    public void assignPersonToSubpack(Person person, Subpack subpack) throws DaoException {
+        checkDataSource();
+        if (person == null) {
+            throw new IllegalArgumentException("Person is null");
+        }
+        if (person.getId() == null || person.getId() < 1) {
+            throw new ValidationException("Person id is null or negative");
+        }
+        if (subpack == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (subpack.getId() == null || subpack.getId() < 1) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        personDao.getById(person.getId());
+        this.getById(subpack.getId());
+        if (!isPersonAssignedToSubpack(person, subpack)) {
+            throw new BeanNotExistsException("There isn't any record for person and subpack");
+        }
         try (Connection connection = dataSource.getConnection(); 
             PreparedStatement st = connection.prepareStatement(
                 "INSERT INTO assignedperson (subpackid, personid, starttime) VALUES (?,?,?)")) {
@@ -630,7 +673,7 @@ public class SubpackDaoImpl implements SubpackDao {
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
                 "UPDATE assignedperson SET endtime = ? " + 
-                "WHERE subpackid = ? OR personid = ?")) {
+                "WHERE subpackid = ? AND personid = ?")) {
             
             Calendar calendar = Calendar.getInstance();
             st.setTimestamp(1, new java.sql.Timestamp(calendar.getTime().getTime()));
