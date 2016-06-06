@@ -20,7 +20,9 @@
         <h2>Select the subpack you wish to start marking:</h2>
         <div class="list-group">
             <c:forEach items = "${subpacks}" var="subpack">
-                <a href="/packages/${subpack.id}" class="list-group-item">ID: <b>${subpack.id}</b> NAME: <b>${subpack.name}</b></a>
+                <a href="/packages/${subpack.key.id}" class="list-group-item">
+                    ID: <b>${subpack.key.id}</b>  ;  NAME: <b>${subpack.key.name}</b>  ;  ${subpack.value} % finished
+                </a>
             </c:forEach>
         </div>
         </br>

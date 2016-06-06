@@ -54,7 +54,8 @@ public class MainController {
         try {
             req.setAttribute("person", personManager.getPersonById((long) 1));
         } catch (DaoException e) {
-            return "redirect:/view-error";
+            req.setAttribute("error", e);
+            return "view-error";
         }
 
         return "view-admin";
@@ -124,8 +125,7 @@ public class MainController {
             try {
                 packManager.createPack(pack, helpList, noiseList, Integer.parseInt(values[2]));
 
-                //implicitne priradenie packu Karlikovi pre moznost testovania, lebo..
-                subpackManager.updatePersonsAssignment(personManager.getOrCreatePersonByUsername("Karlik"), subpackManager.getSubpacksInPack(pack));
+                //subpackManager.updatePersonsAssignment(personManager.getOrCreatePersonByUsername("Karlik"), subpackManager.getSubpacksInPack(pack));
 
             } catch (Exception e) {
                 req.setAttribute("error", e);
@@ -149,7 +149,17 @@ public class MainController {
     public String packages(ServletRequest req, HttpServletRequest httpReq) {
 
         try {
-            req.setAttribute("subpacks", subpackManager.getSubpacksAssignedToPerson(personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser())));
+            Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
+            List<Subpack> list = subpackManager.getSubpacksAssignedToPerson(thisPerson);
+
+            Map subpacks = new HashMap();
+
+            for (Subpack subpack : list) {
+                Long progress = Math.round(statisticsManager.getProgressOfSubpackForPerson(subpack, thisPerson)*100)/100;
+                subpacks.put(subpack, progress);
+            }
+
+            req.setAttribute("subpacks", subpacks);
 
         } catch (DaoException e) {
             req.setAttribute("error", e);
@@ -170,7 +180,7 @@ public class MainController {
 
         } catch (DaoException e) {
             req.setAttribute("error", e);
-            return "redirect:/view-error";
+            return "view-error";
         }
 
         return "redirect:/mark/{subpack}";
@@ -271,13 +281,14 @@ public class MainController {
                 if (e.getMessage() == "No more answers left.") {
                     return "view-finished";
                 } else {
-                    return "redirect:/view-error";
+                    req.setAttribute("error", e);
+                    return "view-error";
                 }
             }
 
         } catch (Exception e) {
             req.setAttribute("error", e);
-            return "redirect:/view-error";
+            return "view-error";
         }
         return "view-mark";
 
