@@ -335,6 +335,7 @@ public class AnswerDaoImpl implements AnswerDao {
         if (!subpackDao.doesExist(subpack)) {
             throw new BeanNotExistsException("Subpack " + subpack + " not found in DB!");
         }
+        //CopyOnWriteArrayList<Answer> answersInSubpack = new CopyOnWriteArrayList<>();
         List<Answer> answersInSubpack = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
              PreparedStatement st = conn.prepareStatement(
@@ -360,6 +361,10 @@ public class AnswerDaoImpl implements AnswerDao {
 
     @Override
     public List<Answer> getUnevaluatedAnswers(Subpack subpack, Person person) throws DaoException {
+        /*CopyOnWriteArrayList<Answer> unevaluatedAnswers = new CopyOnWriteArrayList<>();
+        unevaluatedAnswers.addAll(getAnswersInSubpack(subpack));
+        CopyOnWriteArrayList<Answer> evaluatedAnswers = new CopyOnWriteArrayList<>();
+        evaluatedAnswers.addAll(getEvaluatedAnswers(subpack, person));*/
         List<Answer> unevaluatedAnswers = getAnswersInSubpack(subpack);
         List<Answer> evaluatedAnswers = getEvaluatedAnswers(subpack, person);
         Iterator<Answer> i = unevaluatedAnswers.iterator();
@@ -367,7 +372,7 @@ public class AnswerDaoImpl implements AnswerDao {
             Answer a = i.next();
             if (evaluatedAnswers.contains(a)) {
                 i.remove();
-                unevaluatedAnswers.remove(a);
+                evaluatedAnswers.remove(a);
             }
         }
         return unevaluatedAnswers;
@@ -395,6 +400,7 @@ public class AnswerDaoImpl implements AnswerDao {
             throw new BeanNotExistsException("Person " + person + " not found in DB!");
         }
         List<Answer> evaluatedAnswers = new ArrayList<>();
+        //CopyOnWriteArrayList<Answer> evaluatedAnswers = new CopyOnWriteArrayList<>();
         try (Connection conn = dataSource.getConnection();
             PreparedStatement st = conn.prepareStatement(
             "SELECT answer.id, subpackid, answervalue, isnoise "+
@@ -416,5 +422,9 @@ public class AnswerDaoImpl implements AnswerDao {
         }
     }
 
+    @Override
+    public boolean isSubpackCompletelyEvaluated(Subpack subpack, Person person) throws DaoException {
+        return getUnevaluatedAnswers(subpack, person).isEmpty();
+    }
 
 }

@@ -167,7 +167,7 @@ public class MainController {
 
         } catch (DaoException e) {
             req.setAttribute("error", e);
-            return "redirect:/view-error";
+            return "view-error";
         }
 
         return "view-packages";
@@ -183,8 +183,7 @@ public class MainController {
             redirectAttributes.addFlashAttribute("thisSubpack", thisSubpack);
 
         } catch (DaoException e) {
-            req.setAttribute("error", e);
-            return "view-error";
+            return "redirect:/view-error";
         }
 
         return "redirect:/mark/{subpack}";
@@ -209,7 +208,10 @@ public class MainController {
         try {
             Long longPack = Long.parseLong(packID);
             Pack packObj = packManager.getPackById(longPack);
-            double progress = statisticsManager.getProgressOfPack(packObj);
+            Double progress = Math.round(statisticsManager.getProgressOfPack(packObj)*100.0)/100.0;
+            if (progress != Double.NaN) {
+                progress = Math.round(progress*100.0)/100.0;
+            }
 
 
             req.setAttribute("pack", packObj);
@@ -224,10 +226,26 @@ public class MainController {
                 List<Person> userList = subpackManager.getPersonsAssignedToSubpack(subPack);
                 Map userStats = new HashMap();
                 for (Person user : userList) {
-                    double[] currentUserStats = new double[3];
+                    Double[] currentUserStats = new Double[3];
                     currentUserStats[0] = statisticsManager.getProgressOfSubpackForPerson(subPack, user);
-                    //currentUserStats[1] = statisticsManager.getCohenKappa(user, subPack);
-                    //currentUserStats[2] = statisticsManager.averageEvaluationTimeOfSubpackForPerson(subPack, user);
+
+                    if (currentUserStats[0] != null) {
+                       currentUserStats[0] = Math.round(currentUserStats[0])*100.0/100.0;
+                    } else {
+                        currentUserStats[0] = (double) 0;
+                    }
+                    currentUserStats[1] = statisticsManager.getCohenKappa(user, subPack);
+                    if (currentUserStats[1] != null) {
+                        currentUserStats[1] = Math.round(currentUserStats[1])*100.0/100.0;
+                    }
+
+                    currentUserStats[2] = statisticsManager.averageEvaluationTimeOfSubpackForPerson(subPack, user);
+                    if (currentUserStats[2] != null) {
+                        currentUserStats[2] = Math.round(currentUserStats[2])*100.0/100.0;
+                    } else {
+                        currentUserStats[2] = (double) 0;
+                    }
+
                     userStats.put(user, currentUserStats);
                 }
                 subpackUserStats.put(subPack, userStats);
@@ -237,13 +255,43 @@ public class MainController {
 
             Map subpackGeneralStats = new HashMap();
             for (Subpack subPack : allSubPacks) {
-                double[] GeneralStats = new double[3];
+                Double[] generalStats = new Double[7];
 
-                GeneralStats[0] = statisticsManager.getProgressOfSubpack(subPack);
-                //GeneraStats[1] = statisticsManager.averageCompletionTimeOfSubpack(subPack);
-                //GeneraStats[2] = statisticsManager.averageEvaluationTimeOfSubpack(subPack);
+                generalStats[0] = statisticsManager.getProgressOfSubpack(subPack);
+                System.out.println("GenStat0" + generalStats[0]);
+                if ( !generalStats[0].isNaN()) {
+                    generalStats[0] = Math.round(generalStats[0])*100.0/100.0;
+                }
+                generalStats[1] = statisticsManager.averageCompletionTimeOfSubpack(subPack);
+                System.out.println(generalStats[1]);
+                if (generalStats[1] != null) {
 
-                subpackGeneralStats.put(subPack, GeneralStats);
+                    int seconds = (int) ((generalStats[1] / (1000)) % 60); //sec
+                    generalStats[2] = (double) seconds;
+                    int minutes = (int) ((generalStats[1] / (1000*60)) % 60); //min
+                    generalStats[3] = (double) minutes;
+                    int hour = (int) ((generalStats[1] / (1000*60*60)) % 24); //hour
+                    generalStats[4] = (double) hour;
+                    int day = (int) (generalStats[1] / (1000*60*60*24)); //days
+                    generalStats[5] = (double) day;
+                } else {
+                    generalStats[1] = (double) 0;
+                    generalStats[2] = (double) 0;
+                    generalStats[3] = (double) 0;
+                    generalStats[4] = (double) 0;
+                    generalStats[5] = (double) 0;
+                }
+                generalStats[6] = statisticsManager.averageEvaluationTimeOfSubpack(subPack);
+
+                if (generalStats[6] != null) {
+                    generalStats[6] = Math.round(generalStats[1])*100.0/100.0;
+                } else {
+                    generalStats[6] = (double) 0;
+                }
+
+                System.out.println(generalStats[6]);
+
+                subpackGeneralStats.put(subPack, generalStats);
             }
             req.setAttribute("subpackGeneralStats", subpackGeneralStats);
 
@@ -251,7 +299,7 @@ public class MainController {
 
         } catch (Exception e) {
             req.setAttribute("error", e);
-            return "redirect:/view-error";
+            return "view-error";
         }
         return "view-statsPack";
     }
@@ -447,17 +495,20 @@ public class MainController {
             req.setAttribute("pack", pack);
 
             Map subpackMap = new HashMap();
+            Map subpackUserMap = new HashMap();
             boolean allAssigned = true;
 
             for (Subpack subPack : subpackList) {
                 List<Person> users = subpackManager.getPersonsAssignedToSubpack(subPack);
                 int size = users.size();
                 subpackMap.put(subPack, size);
+                subpackUserMap.put(subPack, users);
                 if(size == 0)
                     allAssigned = false;
             }
             req.setAttribute("subpackMap", subpackMap);
             req.setAttribute("allAssigned", allAssigned);
+            req.setAttribute("subpackUserMap", subpackUserMap);
 
         } catch (DaoException e) {
             req.setAttribute("error", e);
@@ -517,6 +568,20 @@ public class MainController {
 
         return "view-assign";
 
+    }
+
+    @RequestMapping("/assignMenu")
+    public String assignMenu(ServletRequest req) {
+
+        List<Pack> allPacks = null;
+        try {
+            allPacks = packManager.getAllPacks();
+        } catch (DaoException e) {
+            e.printStackTrace();
+        }
+        req.setAttribute("allPacks", allPacks);
+
+        return "view-assignMenu";
     }
 
 

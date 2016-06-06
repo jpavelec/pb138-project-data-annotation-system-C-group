@@ -1,5 +1,6 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
+import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.config.TestConfig;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
@@ -91,6 +92,10 @@ public class EvaluationDaoImplTest {
         subpackDao.create(thingSubpack01);
         subpackDao.create(thingSubpack02);
         subpackDao.create(thingSubpack03);
+        
+        subpackDao.assignPersonToSubpack(frankPerson, animalSubpack01);
+        subpackDao.assignPersonToSubpack(janePerson, animalSubpack02);
+        
         
         dogAnswer = new Answer(animalSubpack01, "dog", false);
         deerAnswer = new Answer(animalSubpack01, "deer", false);
@@ -221,6 +226,25 @@ public class EvaluationDaoImplTest {
                 .hasSize(1);
         assertThat(answerDao.getUnevaluatedAnswers(thingSubpack03, janePerson))
                 .hasSize(1);
+        
+        
     }
+    
+    @Test
+    public void isComplete() throws Exception {
+        assertThat(answerDao.isSubpackCompletelyEvaluated(animalSubpack01, frankPerson))
+                .isTrue();
+        assertThat(answerDao.isSubpackCompletelyEvaluated(animalSubpack03, frankPerson))
+                .isFalse();
+    }
+    
+    @Test
+    public void getCompletationTime() throws Exception {
+        assertThat(subpackDao.getCompletationTime(animalSubpack01, frankPerson))
+                .isNotNull();
+        assertThat(subpackDao.getCompletationTime(animalSubpack02, janePerson))
+                .isNull();
+    }
+    
 
 }

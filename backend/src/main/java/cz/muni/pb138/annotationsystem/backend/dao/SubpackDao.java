@@ -1,11 +1,9 @@
 package cz.muni.pb138.annotationsystem.backend.dao;
 
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
-import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
-import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -25,5 +23,9 @@ public interface SubpackDao extends Dao<Subpack> {
 
     public List<Subpack> getSubpacksInPack(Pack pack) throws DaoException;
     
-    public long getAssignationTime(Subpack subpack, Person person) throws DaoException;
+    public Long getAssignationTime(Subpack subpack, Person person) throws DaoException;
+    
+    public void setCompletationTime(Subpack subpack, Person person) throws DaoException;
+    
+    public Long getCompletationTime(Subpack subpack, Person person) throws DaoException;
 }

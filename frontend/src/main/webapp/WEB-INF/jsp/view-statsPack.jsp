@@ -25,9 +25,24 @@
             <h4>${currentSubpackUserStats.key.name}</h4>
             <c:forEach items="${subpackGeneralStats}" var="currentSubpackGeneralStats">
                 <c:if test="${currentSubpackUserStats.key.id == currentSubpackGeneralStats.key.id}">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" aria-valuenow="70"
+                             aria-valuemin="0" aria-valuemax="100" style="width:${currentSubpackGeneralStats.value[0]}%">
+                                ${currentSubpackGeneralStats.value[0]}%
+                        </div>
+                    </div>
                     Progress: ${currentSubpackGeneralStats.value[0]}%;
-                    Avarage Completion Time: ${currentSubpackGeneralStats.value[1]};
-                    Avarage Completion Time: ${currentSubpackGeneralStats.value[2]}
+                    Avarage Completion Time:
+                    <c:if test="${currentSubpackGeneralStats.value[1] == 0}">
+                        not enough data to compute;
+                    </c:if>
+                    <c:if test="${currentSubpackGeneralStats.value[1] != 0}">
+                        ${currentSubpackGeneralStats.value[5]} days
+                        ${currentSubpackGeneralStats.value[4]} hours
+                        ${currentSubpackGeneralStats.value[3]} minutes;
+                    </c:if>
+
+                    Avarage Evaluation Time: ${currentSubpackGeneralStats.value[6]} ms
 
                 </c:if>
             </c:forEach>
@@ -45,9 +60,9 @@
                 <tbody>
                     <tr>
                         <td>${currentUserStats.key.username}</td>
-                        <td>${currentUserStats.value[0]} </td>
+                        <td>${currentUserStats.value[0]}%</td>
                         <td>${currentUserStats.value[1]} </td>
-                        <td>${currentUserStats.value[2]}</td>
+                        <td>${currentUserStats.value[2]} ms</td>
                     </tr>
                 </tbody>
             </c:forEach>

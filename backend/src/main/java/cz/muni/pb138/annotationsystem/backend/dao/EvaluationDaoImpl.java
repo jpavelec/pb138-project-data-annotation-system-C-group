@@ -28,6 +28,12 @@ public class EvaluationDaoImpl implements EvaluationDao {
     @Inject
     private DataSource dataSource;
 
+    @Inject
+    private SubpackDaoImpl subpackDao;
+    
+    @Inject
+    private AnswerDaoImpl answerDao;
+
     public EvaluationDaoImpl() {
     }
     
@@ -136,11 +142,17 @@ public class EvaluationDaoImpl implements EvaluationDao {
         if (evaluation.getId() != null) {
             throw new ValidationException("Evaluation id is already set");
         }
+        
+        /*if (answerDao.isInsertingLastEvaluation(evaluation.getAnswer().
+                    getFromSubpack(), evaluation.getPerson())) {
+            subpackDao.setCompletationTime(evaluation.getAnswer().
+                    getFromSubpack(), evaluation.getPerson());
+        }*/
+        
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
                 "INSERT INTO evaluation (personid, answerid, rating, elapsedTime) VALUES (?,?,?,?)",
                 Statement.RETURN_GENERATED_KEYS)) {
-            
             st.setLong(1, evaluation.getPerson().getId());
             st.setLong(2, evaluation.getAnswer().getId());
             st.setString(3, evaluation.getRating().toString());
@@ -155,8 +167,14 @@ public class EvaluationDaoImpl implements EvaluationDao {
                 evaluation.setId(getKey(keyRS, evaluation));
             }
             
+            if (answerDao.isSubpackCompletelyEvaluated(evaluation.getAnswer().
+                    getFromSubpack(), evaluation.getPerson())) {
+                subpackDao.setCompletationTime(evaluation.getAnswer().
+                    getFromSubpack(), evaluation.getPerson());
+        }
+            
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when inserting user " + evaluation, ex);
+            throw new ServiceFailureException("Error when inserting evaluation " + evaluation, ex);
         }
     }
 
