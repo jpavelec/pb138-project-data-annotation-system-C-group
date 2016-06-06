@@ -93,8 +93,8 @@ public class EvaluationDaoImplTest {
         subpackDao.create(thingSubpack02);
         subpackDao.create(thingSubpack03);
         
-        subpackDao.assignPersonToSubpack(frankPerson, animalSubpack01);
-        subpackDao.assignPersonToSubpack(janePerson, animalSubpack02);
+        subpackDao.assignPersonToSubpack(animalSubpack01, frankPerson);
+        subpackDao.assignPersonToSubpack(animalSubpack02, janePerson);
         
         
         dogAnswer = new Answer(animalSubpack01, "dog", false);

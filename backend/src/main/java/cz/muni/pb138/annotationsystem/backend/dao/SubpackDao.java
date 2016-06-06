@@ -15,11 +15,13 @@ public interface SubpackDao extends Dao<Subpack> {
     
     public List<Subpack> getSubpacksAssignedToPerson(Person person) throws DaoException;
     
+    public void deleteAssignmentPersonToSubpack(Subpack subpack, Person person) throws DaoException;
+    
     public void updateAssignment(Person person, List<Subpack> assignedSubpacks) throws DaoException;
     
     public void updateAssignment(Subpack subpack, List<Person> assignedPeople) throws DaoException;
     
-    public void assignPersonToSubpack(Person person, Subpack subpack) throws DaoException;
+    public void assignPersonToSubpack(Subpack subpack, Person person) throws DaoException;
 
     public List<Subpack> getSubpacksInPack(Pack pack) throws DaoException;
     

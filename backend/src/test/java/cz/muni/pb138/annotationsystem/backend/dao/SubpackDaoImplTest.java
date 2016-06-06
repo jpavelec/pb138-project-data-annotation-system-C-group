@@ -260,7 +260,7 @@ public class SubpackDaoImplTest {
     public void assignPersonToSubpack() throws Exception {
         Subpack subpack = sampleAnimal01Subpack().build();
         subpackDao.create(subpack);
-        subpackDao.assignPersonToSubpack(pepePerson, subpack);
+        subpackDao.assignPersonToSubpack(subpack, pepePerson);
         assertThat(subpackDao.getPeopleAssignedToSubpack(subpack))
                 .usingFieldByFieldElementComparator()
                 .containsOnly(pepePerson);
@@ -271,32 +271,32 @@ public class SubpackDaoImplTest {
     public void assignNullPersonToSubpack() throws Exception {
         Subpack subpack = sampleAnimal01Subpack().build();
         subpackDao.create(subpack);
-        subpackDao.assignPersonToSubpack(null, subpack);
+        subpackDao.assignPersonToSubpack(subpack, null);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void assignPersonToNullSubpack() throws Exception {
-        subpackDao.assignPersonToSubpack(pepePerson, null);
+        subpackDao.assignPersonToSubpack(null, pepePerson);
     }
     
     @Test(expected = ValidationException.class)
     public void assignPersonWithNullIdToSubpack() throws Exception {
         Subpack subpack = sampleAnimal01Subpack().build();
         subpackDao.create(subpack);
-        subpackDao.assignPersonToSubpack(personWithNullId, subpack);
+        subpackDao.assignPersonToSubpack(subpack, personWithNullId);
     }
     
     @Test(expected = ValidationException.class)
     public void assignPersonToSubpackWithNullId() throws Exception {
         Subpack subpack = sampleAnimal01Subpack().build();
-        subpackDao.assignPersonToSubpack(personWithNullId, subpack);
+        subpackDao.assignPersonToSubpack(subpack, personWithNullId);
     }
     
     @Test(expected = BeanNotExistsException.class)
     public void assignNonexistingPersonToSubpack() throws Exception {
         Subpack subpack = sampleAnimal01Subpack().build();
         subpackDao.create(subpack);
-        subpackDao.assignPersonToSubpack(personNotInDB, subpack);
+        subpackDao.assignPersonToSubpack(subpack, personNotInDB);
     }
     
     @Test(expected = BeanNotExistsException.class)
@@ -304,14 +304,14 @@ public class SubpackDaoImplTest {
         Subpack subpack = sampleAnimal01Subpack().build();
         subpackDao.create(subpack);
         subpack.setId((long) 100);
-        subpackDao.assignPersonToSubpack(personNotInDB, subpack);
+        subpackDao.assignPersonToSubpack(subpack, personNotInDB);
     }
     
     @Test
     public void assignPeopleToSubpack() throws Exception {
         Subpack subpack = sampleAnimal01Subpack().build();
         subpackDao.create(subpack);
-        subpackDao.assignPersonToSubpack(pepePerson, subpack);
+        subpackDao.assignPersonToSubpack(subpack, pepePerson);
         subpackDao.updateAssignment(subpack, Arrays.asList(leonPerson));
         assertThat(subpackDao.getPeopleAssignedToSubpack(subpack))
                 .usingFieldByFieldElementComparator()
@@ -394,5 +394,32 @@ public class SubpackDaoImplTest {
         
         assertThat(answerDao.getAnswersInSubpack(subpack01))
                     .hasSize(8+3);
+    }
+    
+    @Test
+    public void deleteAssignation() throws Exception {
+        Subpack subpack = sampleAnimal01Subpack().build();
+        subpackDao.create(subpack);
+        subpackDao.assignPersonToSubpack(subpack, leonPerson);
+        subpackDao.assignPersonToSubpack(subpack, pepePerson);
+        assertThat(subpackDao.getAssignationTime(subpack, pepePerson))
+                .isNotNull();
+        assertThat(subpackDao.getAssignationTime(subpack, leonPerson))
+                .isNotNull();
+        subpackDao.deleteAssignmentPersonToSubpack(subpack, pepePerson);
+        assertThat(subpackDao.getAssignationTime(subpack, leonPerson))
+                .isNotNull();
+    }
+    
+    @Test(expected = BeanNotExistsException.class)
+    public void getDeletedAssignation() throws Exception {
+        Subpack subpack = sampleAnimal01Subpack().build();
+        subpackDao.create(subpack);
+        subpackDao.assignPersonToSubpack(subpack, pepePerson);
+        assertThat(subpackDao.getAssignationTime(subpack, pepePerson))
+                .isNotNull();
+        subpackDao.deleteAssignmentPersonToSubpack(subpack, pepePerson);
+        assertThat(subpackDao.getAssignationTime(subpack, leonPerson))
+                .isNotNull();
     }
 }
