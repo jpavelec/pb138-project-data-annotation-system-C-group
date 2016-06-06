@@ -294,24 +294,23 @@ public class MainController {
             if (isCorrection != null && isCorrection == true) {
                 req.setAttribute("canCorrect", false);
                 answer = correction.getAnswer();
+                req.setAttribute("thisAnswer", answer);
             } else {
                 if (correction == null || !correction.getAnswer().getFromSubpack().equals(thisSubpack)) {
                     req.setAttribute("canCorrect", false);
                 }
-                answer = answerManager.nextAnswer(
-                        person,
-                        thisSubpack);
-            }
-
-
                 try {
-                req.setAttribute("thisAnswer", answer);
-            } catch (IllegalStateException e) {
-                if (e.getMessage() == "No more answers left.") {
-                    return "view-finished";
-                } else {
-                    req.setAttribute("error", e);
-                    return "view-error";
+                    answer = answerManager.nextAnswer(
+                            person,
+                            thisSubpack);
+                    req.setAttribute("thisAnswer", answer);
+                } catch (IllegalStateException e) {
+                    if (e.getMessage() == "No more answers left.") {
+                        return "view-finished";
+                    } else {
+                        req.setAttribute("error", e);
+                        return "view-error";
+                    }
                 }
             }
 
@@ -325,10 +324,10 @@ public class MainController {
 
 
     @RequestMapping(value = "/correct/{subpackId}", method = {RequestMethod.GET})
-    public String markCorrect(ServletRequest req, RedirectAttributes redirectAttrs) {
+    public String markCorrect(ServletRequest req, RedirectAttributes redir) {
 
         try {
-            redirectAttrs.addFlashAttribute("isCorrection", true);
+            redir.addFlashAttribute("isCorrection", true);
             return "redirect:/mark/{subpackId}";
         } catch (Exception e) {
             req.setAttribute("error", e);
@@ -341,10 +340,11 @@ public class MainController {
 
     @RequestMapping(value = "/mark/{subpack}/{answer}/{time}", method = {RequestMethod.POST})
     public String markPost(RedirectAttributes redirectAttributes, @RequestParam String value,
-                           ServletRequest req,
+                           ServletRequest req, @RequestParam String isCorrection,
                            @PathVariable String subpack, @PathVariable String answer,
                            @PathVariable String time, HttpServletRequest httpReq,
-                           HttpServletResponse res) {
+                           HttpServletResponse res,
+                           @CookieValue("previousEvalId") long previousEvalId) {
 
         try {
 
@@ -355,17 +355,32 @@ public class MainController {
             Answer thisAnswer = answerManager.getAnswerById(Long.parseLong(answer));
             Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
 
-            Evaluation evaluation;
-            if (Integer.parseInt(value) == 1) {
-                evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, (int) (long) difference);
+            if (Boolean.valueOf(isCorrection)) {
+                Evaluation cor = evaluationManager.getEvaluationById(previousEvalId);
+                if (Integer.parseInt(value) == 1) {
+                    cor.setRating(Rating.POSITIVE);
+                } else if (Integer.parseInt(value) == 2) {
+                    cor.setRating(Rating.NEGATIVE);
+                } else {
+                    cor.setRating(Rating.NONSENSE);
+                }
+                evaluationManager.correct(cor);
             } else {
-                evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NEGATIVE, (int) (long) difference);
-            }
-            evaluationManager.eval(evaluation);
+                Evaluation evaluation;
+                if (Integer.parseInt(value) == 1) {
+                    evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, (int) (long) difference);
+                } else if (Integer.parseInt(value) == 2) {
+                    evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NEGATIVE, (int) (long) difference);
+                } else {
+                    evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NONSENSE, (int) (long) difference);
+                }
+                evaluationManager.eval(evaluation);
 
-            Cookie previousEvalCookie = new Cookie("previousEvalId", String.valueOf(evaluation.getId()));
-            previousEvalCookie.setPath("/");
-            res.addCookie(previousEvalCookie);
+                Cookie previousEvalCookie = new Cookie("previousEvalId", String.valueOf(evaluation.getId()));
+                previousEvalCookie.setPath("/");
+                res.addCookie(previousEvalCookie);
+            }
+
 
             Long longSubpack = Long.parseLong(subpack);
             Subpack thisSubpack = subpackManager.getSubpackById(longSubpack);
@@ -386,7 +401,8 @@ public class MainController {
 
     @RequestMapping(value = "/mark/{subpack}/{answer}/{time}/report", method = {RequestMethod.POST})
     public String markReport(RedirectAttributes redirectAttributes, @PathVariable String time, ServletRequest req,
-                             @PathVariable String subpack, @PathVariable String answer, HttpServletRequest httpReq) {
+                             @PathVariable String subpack, @PathVariable String answer, HttpServletRequest httpReq,
+                             @RequestParam String isCorrection) {
 
         try {
 

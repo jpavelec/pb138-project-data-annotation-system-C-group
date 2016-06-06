@@ -38,8 +38,10 @@
             <div id="wrap">
                 <button onclick="window.location.href='/correct/${thisSubpack.id}'" class="btn btn-default"
                 ${(not canCorrect) ? 'disabled' : ''} >Previous word</button>
-                <form id="reportForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}/${lStartTime}/report" method="POST" enctype="multipart/form-data">
-                    <input  class="btn btn-default" id="value" name="value" type="submit" value="Report this word" name="btnChangeContext" />
+                <form id="reportForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}/${lStartTime}" method="POST" enctype="multipart/form-data">
+                    <input name="value" type="hidden" value="3" />
+                    <input class="btn btn-default" type="submit" value="Report this word" />
+                    <input name="isCorrection" type="hidden" value="${isCorrection}" />
                 </form>
             </div>
         </div>
@@ -49,6 +51,7 @@
                 <div class="next" id="minus-next">
                     <form id="answerForm2" action="/mark/${thisSubpack.id}/${thisAnswer.id}/${lStartTime}" method="POST" enctype="multipart/form-data">
                         <input id="value" name="value" type="image" alt="no" value="0" src="<c:url value="/resources/images/no.svg" />" width="100%"/>
+                        <input name="isCorrection" type="hidden" value="${isCorrection}" />
                     </form>
                 </div>
             </div>
@@ -59,6 +62,7 @@
                 <div class="next" id="plus-next">
                     <form id="answerForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}/${lStartTime}" method="POST" enctype="multipart/form-data">
                         <input id="value" name="value" type="image" alt="no" value="1" src="<c:url value="/resources/images/yes.svg" />" width="100%"/>
+                        <input name="isCorrection" type="hidden" value="${isCorrection}" />
                     </form>
                 </div>
             </div>
