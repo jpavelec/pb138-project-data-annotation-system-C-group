@@ -41,10 +41,10 @@
 
                         Avarage Completion Time:
                         <b>
-                        <c:if test="${currentSubpackGeneralStats.value[1] == 0}">
+                        <c:if test="${empty currentSubpackGeneralStats.value[1]}">
                             not enough data to compute
                         </c:if>
-                        <c:if test="${currentSubpackGeneralStats.value[1] != 0}">
+                        <c:if test="${not empty currentSubpackGeneralStats.value[1]}">
                             ${currentSubpackGeneralStats.value[5]} days
                             ${currentSubpackGeneralStats.value[4]} hours
                             ${currentSubpackGeneralStats.value[3]} minutes
@@ -53,7 +53,15 @@
 
                         &nbsp; &nbsp; &nbsp;
 
-                        Avarage Evaluation Time: <b>${currentSubpackGeneralStats.value[6]} ms</b>
+                        Avarage Evaluation Time:
+                        <b>
+                        <c:if test="${empty currentSubpackGeneralStats.value[6]}">
+                            not enough data to compute
+                        </c:if>
+                        <c:if test="${not empty currentSubpackGeneralStats.value[6]}">
+                            ${currentSubpackGeneralStats.value[6]} ms
+                        </c:if>
+                        </b>
 
                         <table class="table table-hover">
                             <thead>

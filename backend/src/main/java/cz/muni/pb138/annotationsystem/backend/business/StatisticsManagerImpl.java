@@ -322,14 +322,19 @@ public class StatisticsManagerImpl implements StatisticsManager {
         }
         List<Person> usersOnSubpack = subpackDao.getPeopleAssignedToSubpack(subpack);
         long sumOfTimes = 0;
+        long num = 0;
         for (Person p : usersOnSubpack) {
             if (subpackDao.getCompletationTime(subpack, p) == null) {
-                return null;
+                continue;
             }
+            num ++;
             sumOfTimes += subpackDao.getCompletationTime(subpack, p) - 
                           subpackDao.getAssignationTime(subpack, p);
         }
         
+        if (num == 0) {
+            return null;
+        }
 
         return  1.0*sumOfTimes/usersOnSubpack.size();
     }

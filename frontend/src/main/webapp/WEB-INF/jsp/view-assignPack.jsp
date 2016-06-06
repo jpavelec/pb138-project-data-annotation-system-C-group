@@ -37,12 +37,12 @@
                             </c:if>
                         </c:forEach>
 
-                        <label class="btn btn-default assign-checkbox ${(contains) ? 'active' : ''}">
+                        <label class="btn btn-default btn-lg assign-checkbox ${(contains) ? 'active' : ''}">
 
                             <input id="${subpack.key.id}" name="value" type="checkbox"
                                    value="${subpack.key.id}" autocomplete="off" ${(contains) ? 'checked' : ''}>
 
-                            <b>${subpack.key.name}</b>&nbsp;
+                            ${subpack.key.name}&nbsp;
 
                             <c:if test="${subpack.value == 0}">
                                 &nbsp;<span class="label label-warning">not assigned</span>

@@ -259,7 +259,7 @@ public class MainController {
 
                 generalStats[0] = statisticsManager.getProgressOfSubpack(subPack);
                 if ( !generalStats[0].isNaN()) {
-                    generalStats[0] = Math.round(generalStats[0])*100.0/100.0;
+                    generalStats[0] = Math.round(generalStats[0]*100.0)/100.0;
                 }
                 generalStats[1] = statisticsManager.averageCompletionTimeOfSubpack(subPack);
                 if (generalStats[1] != null) {
@@ -273,7 +273,6 @@ public class MainController {
                     int day = (int) (generalStats[1] / (1000*60*60*24)); //days
                     generalStats[5] = (double) day;
                 } else {
-                    generalStats[1] = (double) 0;
                     generalStats[2] = (double) 0;
                     generalStats[3] = (double) 0;
                     generalStats[4] = (double) 0;
@@ -282,9 +281,9 @@ public class MainController {
                 generalStats[6] = statisticsManager.averageEvaluationTimeOfSubpack(subPack);
 
                 if (generalStats[6] != null) {
-                    generalStats[6] = Math.round(generalStats[1])*100.0/100.0;
+                    generalStats[6] = Math.round(generalStats[6]*100.0)/100.0;
                 } else {
-                    generalStats[6] = (double) 0;
+                    generalStats[6] = null;
                 }
 
                 subpackGeneralStats.put(subPack, generalStats);
@@ -293,7 +292,7 @@ public class MainController {
 
 
 
-        } catch (Exception e) {
+        } catch (DaoException e) {
             req.setAttribute("error", e);
             return "view-error";
         }
