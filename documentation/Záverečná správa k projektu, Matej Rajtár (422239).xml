@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+                         "http://docbook.org/xml/4.5/docbookx.dtd">
+<article>
+    <title>PB138: Záverečná správa k projektu, Matej Rajtár (422239)</title>
+    <sect1>
+        <title>Zadanie a moja úloha</title>
+        <para>Pre mnohé úlohy strojového učenia je potrebné získať označkované dáta. Zadaním bolo
+            vytvoriť systém, ktorý toto značkovanie človekom "anotátorom" umožní. Anotátor odpovedá
+            na otázky áno a nie a podľa toho sa stroj učí. Pri značkovaní sa však typycky vyskytujú
+            rôzne chyby a preto je potrebné do systému implementovať niekoľko akcií, ktoré tieto
+            chyby minimalizujú, alebo zvyšujú šancu ich detekcie. Týmito akciami môže byť napríklad
+            pridanie šumu a opakovanie niektorých otázok viac krát. Na základe výsledkov sú v rámci
+            aplikácie prezentované základné štatistiky.</para>
+        <para>Na začiatku práce na projekte sme si v tíme rozdelili úlohy a tou mojou bol vývoj
+            "frontend-u". Frontend je závislý na backende, pričom k správe závislostí využívam
+            dependency injection (Spring IoC). </para>
+    </sect1>
+    <sect1>
+        <title>Use cases a wireframes</title>
+        <para>Pre ujasnenie usporiadania grafických prvkov na obrazovke som vytvoril náčrt
+            wireframov (na papier) a ako zoznam požadovanej funkcionality nasledujúce "use
+            cases":</para>
+        <para>
+            <programlisting>As a user, i want to be able to mark the words, so that i can pick from +,-,/
+As a user, i want to be able to see the packages available for me to solve, so that i can see my progress in each of them
+As an administrator, i want to be able to upload new word dictionaries, so that i can choose a size of packages
+As an administrator, i want to be able to choose the repetition value for the dictionary im uploading
+As an administrator, i want to be able to choose a noise value for the dictionary im uploading
+As an administrator, i want to be able to pick users which can work on individual packages
+As an administrator, i want to be able to see the time in which the user finished the package
+As an administrator, i want to be able to the coher kappa value, so that i can compare the results from different users
+As an administrator, i want to be able to export the file with the results to a csv</programlisting>
+        </para>
+        <para>Use cases však po čase čiastočne stratili zmysel, pretože oproti pôvodnému zadaniu
+            práce sa úloha pozmenila na len jeden typ užívateľa (administrátora), ktorý má v
+            aplikácií všetky práva.</para>
+    </sect1>
+    <sect1>
+        <title>Prevedenie do HTML &amp; CSS</title>
+        <para>Pre plnú požadovanú funkcionalitu som dokopy vytvoril osem takýchto wireframov, ktoré
+            som postupne previedol do jazyku HTML vrátane kaskádových štýlov. Pre uľahčenie roboty
+            som využil voľne dostupnú knižnicu Bootstrap. Táto knižnica prináša so sebou aj ďalšiu
+            výhodu a tou je responzívnosť webovej stránky, a teda, že sa jednotlivé stránky
+            automaticky prispôsobujú displejom mobilných zatriadení. Táto požiadavka bola kladená od
+            zadávateľa úlohy pre možnosť využitia aplikácie aj na prenosných zariadeniach z dôvodu
+            väčšieho komfortu pri dlhotrvajúcom anotovaní.</para>
+    </sect1>
+    <sect1>
+        <title>Nahrávanie súborov a anotovanie</title>
+        <para>Cyklus anotovania dát začína nahratím nového balíku do systému. Užívateľ zvolí súbory
+            ktoré chce nahrať. Tie by pre správne fungovanie mali byť vo formáte CSV. Na
+            jednotlivých riadkoch v tomto súbore sú jednotlivé hodnotené slová. Prvý riadok je
+            špeciálny a obsahuje zadávanú otázku, nasledujúci medzi otázkou a hodnotenými slovami je
+            prázdny. Dáta v takejto forme v kóde parsujem najskôr pomocou uloženia do zoznamu ako
+            dátový typ MULTIPART FILE a neskôr doplnkom OPEN CSV. Získané dáta sa aj so zadanými
+            ďalšími voliteľnými hodnotami uložia do databázy volaním funkcie z backendu. </para>
+        <para>Anotovanie prebieha na samostatnej stránke aplikácie s názvom "mark". Na tejto
+            užívateľ vidí v každom momente balík, ktorý anotuje, otázku, ktorú hodnotí, percento
+            dokončenia a slovo ktoré značkuje. Taktiež sa môže vrátiť o jedno slovo späť a upraviť
+            svoju odpoveď, alebo slovo nahlásiť v prípade, že si myslí, že by v systéme vôbec nemalo
+            existovať (napr. slovo obsajuhúce číslice).</para>
+    </sect1>
+</article>
