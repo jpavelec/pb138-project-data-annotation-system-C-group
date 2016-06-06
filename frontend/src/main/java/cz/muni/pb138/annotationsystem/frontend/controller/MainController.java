@@ -52,6 +52,13 @@ public class MainController {
     @Inject
     private SubpackManager subpackManager;
 
+    /**
+     * Returns the main page of the annotation system
+     *
+     * @author Matej Rajtár <matej.rajtar@gmail.com>
+     * @param req
+     * @return view-admin
+     */
     @RequestMapping("/")
     public String primaryView(ServletRequest req) {
 
@@ -66,12 +73,33 @@ public class MainController {
 
     }
 
+    /**
+     * Returns the form for uploading a new pack to the database
+     *
+     * @author Matej Rajtár <matej.rajtar@gmail.com>
+     * @param req
+     * @return view-upload or returns view-error otherwise
+     */
     @RequestMapping(value = "/upload", method = {RequestMethod.GET})
     public String doGet(ServletRequest req) {
 
         return "view-upload";
     }
 
+    /**
+     * Reacts to POST method of the upload form
+     * Parses the seleced file(s) to List<String>
+     * Reads the set repetition rate, noise rate and maximum size of one package
+     * Saves all the aquired data to the database
+     * Redirects to view-assign or returns view-error otherwise
+     *
+     * @author Matej Rajtár <matej.rajtar@gmail.com>
+     * @param redirectAttributes
+     * @param req
+     * @param files list of uploaded files
+     * @param values list of set string values
+     * @return
+     */
     @RequestMapping(value = "/upload", method = {RequestMethod.POST})
     public String doPost(RedirectAttributes redirectAttributes,
                          ServletRequest req,
@@ -129,15 +157,10 @@ public class MainController {
             try {
                 packManager.createPack(pack, helpList, noiseList, Integer.parseInt(values[2]));
 
-                //subpackManager.updatePersonsAssignment(personManager.getOrCreatePersonByUsername("Karlik"), subpackManager.getSubpacksInPack(pack));
-
             } catch (Exception e) {
                 req.setAttribute("error", e);
                 return "view-error";
             }
-
-            //System.out.println("AAAAAAAAAAAAAAAAAAAAAA" + pack + ".." + values[0] + ".." + values[1] );
-            //System.out.println("BBBBBBBBBBBBBBBBBBBBBB" + pack + ".." + answersList + ".." + noiseList + ".." + values[2] );
 
             redirectAttributes.addFlashAttribute("pack", pack);
 
@@ -149,6 +172,14 @@ public class MainController {
 
     }
 
+    /**
+     * Returns view-packages (packages for user to pick for marking) or returns view-error otherwise
+     *
+     * @author Matej Rajtár <matej.rajtar@gmail.com>
+     * @param req
+     * @param httpReq
+     * @return
+     */
     @RequestMapping("/packages")
     public String packages(ServletRequest req, HttpServletRequest httpReq) {
 
@@ -174,6 +205,15 @@ public class MainController {
 
     }
 
+    /**
+     * Redirects user to /mark/subpack where subpack is the chosen subpack at view-packages or returns view-error otherwise
+     *
+     * @author Matej Rajtár <matej.rajtar@gmail.com>
+     * @param redirectAttributes
+     * @param req
+     * @param subpack
+     * @return
+     */
     @RequestMapping(value = "/packages/{subpack}", method = {RequestMethod.GET})
     public String getPackage(RedirectAttributes redirectAttributes, ServletRequest req, @PathVariable String subpack) {
 
@@ -189,6 +229,11 @@ public class MainController {
         return "redirect:/mark/{subpack}";
     }
 
+    /**
+     * @author Kristýna Pavlíčková <422537@mail.muni.cz>
+     * @param req
+     * @return
+     */
     @RequestMapping("/stats")
     public String stats(ServletRequest req) {
 
@@ -203,6 +248,12 @@ public class MainController {
         return "view-stats";
     }
 
+    /**
+     * @author Kristýna Pavlíčková <422537@mail.muni.cz>
+     * @param req
+     * @param packID
+     * @return
+     */
     @RequestMapping("/stats/{packID}")
     public String stats(ServletRequest req, @PathVariable String packID) {
         try {
@@ -300,6 +351,20 @@ public class MainController {
         return "view-statsPack";
     }
 
+    /**
+     * Returns view-mark with the next answer. Allows to correct previous answer
+     * Measures time it takes to user to mark the answer
+     *
+     * @author Matej Rajtár <matej.rajtar@gmail.com>
+     * @author Ondrej Velisek <ondrejvelisek@gmail.com>
+     * @param req
+     * @param subpack
+     * @param httpReq
+     * @param model
+     * @param previousEvalId
+     * @return
+     * @throws DaoException
+     */
     @RequestMapping(value = "/mark/{subpack}", method = {RequestMethod.GET})
     public String markGet(ServletRequest req, @PathVariable String subpack, HttpServletRequest httpReq,
                           Model model, @CookieValue(value = "previousEvalId", required = false) Long previousEvalId) throws DaoException {
@@ -370,7 +435,11 @@ public class MainController {
 
     }
 
-
+    /**
+     * @param req
+     * @param redir
+     * @return
+     */
     @RequestMapping(value = "/correct/{subpackId}", method = {RequestMethod.GET})
     public String markCorrect(ServletRequest req, RedirectAttributes redir) {
 
@@ -384,8 +453,24 @@ public class MainController {
 
     }
 
-
-
+    /**
+     * Reacts to POST method of the answer form. Allows to correct previous answer.
+     * Measures time it takes to user to mark the answer
+     *
+     * @author Matej Rajtár <matej.rajtar@gmail.com>
+     * @author Ondrej Velisek <ondrejvelisek@gmail.com>
+     * @param redirectAttributes
+     * @param value
+     * @param req
+     * @param isCorrection
+     * @param subpack
+     * @param answer
+     * @param time
+     * @param httpReq
+     * @param res
+     * @param previousEvalId
+     * @return
+     */
     @RequestMapping(value = "/mark/{subpack}/{answer}/{time}", method = {RequestMethod.POST})
     public String markPost(RedirectAttributes redirectAttributes, @RequestParam String value,
                            ServletRequest req, @RequestParam String isCorrection,
@@ -447,6 +532,21 @@ public class MainController {
 
     }
 
+    /**
+     * Allows to report the answer as nonsense
+     * Measures time it takes to user to mark the answer
+     *
+     * @author Matej Rajtár <matej.rajtar@gmail.com>
+     * @author Ondrej Velisek <ondrejvelisek@gmail.com>
+     * @param redirectAttributes
+     * @param time
+     * @param req
+     * @param subpack
+     * @param answer
+     * @param httpReq
+     * @param isCorrection
+     * @return
+     */
     @RequestMapping(value = "/mark/{subpack}/{answer}/{time}/report", method = {RequestMethod.POST})
     public String markReport(RedirectAttributes redirectAttributes, @PathVariable String time, ServletRequest req,
                              @PathVariable String subpack, @PathVariable String answer, HttpServletRequest httpReq,
@@ -481,6 +581,13 @@ public class MainController {
 
     }
 
+    /**
+     * @author Kristýna Pavlíčková <422537@mail.muni.cz>
+     * @param req
+     * @param packID
+     * @param userID
+     * @return
+     */
     @RequestMapping(value = "/assign/{packID}/{userID}", method = {RequestMethod.GET})
     public String assignPackGet(ServletRequest req, @PathVariable String packID, @PathVariable String userID) {
         try {
@@ -517,6 +624,14 @@ public class MainController {
         return "view-assignPack";
     }
 
+    /**
+     * @author Kristýna Pavlíčková <422537@mail.muni.cz>
+     * @param req
+     * @param packID
+     * @param userID
+     * @param values
+     * @return
+     */
     @RequestMapping(value ="/assign/{packID}/{userID}", method = {RequestMethod.POST})
     public String assignPackGet(ServletRequest req,
                                 @PathVariable long packID,
@@ -539,7 +654,12 @@ public class MainController {
         return "redirect:/assign/{packID}";
     }
 
-
+    /**
+     * @author Kristýna Pavlíčková <422537@mail.muni.cz>
+     * @param req
+     * @param id
+     * @return
+     */
     @RequestMapping("/assign/{id}")
     public String assign(ServletRequest req, @PathVariable String id) {
         try {
@@ -570,6 +690,11 @@ public class MainController {
 
     }
 
+    /**
+     * @author Kristýna Pavlíčková <422537@mail.muni.cz>
+     * @param req
+     * @return
+     */
     @RequestMapping("/assignMenu")
     public String assignMenu(ServletRequest req) {
 

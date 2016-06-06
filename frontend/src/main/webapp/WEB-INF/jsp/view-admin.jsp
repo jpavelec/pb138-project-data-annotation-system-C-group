@@ -20,7 +20,7 @@
     <div class="container">
         <div id="wrap">
             </br>
-            <center><h2>What would you like to do?</h2></center>
+            <center><h2>Hello ${person.username}! What would you like to do?</h2></center>
             </br>
             <form action="<spring:url value="/upload"/>">
                 <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Upload a new dictionary">
