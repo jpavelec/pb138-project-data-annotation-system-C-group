@@ -479,7 +479,7 @@ public class SubpackDaoImpl implements SubpackDao {
     }
 
     @Override
-    public void assignPersonToSubpack(Person person, Subpack subpack) throws DaoException {
+    public void assignPersonToSubpack(Subpack subpack, Person person) throws DaoException {
         checkDataSource();
         if (person == null) {
             throw new IllegalArgumentException("Person is null");
@@ -495,9 +495,6 @@ public class SubpackDaoImpl implements SubpackDao {
         }
         personDao.getById(person.getId());
         this.getById(subpack.getId());
-        if (!isPersonAssignedToSubpack(person, subpack)) {
-            throw new BeanNotExistsException("There isn't any record for person and subpack");
-        }
         try (Connection connection = dataSource.getConnection(); 
             PreparedStatement st = connection.prepareStatement(
                 "INSERT INTO assignedperson (subpackid, personid, starttime) VALUES (?,?,?)")) {
@@ -693,5 +690,43 @@ public class SubpackDaoImpl implements SubpackDao {
             person + " to subpack " + subpack;
             throw new ServiceFailureException(msg, ex);
         }
+    }
+
+    @Override
+    public void deleteAssignmentPersonToSubpack(Subpack subpack, Person person) throws DaoException {
+        checkDataSource();
+        if (subpack == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (subpack.getId() == null || subpack.getId() < 0) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        if (person == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (person.getId() == null || person.getId() < 0) {
+            throw new ValidationException("Person id is null or negative");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "DELETE FROM assignedperson "+ 
+                "WHERE subpackid = ? AND personid = ?")) {
+            
+            st.setLong(1, subpack.getId());
+            st.setLong(2, person.getId());
+            int count = st.executeUpdate();
+            if (count == 0) {
+                throw new BeanNotExistsException("Record for subpack and person was not found in database!");
+            } else if (count != 1) {
+                throw new ServiceFailureException(
+                        "Invalid deleted rows count detected (one row should be updated): " + count);
+            }
+            
+        } catch (SQLException ex) {
+            String msg = "Error when deleting assignation person " +
+            person + " to subpack " + subpack;
+            throw new ServiceFailureException(msg, ex);
+        }
+            
     }
 }
