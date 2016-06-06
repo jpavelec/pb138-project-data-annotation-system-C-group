@@ -475,7 +475,7 @@ public class SubpackDaoImpl implements SubpackDao {
     }
     
     @Override
-    public long getAssignationTime(Subpack subpack, Person person) throws DaoException {
+    public Long getAssignationTime(Subpack subpack, Person person) throws DaoException {
         checkDataSource();
         if (person == null) {
             throw new IllegalArgumentException("Person is null");
@@ -556,7 +556,7 @@ public class SubpackDaoImpl implements SubpackDao {
     }
 
     @Override
-    public long getCompletationTime(Subpack subpack, Person person) throws DaoException {
+    public Long getCompletationTime(Subpack subpack, Person person) throws DaoException {
         checkDataSource();
         if (person == null) {
             throw new IllegalArgumentException("Person is null");
@@ -589,6 +589,9 @@ public class SubpackDaoImpl implements SubpackDao {
                         throw new ServiceFailureException(
                             "Internal error: More entities with the same subpackid and personid found " +
                             "in assignment subpacks and people");
+                    }
+                    if (endTime == null) {
+                        return null;
                     }
                     return endTime.getTime();
                 } else {

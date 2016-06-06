@@ -143,11 +143,11 @@ public class EvaluationDaoImpl implements EvaluationDao {
             throw new ValidationException("Evaluation id is already set");
         }
         
-        if (answerDao.isInsertingLastEvaluation(evaluation.getAnswer().
+        /*if (answerDao.isInsertingLastEvaluation(evaluation.getAnswer().
                     getFromSubpack(), evaluation.getPerson())) {
             subpackDao.setCompletationTime(evaluation.getAnswer().
                     getFromSubpack(), evaluation.getPerson());
-        }
+        }*/
         
         try (Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
@@ -163,12 +163,15 @@ public class EvaluationDaoImpl implements EvaluationDao {
                         + addedRows + ") inserted when trying to insert evaluation " + evaluation);
             }
             
-            
-            
             try (ResultSet keyRS = st.getGeneratedKeys()) {
                 evaluation.setId(getKey(keyRS, evaluation));
-                
             }
+            
+            if (answerDao.isSubpackCompletelyEvaluated(evaluation.getAnswer().
+                    getFromSubpack(), evaluation.getPerson())) {
+                subpackDao.setCompletationTime(evaluation.getAnswer().
+                    getFromSubpack(), evaluation.getPerson());
+        }
             
         } catch (SQLException ex) {
             throw new ServiceFailureException("Error when inserting evaluation " + evaluation, ex);

@@ -373,7 +373,7 @@ public class AnswerDaoImpl implements AnswerDao {
             Answer a = i.next();
             if (evaluatedAnswers.contains(a)) {
                 i.remove();
-                unevaluatedAnswers.remove(a);
+                evaluatedAnswers.remove(a);
             }
         }
         return unevaluatedAnswers;
@@ -424,12 +424,8 @@ public class AnswerDaoImpl implements AnswerDao {
     }
 
     @Override
-    public boolean isInsertingLastEvaluation(Subpack subpack, Person person) throws DaoException {
-        if (getUnevaluatedAnswers(subpack, person).size() == 1) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean isSubpackCompletelyEvaluated(Subpack subpack, Person person) throws DaoException {
+        return getUnevaluatedAnswers(subpack, person).isEmpty();
     }
 
 }
