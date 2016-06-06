@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -131,23 +132,25 @@ public class SubpackManagerImpl implements SubpackManager {
             }
         }
 
-        List<Subpack> toRemove = getSubpacksInPack(pack);
+        List<Subpack> toRemove = getSubpacksAssignedToPerson(person);
+        Iterator<Subpack> i = toRemove.listIterator();
+        while (i.hasNext()) {
+            if (!i.next().getParent().equals(pack)) {
+                i.remove();
+            }
+        }
         toRemove.removeAll(subpacks);
 
-        System.out.println("To remove:");
         for (Subpack s : toRemove) {
-            System.out.print(s.getName());
+            subpackDao.deleteAssignmentPersonToSubpack(s, person);
         }
-        System.out.println();
 
         List<Subpack> toAdd = new ArrayList<>(subpacks);
-        toAdd.removeAll(getSubpacksInPack(pack));
+        toAdd.removeAll(getSubpacksAssignedToPerson(person));
 
-        System.out.println("To add:");
         for (Subpack s : toAdd) {
-            System.out.print(s.getName());
+            subpackDao.assignPersonToSubpack(s, person);
         }
-        System.out.println();
 
     }
 
