@@ -1,7 +1,9 @@
 package cz.muni.pb138.annotationsystem.frontend.controller;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import cz.muni.pb138.annotationsystem.backend.api.*;
+import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.*;
 import org.springframework.stereotype.Controller;
@@ -12,8 +14,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.*;
 import java.io.*;
@@ -163,7 +167,7 @@ public class MainController {
 
         } catch (DaoException e) {
             req.setAttribute("error", e);
-            return "redirect:/view-error";
+            return "view-error";
         }
 
         return "view-packages";
@@ -179,8 +183,7 @@ public class MainController {
             redirectAttributes.addFlashAttribute("thisSubpack", thisSubpack);
 
         } catch (DaoException e) {
-            req.setAttribute("error", e);
-            return "view-error";
+            return "redirect:/view-error";
         }
 
         return "redirect:/mark/{subpack}";
@@ -205,7 +208,10 @@ public class MainController {
         try {
             Long longPack = Long.parseLong(packID);
             Pack packObj = packManager.getPackById(longPack);
-            double progress = statisticsManager.getProgressOfPack(packObj);
+            Double progress = Math.round(statisticsManager.getProgressOfPack(packObj)*100.0)/100.0;
+            if (progress != Double.NaN) {
+                progress = Math.round(progress*100.0)/100.0;
+            }
 
 
             req.setAttribute("pack", packObj);
@@ -220,10 +226,26 @@ public class MainController {
                 List<Person> userList = subpackManager.getPersonsAssignedToSubpack(subPack);
                 Map userStats = new HashMap();
                 for (Person user : userList) {
-                    double[] currentUserStats = new double[3];
+                    Double[] currentUserStats = new Double[3];
                     currentUserStats[0] = statisticsManager.getProgressOfSubpackForPerson(subPack, user);
-                    //currentUserStats[1] = statisticsManager.getCohenKappa(user, subPack);
-                    //currentUserStats[2] = statisticsManager.averageEvaluationTimeOfSubpackForPerson(subPack, user);
+
+                    if (currentUserStats[0] != null) {
+                       currentUserStats[0] = Math.round(currentUserStats[0])*100.0/100.0;
+                    } else {
+                        currentUserStats[0] = (double) 0;
+                    }
+                    currentUserStats[1] = statisticsManager.getCohenKappa(user, subPack);
+                    if (currentUserStats[1] != null) {
+                        currentUserStats[1] = Math.round(currentUserStats[1])*100.0/100.0;
+                    }
+
+                    currentUserStats[2] = statisticsManager.averageEvaluationTimeOfSubpackForPerson(subPack, user);
+                    if (currentUserStats[2] != null) {
+                        currentUserStats[2] = Math.round(currentUserStats[2])*100.0/100.0;
+                    } else {
+                        currentUserStats[2] = (double) 0;
+                    }
+
                     userStats.put(user, currentUserStats);
                 }
                 subpackUserStats.put(subPack, userStats);
@@ -233,13 +255,43 @@ public class MainController {
 
             Map subpackGeneralStats = new HashMap();
             for (Subpack subPack : allSubPacks) {
-                double[] GeneralStats = new double[3];
+                Double[] generalStats = new Double[7];
 
-                GeneralStats[0] = statisticsManager.getProgressOfSubpack(subPack);
-                //GeneraStats[1] = statisticsManager.averageCompletionTimeOfSubpack(subPack);
-                //GeneraStats[2] = statisticsManager.averageEvaluationTimeOfSubpack(subPack);
+                generalStats[0] = statisticsManager.getProgressOfSubpack(subPack);
+                System.out.println("GenStat0" + generalStats[0]);
+                if ( !generalStats[0].isNaN()) {
+                    generalStats[0] = Math.round(generalStats[0])*100.0/100.0;
+                }
+                generalStats[1] = statisticsManager.averageCompletionTimeOfSubpack(subPack);
+                System.out.println(generalStats[1]);
+                if (generalStats[1] != null) {
 
-                subpackGeneralStats.put(subPack, GeneralStats);
+                    int seconds = (int) ((generalStats[1] / (1000)) % 60); //sec
+                    generalStats[2] = (double) seconds;
+                    int minutes = (int) ((generalStats[1] / (1000*60)) % 60); //min
+                    generalStats[3] = (double) minutes;
+                    int hour = (int) ((generalStats[1] / (1000*60*60)) % 24); //hour
+                    generalStats[4] = (double) hour;
+                    int day = (int) (generalStats[1] / (1000*60*60*24)); //days
+                    generalStats[5] = (double) day;
+                } else {
+                    generalStats[1] = (double) 0;
+                    generalStats[2] = (double) 0;
+                    generalStats[3] = (double) 0;
+                    generalStats[4] = (double) 0;
+                    generalStats[5] = (double) 0;
+                }
+                generalStats[6] = statisticsManager.averageEvaluationTimeOfSubpack(subPack);
+
+                if (generalStats[6] != null) {
+                    generalStats[6] = Math.round(generalStats[1])*100.0/100.0;
+                } else {
+                    generalStats[6] = (double) 0;
+                }
+
+                System.out.println(generalStats[6]);
+
+                subpackGeneralStats.put(subPack, generalStats);
             }
             req.setAttribute("subpackGeneralStats", subpackGeneralStats);
 
@@ -247,13 +299,14 @@ public class MainController {
 
         } catch (Exception e) {
             req.setAttribute("error", e);
-            return "redirect:/view-error";
+            return "view-error";
         }
         return "view-statsPack";
     }
 
     @RequestMapping(value = "/mark/{subpack}", method = {RequestMethod.GET})
-    public String markGet(ServletRequest req, @PathVariable String subpack, HttpServletRequest httpReq) {
+    public String markGet(ServletRequest req, @PathVariable String subpack, HttpServletRequest httpReq,
+                          Model model, @CookieValue("previousEvalId") String previousEvalId) throws DaoException {
 
         try {
 
@@ -273,16 +326,39 @@ public class MainController {
 
             req.setAttribute("progress", num);
 
+
+            Boolean isCorrection = (Boolean) model.asMap().get("isCorrection");
+
+            Answer answer;
+            Evaluation correction;
             try {
-                Answer answer = answerManager.nextAnswer(person,
-                        subpackManager.getSubpackById(Long.parseLong(subpack)));
+                correction = evaluationManager.getEvaluationById(Long.valueOf(previousEvalId));
+            } catch (BeanNotExistsException e) {
+                correction = null;
+            }
+
+            req.setAttribute("canCorrect", true);
+
+            if (isCorrection != null && isCorrection == true) {
+                req.setAttribute("canCorrect", false);
+                answer = correction.getAnswer();
                 req.setAttribute("thisAnswer", answer);
-            } catch (IllegalStateException e) {
-                if (e.getMessage() == "No more answers left.") {
-                    return "view-finished";
-                } else {
-                    req.setAttribute("error", e);
-                    return "view-error";
+            } else {
+                if (correction == null || !correction.getAnswer().getFromSubpack().equals(thisSubpack)) {
+                    req.setAttribute("canCorrect", false);
+                }
+                try {
+                    answer = answerManager.nextAnswer(
+                            person,
+                            thisSubpack);
+                    req.setAttribute("thisAnswer", answer);
+                } catch (IllegalStateException e) {
+                    if (e.getMessage() == "No more answers left.") {
+                        return "view-finished";
+                    } else {
+                        req.setAttribute("error", e);
+                        return "view-error";
+                    }
                 }
             }
 
@@ -294,11 +370,29 @@ public class MainController {
 
     }
 
+
+    @RequestMapping(value = "/correct/{subpackId}", method = {RequestMethod.GET})
+    public String markCorrect(ServletRequest req, RedirectAttributes redir) {
+
+        try {
+            redir.addFlashAttribute("isCorrection", true);
+            return "redirect:/mark/{subpackId}";
+        } catch (Exception e) {
+            req.setAttribute("error", e);
+            return "view-error";
+        }
+
+    }
+
+
+
     @RequestMapping(value = "/mark/{subpack}/{answer}/{time}", method = {RequestMethod.POST})
     public String markPost(RedirectAttributes redirectAttributes, @RequestParam String value,
-                           ServletRequest req,
+                           ServletRequest req, @RequestParam String isCorrection,
                            @PathVariable String subpack, @PathVariable String answer,
-                           @PathVariable String time, HttpServletRequest httpReq) {
+                           @PathVariable String time, HttpServletRequest httpReq,
+                           HttpServletResponse res,
+                           @CookieValue("previousEvalId") long previousEvalId) {
 
         try {
 
@@ -309,13 +403,32 @@ public class MainController {
             Answer thisAnswer = answerManager.getAnswerById(Long.parseLong(answer));
             Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
 
-            if (Integer.parseInt(value) == 1) {
-              Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, (int) (long) difference);
-                evaluationManager.eval(evaluation);
+            if (Boolean.valueOf(isCorrection)) {
+                Evaluation cor = evaluationManager.getEvaluationById(previousEvalId);
+                if (Integer.parseInt(value) == 1) {
+                    cor.setRating(Rating.POSITIVE);
+                } else if (Integer.parseInt(value) == 2) {
+                    cor.setRating(Rating.NEGATIVE);
+                } else {
+                    cor.setRating(Rating.NONSENSE);
+                }
+                evaluationManager.correct(cor);
             } else {
-                Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NEGATIVE, (int) (long) difference);
+                Evaluation evaluation;
+                if (Integer.parseInt(value) == 1) {
+                    evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, (int) (long) difference);
+                } else if (Integer.parseInt(value) == 2) {
+                    evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NEGATIVE, (int) (long) difference);
+                } else {
+                    evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NONSENSE, (int) (long) difference);
+                }
                 evaluationManager.eval(evaluation);
+
+                Cookie previousEvalCookie = new Cookie("previousEvalId", String.valueOf(evaluation.getId()));
+                previousEvalCookie.setPath("/");
+                res.addCookie(previousEvalCookie);
             }
+
 
             Long longSubpack = Long.parseLong(subpack);
             Subpack thisSubpack = subpackManager.getSubpackById(longSubpack);
@@ -336,7 +449,8 @@ public class MainController {
 
     @RequestMapping(value = "/mark/{subpack}/{answer}/{time}/report", method = {RequestMethod.POST})
     public String markReport(RedirectAttributes redirectAttributes, @PathVariable String time, ServletRequest req,
-                             @PathVariable String subpack, @PathVariable String answer, HttpServletRequest httpReq) {
+                             @PathVariable String subpack, @PathVariable String answer, HttpServletRequest httpReq,
+                             @RequestParam String isCorrection) {
 
         try {
 
@@ -381,17 +495,20 @@ public class MainController {
             req.setAttribute("pack", pack);
 
             Map subpackMap = new HashMap();
+            Map subpackUserMap = new HashMap();
             boolean allAssigned = true;
 
             for (Subpack subPack : subpackList) {
                 List<Person> users = subpackManager.getPersonsAssignedToSubpack(subPack);
                 int size = users.size();
                 subpackMap.put(subPack, size);
+                subpackUserMap.put(subPack, users);
                 if(size == 0)
                     allAssigned = false;
             }
             req.setAttribute("subpackMap", subpackMap);
             req.setAttribute("allAssigned", allAssigned);
+            req.setAttribute("subpackUserMap", subpackUserMap);
 
         } catch (DaoException e) {
             req.setAttribute("error", e);
@@ -451,6 +568,20 @@ public class MainController {
 
         return "view-assign";
 
+    }
+
+    @RequestMapping("/assignMenu")
+    public String assignMenu(ServletRequest req) {
+
+        List<Pack> allPacks = null;
+        try {
+            allPacks = packManager.getAllPacks();
+        } catch (DaoException e) {
+            e.printStackTrace();
+        }
+        req.setAttribute("allPacks", allPacks);
+
+        return "view-assignMenu";
     }
 
 

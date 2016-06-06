@@ -31,11 +31,16 @@
                                 <c:if test="${subpack.value == 0}">
                                     &nbsp;&nbsp;<span class="label label-warning">Not assigned!</span>
                                 </c:if>
-                                <c:if test="${subpack.value == 1}">
-                                    &nbsp;&nbsp;<span class="label label-default">Assigned to one user.</span>
-                                </c:if>
-                                <c:if test="${subpack.value > 1}">
-                                    &nbsp;&nbsp;<span class="label label-default">Assigned to ${subpack.value} users.</span>
+                                <c:if test="${subpack.value > 0}">
+                                    &nbsp;&nbsp;<span class="label label-default">Assigned to&nbsp;
+                                    <c:forEach var="subpackUserList" items="${subpackUserMap}">
+                                        <c:if test="${subpack.key.id == subpackUserList.key.id}">
+                                            <c:forEach var="user" items="${subpackUserList.value}">
+                                                <c:out value="${user.username}"/>&nbsp;
+                                            </c:forEach>
+                                        </c:if>
+                                    </c:forEach>
+                                    </span>
                                 </c:if>
                             </label>
                         </div>
@@ -48,11 +53,11 @@
             <center>
                 <h3>All packages are assigned</h3>
             </center>
-            <form action="<spring:url value="/"/>">
-                </br>
-                <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back to main menu">
-            </form>
         </c:if>
+        <form action="<spring:url value="/"/>">
+            </br>
+            <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back to main menu">
+        </form>
     </div>
 
 </div>
