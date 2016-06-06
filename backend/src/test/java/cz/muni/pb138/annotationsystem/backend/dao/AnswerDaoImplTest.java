@@ -56,7 +56,7 @@ public class AnswerDaoImplTest {
     private Subpack animalSubpack;
     
     private void prepareTestData() throws Exception {
-        animalPack = new Pack("Is it an animal?", "animal", 2.2, 3.5);
+        animalPack = new Pack("an animal", "animal", 2.2, 3.5);
         packDao.create(animalPack);
         animalSubpack = new Subpack(animalPack, "animal_01");
         subpackDao.create(animalSubpack);

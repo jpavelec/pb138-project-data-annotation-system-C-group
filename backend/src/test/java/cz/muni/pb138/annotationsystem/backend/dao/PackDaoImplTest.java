@@ -48,7 +48,7 @@ public class PackDaoImplTest {
     private PackBuilder sampleAnimalPack() {
         return new PackBuilder()
                 .id(null)
-                .question("Is it an animal?")
+                .question("an animal")
                 .name("Animal")
                 .noiseRate(3.23)
                 .repeatingRate(2.94);
@@ -57,7 +57,7 @@ public class PackDaoImplTest {
     private PackBuilder sampleThingPack() {
         return new PackBuilder()
                 .id(null)
-                .question("Is it a thing?")
+                .question("a thing")
                 .name("Thing")
                 .noiseRate(0.99)
                 .repeatingRate(15.95);
