@@ -306,7 +306,7 @@ public class MainController {
 
     @RequestMapping(value = "/mark/{subpack}", method = {RequestMethod.GET})
     public String markGet(ServletRequest req, @PathVariable String subpack, HttpServletRequest httpReq,
-                          Model model, @CookieValue("previousEvalId") String previousEvalId) throws DaoException {
+                          Model model, @CookieValue(value = "previousEvalId", required = false) Long previousEvalId) throws DaoException {
 
         try {
 
@@ -332,7 +332,11 @@ public class MainController {
             Answer answer;
             Evaluation correction;
             try {
-                correction = evaluationManager.getEvaluationById(Long.valueOf(previousEvalId));
+                if (previousEvalId == null) {
+                    correction = null;
+                } else {
+                    correction = evaluationManager.getEvaluationById(previousEvalId);
+                }
             } catch (BeanNotExistsException e) {
                 correction = null;
             }
@@ -392,7 +396,7 @@ public class MainController {
                            @PathVariable String subpack, @PathVariable String answer,
                            @PathVariable String time, HttpServletRequest httpReq,
                            HttpServletResponse res,
-                           @CookieValue("previousEvalId") long previousEvalId) {
+                           @CookieValue(value = "previousEvalId", required = false) Long previousEvalId) {
 
         try {
 
