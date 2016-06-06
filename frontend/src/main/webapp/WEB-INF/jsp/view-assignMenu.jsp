@@ -13,30 +13,25 @@
     <title>Annotation system</title>
 </head>
 <body>
-
 <div class="container">
-    <h2>Assign users to package ${pack.name}</h2>
-    <form id="fileAssignForm" method="POST" enctype="multipart/form-data">
-    <div id="middle">
+    </br>
+    <center><h2>Choose your package</h2></center>
+    </br>
+    <c:forEach items="${allPacks}" var="Pack">
+        <form action="<spring:url value="/assign/${Pack.id}"/>">
+            <input type="submit" class="btn btn-lg btn-primary btn-block"   value="${Pack.name}">
+            </br>
+        </form>
 
-        <div class="list-group">
-            <c:forEach items="${users}" var="person">
-                <a href="<spring:url value="/assign/${pack.id}/${person.id}" />" class="list-group-item" type="submit">
-                    ${person.username}
-                </a>
-            </c:forEach>
-        </div>
-    </div>
-    </form>
-    <c:if test="${allAssigned == true}">
-        <center>
-            <h3>All packages are assigned</h3>
-        </center>
-    </c:if>
+    </c:forEach>
+
+
+
     <form action="<spring:url value="/"/>">
         </br>
-        <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back to main menu">
+        <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back">
     </form>
 </div>
 </body>
 </html>
+
