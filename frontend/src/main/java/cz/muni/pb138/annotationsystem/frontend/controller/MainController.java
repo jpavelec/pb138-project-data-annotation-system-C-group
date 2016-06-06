@@ -5,6 +5,7 @@ import cz.muni.pb138.annotationsystem.backend.api.*;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -12,8 +13,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpSession;
+import java.awt.*;
 import java.io.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
 
 
 @Controller
@@ -39,12 +49,13 @@ public class MainController {
     private SubpackManager subpackManager;
 
     @RequestMapping("/")
-    public String primaryView(ServletRequest req, HttpServletRequest httpReq) {
+    public String primaryView(ServletRequest req) {
 
         try {
-            req.setAttribute("person", personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser()));
+            req.setAttribute("person", personManager.getPersonById((long) 1));
         } catch (DaoException e) {
-            return "redirect:/view-error";
+            req.setAttribute("error", e);
+            return "view-error";
         }
 
         return "view-admin";
@@ -61,7 +72,8 @@ public class MainController {
     public String doPost(RedirectAttributes redirectAttributes,
                          ServletRequest req,
                          @RequestParam("file") MultipartFile[] files,
-                         @RequestParam("value") String[] values) {
+                         @RequestParam("value") String[] values)
+                          {
 
         if (!(files.length < 1)) {
 
@@ -113,8 +125,7 @@ public class MainController {
             try {
                 packManager.createPack(pack, helpList, noiseList, Integer.parseInt(values[2]));
 
-                //implicitne priradenie packu Karlikovi pre moznost testovania, lebo..
-                subpackManager.updatePersonsAssignment(personManager.getOrCreatePersonByUsername("Karlik"), subpackManager.getSubpacksInPack(pack));
+                //subpackManager.updatePersonsAssignment(personManager.getOrCreatePersonByUsername("Karlik"), subpackManager.getSubpacksInPack(pack));
 
             } catch (Exception e) {
                 req.setAttribute("error", e);
@@ -138,9 +149,20 @@ public class MainController {
     public String packages(ServletRequest req, HttpServletRequest httpReq) {
 
         try {
-            req.setAttribute("subpacks", subpackManager.getSubpacksAssignedToPerson(personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser())));
+            Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
+            List<Subpack> list = subpackManager.getSubpacksAssignedToPerson(thisPerson);
+
+            Map subpacks = new HashMap();
+
+            for (Subpack subpack : list) {
+                Long progress = Math.round(statisticsManager.getProgressOfSubpackForPerson(subpack, thisPerson)*100)/100;
+                subpacks.put(subpack, progress);
+            }
+
+            req.setAttribute("subpacks", subpacks);
 
         } catch (DaoException e) {
+            req.setAttribute("error", e);
             return "redirect:/view-error";
         }
 
@@ -157,7 +179,8 @@ public class MainController {
             redirectAttributes.addFlashAttribute("thisSubpack", thisSubpack);
 
         } catch (DaoException e) {
-            return "redirect:/view-error";
+            req.setAttribute("error", e);
+            return "view-error";
         }
 
         return "redirect:/mark/{subpack}";
@@ -177,29 +200,53 @@ public class MainController {
         return "view-stats";
     }
 
-    @RequestMapping("/stats/{pack}")
-    public String stats(ServletRequest req, @PathVariable String pack) {
+    @RequestMapping("/stats/{packID}")
+    public String stats(ServletRequest req, @PathVariable String packID) {
         try {
-            Long longPack = Long.parseLong(pack);
+            Long longPack = Long.parseLong(packID);
             Pack packObj = packManager.getPackById(longPack);
-            double width = statisticsManager.getProgressOfPack(packObj);
-            req.setAttribute("Pack", packObj);
-            req.setAttribute("width", width);
+            double progress = statisticsManager.getProgressOfPack(packObj);
+
+
+            req.setAttribute("pack", packObj);
+            req.setAttribute("progress", progress);
             List<Subpack> allSubPacks = subpackManager.getSubpacksInPack(packObj);
             req.setAttribute("allSubPacks", allSubPacks);
-            Map statMap = new HashMap();
+
+
+            Map subpackUserStats = new HashMap();
 
             for (Subpack subPack : allSubPacks) {
                 List<Person> userList = subpackManager.getPersonsAssignedToSubpack(subPack);
-                Map subpackStat = new HashMap();
+                Map userStats = new HashMap();
                 for (Person user : userList) {
-                    subpackStat.put(user, statisticsManager.getProgressOfSubpackForPerson(subPack, user));
+                    double[] currentUserStats = new double[3];
+                    currentUserStats[0] = statisticsManager.getProgressOfSubpackForPerson(subPack, user);
+                    //currentUserStats[1] = statisticsManager.getCohenKappa(user, subPack);
+                    //currentUserStats[2] = statisticsManager.averageEvaluationTimeOfSubpackForPerson(subPack, user);
+                    userStats.put(user, currentUserStats);
                 }
-                statMap.put(subPack, subpackStat);
+                subpackUserStats.put(subPack, userStats);
             }
-            req.setAttribute("stats", statMap);
+            req.setAttribute("subpackUserStats", subpackUserStats);
+
+
+            Map subpackGeneralStats = new HashMap();
+            for (Subpack subPack : allSubPacks) {
+                double[] GeneralStats = new double[3];
+
+                GeneralStats[0] = statisticsManager.getProgressOfSubpack(subPack);
+                //GeneraStats[1] = statisticsManager.averageCompletionTimeOfSubpack(subPack);
+                //GeneraStats[2] = statisticsManager.averageEvaluationTimeOfSubpack(subPack);
+
+                subpackGeneralStats.put(subPack, GeneralStats);
+            }
+            req.setAttribute("subpackGeneralStats", subpackGeneralStats);
+
+
 
         } catch (Exception e) {
+            req.setAttribute("error", e);
             return "redirect:/view-error";
         }
         return "view-statsPack";
@@ -220,20 +267,28 @@ public class MainController {
             String question = pack.getQuestion();
             req.setAttribute("thisQuestion", question);
 
+            Person person = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
+
+            Long num = Math.round(statisticsManager.getProgressOfSubpackForPerson(thisSubpack, person)*100)/100;
+
+            req.setAttribute("progress", num);
+
             try {
-                Answer answer = answerManager.nextAnswer(personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser()),
+                Answer answer = answerManager.nextAnswer(person,
                         subpackManager.getSubpackById(Long.parseLong(subpack)));
                 req.setAttribute("thisAnswer", answer);
             } catch (IllegalStateException e) {
                 if (e.getMessage() == "No more answers left.") {
                     return "view-finished";
                 } else {
-                    return "redirect:/view-error";
+                    req.setAttribute("error", e);
+                    return "view-error";
                 }
             }
 
         } catch (Exception e) {
-            return "redirect:/view-error";
+            req.setAttribute("error", e);
+            return "view-error";
         }
         return "view-mark";
 
@@ -241,6 +296,7 @@ public class MainController {
 
     @RequestMapping(value = "/mark/{subpack}/{answer}/{time}", method = {RequestMethod.POST})
     public String markPost(RedirectAttributes redirectAttributes, @RequestParam String value,
+                           ServletRequest req,
                            @PathVariable String subpack, @PathVariable String answer,
                            @PathVariable String time, HttpServletRequest httpReq) {
 
@@ -254,7 +310,7 @@ public class MainController {
             Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
 
             if (Integer.parseInt(value) == 1) {
-                Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, (int) (long) difference);
+              Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, (int) (long) difference);
                 evaluationManager.eval(evaluation);
             } else {
                 Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NEGATIVE, (int) (long) difference);
@@ -270,15 +326,16 @@ public class MainController {
             redirectAttributes.addFlashAttribute("thisQuestion", question);
 
         } catch (DaoException e) {
-            return "redirect:/view-error";
+            req.setAttribute("error", e);
+            return "view-error";
         }
 
         return "redirect:/mark/{subpack}";
 
     }
 
-    @RequestMapping(value = "/mark/{subpack}/{answer}/report/{time}", method = {RequestMethod.POST})
-    public String markReport(RedirectAttributes redirectAttributes, @PathVariable String time,
+    @RequestMapping(value = "/mark/{subpack}/{answer}/{time}/report", method = {RequestMethod.POST})
+    public String markReport(RedirectAttributes redirectAttributes, @PathVariable String time, ServletRequest req,
                              @PathVariable String subpack, @PathVariable String answer, HttpServletRequest httpReq) {
 
         try {
@@ -302,7 +359,8 @@ public class MainController {
             redirectAttributes.addFlashAttribute("thisQuestion", question);
 
         } catch (DaoException e) {
-            return "redirect:/view-error";
+            req.setAttribute("error", e);
+            return "view-error";
         }
 
         return "redirect:/mark/{subpack}";
@@ -311,7 +369,6 @@ public class MainController {
 
     @RequestMapping(value = "/assign/{packID}/{userID}", method = {RequestMethod.GET})
     public String assignPackGet(ServletRequest req, @PathVariable String packID, @PathVariable String userID) {
-
         try {
             long longPackID = Long.parseLong(packID);
             long longUserID = Long.parseLong(userID);
@@ -321,12 +378,48 @@ public class MainController {
             Person user = personManager.getPersonById(longUserID);
 
             req.setAttribute("user", user);
-            req.setAttribute("subPackList", subpackList);
             req.setAttribute("pack", pack);
+
+            Map subpackMap = new HashMap();
+            boolean allAssigned = true;
+
+            for (Subpack subPack : subpackList) {
+                List<Person> users = subpackManager.getPersonsAssignedToSubpack(subPack);
+                int size = users.size();
+                subpackMap.put(subPack, size);
+                if(size == 0)
+                    allAssigned = false;
+            }
+            req.setAttribute("subpackMap", subpackMap);
+            req.setAttribute("allAssigned", allAssigned);
+
         } catch (DaoException e) {
-            return "redirect:/view-error";
+            req.setAttribute("error", e);
+            return "view-error";
         }
         return "view-assignPack";
+    }
+
+    @RequestMapping(value ="/assign/{packID}/{userID}", method = {RequestMethod.POST})
+    public String assignPackGet(ServletRequest req,
+                                @PathVariable String packID,
+                                @PathVariable String userID,
+                                @RequestParam("value") String[] values) {
+        try {
+            List<Subpack> subpackList = new ArrayList<>();
+            for (int i = 0; i < values.length; i++) {
+                Subpack subpack = subpackManager.getSubpackById(Long.parseLong(values[i]));
+                subpackList.add(subpack);
+            }
+            Person user = personManager.getPersonById(Long.parseLong(userID));
+            subpackManager.updatePersonsAssignment(user, subpackList);
+        } catch (DaoException e) {
+            req.setAttribute("error", e);
+            return "view-error";
+        }
+
+
+        return "redirect:/assign/{packID}";
     }
 
 
@@ -339,8 +432,21 @@ public class MainController {
             req.setAttribute("users", users);
             req.setAttribute("pack", pack);
 
+            List<Subpack> subpackList = subpackManager.getSubpacksInPack(pack);
+            boolean allAssigned = true;
+            for (Subpack subPack : subpackList) {
+                List<Person> usersOfSubpack = subpackManager.getPersonsAssignedToSubpack(subPack);
+                int size = usersOfSubpack.size();
+                if(size == 0)
+                    allAssigned = false;
+            }
+            req.setAttribute("allAssigned", allAssigned);
+
+
+
         } catch (DaoException e) {
-            return "redirect:/view-error";
+            req.setAttribute("error", e);
+            return "view-error";
         }
 
         return "view-assign";

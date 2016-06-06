@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="utf-8" trimDirectiveWhitespaces="true" session="false" %>
 
 
@@ -16,22 +17,42 @@
 
 
 <div class="container">
-    <h2>Assign ${user} to package ${pack}</h2>
+    <h2>Assign ${user.username} to package ${pack.name}</h2>
     <div id="middle">
-        <ul class="list-group">
-            <c:forEach var="subpack" items="${subPackList}">
-                <li class="list-group-item">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" value=""><c:out value="${subpack.name}"/>
-                        </label>
-                    </div>
-                </li>
-            </c:forEach>
-        </ul>
-        <form action="<spring:url value="/assign/${pack}"/>">
+        <form id="assi" method="POST" enctype="multipart/form-data">
+
+            <ul class="list-group">
+                <c:forEach var="subpack" items="${subpackMap}">
+                    <li class="list-group-item">
+                        <div class="checkbox">
+                            <label>
+                                <input id="${subpack.key.id}" name="value" type="checkbox" value="${subpack.key.id}">
+                                <c:out value="${subpack.key.name}"/>
+                                <c:if test="${subpack.value == 0}">
+                                    &nbsp;&nbsp;<span class="label label-warning">Not assigned!</span>
+                                </c:if>
+                                <c:if test="${subpack.value == 1}">
+                                    &nbsp;&nbsp;<span class="label label-default">Assigned to one user.</span>
+                                </c:if>
+                                <c:if test="${subpack.value > 1}">
+                                    &nbsp;&nbsp;<span class="label label-default">Assigned to ${subpack.value} users.</span>
+                                </c:if>
+                            </label>
+                        </div>
+                    </li>
+                </c:forEach>
+            </ul>
             <input type="submit" class="btn btn-lg btn-primary btn-block" value="Assign packages">
         </form>
+        <c:if test="${allAssigned == true}">
+            <center>
+                <h3>All packages are assigned</h3>
+            </center>
+            <form action="<spring:url value="/"/>">
+                </br>
+                <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back to main menu">
+            </form>
+        </c:if>
     </div>
 
 </div>

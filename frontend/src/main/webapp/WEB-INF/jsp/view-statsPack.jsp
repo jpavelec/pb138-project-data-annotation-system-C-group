@@ -14,36 +14,49 @@
 </head>
 <body>
 <div class="container">
-    <h3>${Pack.name}</h3>
+    <h3>${pack.name}</h3>
     <div class="progress">
         <div class="progress-bar" role="progressbar" aria-valuenow="70"
-             aria-valuemin="0" aria-valuemax="100" style="width:${width}%">
-            <span class="sr-only">${width}% Complete</span>
+             aria-valuemin="0" aria-valuemax="100" style="width:${progress}%">
+            ${progress}%
         </div>
     </div>
-        <c:forEach items="${stats}" var="stats">
-            <h4>${stats.key.name}</h4>
+        <c:forEach items="${subpackUserStats}" var="currentSubpackUserStats">
+            <h4>${currentSubpackUserStats.key.name}</h4>
+            <c:forEach items="${subpackGeneralStats}" var="currentSubpackGeneralStats">
+                <c:if test="${currentSubpackUserStats.key.id == currentSubpackGeneralStats.key.id}">
+                    Progress: ${currentSubpackGeneralStats.value[0]}%;
+                    Avarage Completion Time: ${currentSubpackGeneralStats.value[1]};
+                    Avarage Completion Time: ${currentSubpackGeneralStats.value[2]}
+
+                </c:if>
+            </c:forEach>
+
             <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>user</th>
-                    <th>progress</th>
+                    <th>User</th>
+                    <th>Progress</th>
+                    <th>Cohen kappa</th>
+                    <th>Average evaluation time</th>
                 </tr>
             </thead>
-            <c:forEach items="${stats.value}" var="statsSubPack">
-                    <tbody>
+            <c:forEach items="${currentSubpackUserStats.value}" var="currentUserStats">
+                <tbody>
                     <tr>
-                        <td>${statsSubPack.key.username}</td>
-                        <td>${statsSubPack.value}</td>
+                        <td>${currentUserStats.key.username}</td>
+                        <td>${currentUserStats.value[0]} </td>
+                        <td>${currentUserStats.value[1]} </td>
+                        <td>${currentUserStats.value[2]}</td>
                     </tr>
-                    </tbody>
+                </tbody>
             </c:forEach>
             </table>
         </c:forEach>
 
 
 
-    <form action="<spring:url value="/"/>">
+    <form action="<spring:url value="/stats"/>">
         <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back">
     </form>
 </div>

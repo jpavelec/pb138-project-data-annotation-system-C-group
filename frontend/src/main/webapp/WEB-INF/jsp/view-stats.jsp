@@ -14,8 +14,9 @@
 </head>
 <body>
     <div class="container">
-            <h3>Hello, I'm a young webpage and I would like to show <i><b>statisticsBla</b></i> when I grow up. Please fulfill my wild dreams and code me!</h3>
-            </br>
+        </br>
+        <center><h2>Choose your package</h2></center>
+        </br>
             <c:forEach items="${allPacks}" var="Pack">
                 <form action="<spring:url value="/stats/${Pack.id}"/>">
                     <input type="submit" class="btn btn-lg btn-primary btn-block"   value="${Pack.name}">

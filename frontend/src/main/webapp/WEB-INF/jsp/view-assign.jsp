@@ -24,15 +24,18 @@
                     <a href="<spring:url value="/assign/${pack.id}/${person.id}"/>" type="submit" class="btn btn-link">${person.username}</a>
                 </li>
             </c:forEach>
-            <li class="list-group-item">
-                <a href="<spring:url value="/assign/3/1"/>" type="submit" class="btn btn-link">User1 </a>
-            </li>
         </ul>
     </div>
     </form>
-    <form action="<spring:url value="/"/>">
-        <input type="submit" class="btn btn-lg btn-primary btn-block" value="Back to main menu">
-    </form>
+    <c:if test="${allAssigned == true}">
+        <center>
+            <h3>All packages are assigned</h3>
+        </center>
+        <form action="<spring:url value="/"/>">
+            </br>
+            <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back to main menu">
+        </form>
+    </c:if>
 </div>
 </body>
 </html>

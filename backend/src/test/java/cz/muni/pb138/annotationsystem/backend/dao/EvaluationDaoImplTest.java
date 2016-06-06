@@ -75,8 +75,8 @@ public class EvaluationDaoImplTest {
         personDao.create(frankPerson);
         personDao.create(janePerson);
         
-        animalPack = new Pack("Is it an animal?", "animal", 2.2, 3.5);
-        thingPack = new Pack("Is it a thing?", "thing", 15.85, 20.35);
+        animalPack = new Pack("an animal", "animal", 2.2, 3.5);
+        thingPack = new Pack("a thing", "thing", 15.85, 20.35);
         packDao.create(animalPack);
         packDao.create(thingPack);
         

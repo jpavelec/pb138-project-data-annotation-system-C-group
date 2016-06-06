@@ -103,17 +103,17 @@ public class TestDataConfig {
 
 
     static public Pack animalsPack() {
-        Pack pack = new Pack("Is it an animal?", "animals.csv", 22, 28);
+        Pack pack = new Pack("an animal", "animals.csv", 22, 28);
         return pack;
     }
 
     static public Pack wordPack() {
-        Pack pack = new Pack("Is it a correct word?", "words.csv", 16, 23);
+        Pack pack = new Pack("a correct word", "words.csv", 16, 23);
         return pack;
     }
 
     static public Pack namePack() {
-        Pack pack = new Pack("Is it a name?", "names.csv", 28, 14);
+        Pack pack = new Pack("a name", "names.csv", 28, 14);
         return pack;
     }
 

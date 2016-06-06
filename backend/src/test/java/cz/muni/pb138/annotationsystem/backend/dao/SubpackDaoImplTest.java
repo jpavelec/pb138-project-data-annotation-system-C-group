@@ -64,8 +64,8 @@ public class SubpackDaoImplTest {
     private Person pepePerson, leonPerson, personNotInDB, personWithNullId;
     
     private void prepareTestData() throws Exception {
-        animalPack = new PackBuilder().question("Is it an animal?").name("animal").noiseRate(12.25).repeatingRate(5.5).build();
-        thingPack = new PackBuilder().question("Is it a thing?").name("thing").noiseRate(0).repeatingRate(0).build();
+        animalPack = new PackBuilder().question("an animal").name("animal").noiseRate(12.25).repeatingRate(5.5).build();
+        thingPack = new PackBuilder().question("a thing").name("thing").noiseRate(0).repeatingRate(0).build();
         packNotInDB = new PackBuilder().id((long) 100).build();
         packWithNullId = new PackBuilder().id(null).build();
         packDao.create(animalPack);
