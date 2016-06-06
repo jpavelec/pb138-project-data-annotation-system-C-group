@@ -326,8 +326,8 @@ public class StatisticsManagerImpl implements StatisticsManager {
             if (subpackDao.getCompletationTime(subpack, p) == null) {
                 return null;
             }
-            sumOfTimes += subpackDao.getAssignationTime(subpack, p) - 
-                          subpackDao.getCompletationTime(subpack, p);
+            sumOfTimes += subpackDao.getCompletationTime(subpack, p) - 
+                          subpackDao.getAssignationTime(subpack, p);
         }
         
 
