@@ -646,51 +646,7 @@ public class SubpackDaoImpl implements SubpackDao {
         }
     }
 
-    @Override
-    public void setCompletationTime(Subpack subpack, Person person) throws DaoException {
-        checkDataSource();
-        if (person == null) {
-            throw new IllegalArgumentException("Person is null");
-        }
-        if (person.getId() == null || person.getId() < 1) {
-            throw new ValidationException("Person id is null or negative");
-        }
-        if (subpack == null) {
-            throw new IllegalArgumentException("Subpack is null");
-        }
-        if (subpack.getId() == null || subpack.getId() < 1) {
-            throw new ValidationException("Subpack id is null or negative");
-        }
-        if (!doesExist(subpack)) {
-            throw new BeanNotExistsException("Subpack with id " + subpack.getId()+" is not in DB!");
-        }
-        if (!personDao.doesExist(person)) {
-            throw new BeanNotExistsException("Person with id " + person.getId()+" is not in DB!");
-        }
-        try (Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement(
-                "UPDATE assignedperson SET endtime = ? " + 
-                "WHERE subpackid = ? AND personid = ?")) {
-            
-            Calendar calendar = Calendar.getInstance();
-            st.setTimestamp(1, new java.sql.Timestamp(calendar.getTime().getTime()));
-            st.setLong(2, subpack.getId());
-            st.setLong(3, person.getId());
-            System.err.println("Time: "+new java.sql.Timestamp(calendar.getTime().getTime())+" "+person+subpack);
-            int count = st.executeUpdate();
-            if (count == 0) {
-                throw new BeanNotExistsException("Invalid records in assignedperson");
-            } else if (count != 1) {
-                throw new ServiceFailureException(
-                "Invalid updated rows count detected (one row should be updated): " + count);
-            }
-            
-        } catch (SQLException ex) {
-            String msg = "Error when inserting completation time for assignation person " +
-            person + " to subpack " + subpack;
-            throw new ServiceFailureException(msg, ex);
-        }
-    }
+    
 
     @Override
     public void deleteAssignmentPersonToSubpack(Subpack subpack, Person person) throws DaoException {

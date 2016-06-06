@@ -46,7 +46,7 @@ public class BackendConfig {
         EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
         EmbeddedDatabase dataSource = builder
                 .setType(EmbeddedDatabaseType.DERBY)
-                .addScripts("createTables.sql", "testData.sql")
+                .addScripts("createTables.sql")
                 .build();
         return dataSource;
     }
