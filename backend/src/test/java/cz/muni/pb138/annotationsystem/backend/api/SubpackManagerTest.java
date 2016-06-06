@@ -150,8 +150,8 @@ public class SubpackManagerTest {
         List<Subpack> subpacks0 = subpackManager.getSubpacksInPack(packs[0]);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
 
-        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks0);
-        subpackManager.updatePersonsAssignment(persons[1], packs[0], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[0], subpacks0);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
 
         subpacks.addAll(subpacks0);
         List<Subpack> result = subpackManager.getSubpacksAssignedToPerson(persons[1]);
@@ -244,9 +244,11 @@ public class SubpackManagerTest {
 
         List<Subpack> subpacks0 = subpackManager.getSubpacksInPack(packs[0]);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
-        subpacks.add(subpacks0.get(1));
 
+        subpackManager.updatePersonsAssignment(persons[1], packs[0], subpacks0);
         subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
+
+        subpacks.addAll(subpacks0);
 
         List<Subpack> result = subpackManager.getSubpacksAssignedToPerson(persons[1]);
         assertEquals(new HashSet<>(subpacks), new HashSet<>(result));
@@ -264,16 +266,17 @@ public class SubpackManagerTest {
 
         List<Subpack> subpacks0 = subpackManager.getSubpacksInPack(packs[0]);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
-        subpacks.add(subpacks0.get(1));
 
+        subpackManager.updatePersonsAssignment(persons[1], packs[0], subpacks0);
         subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
 
-        subpacks0.add(subpacks.get(1));
+        subpacks0.remove(0);
 
-        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks0);
+        subpackManager.updatePersonsAssignment(persons[1], packs[0], subpacks0);
 
+        subpacks.addAll(subpacks0);
         List<Subpack> result = subpackManager.getSubpacksAssignedToPerson(persons[1]);
-        assertEquals(new HashSet<>(subpacks0), new HashSet<>(result));
+        assertEquals(new HashSet<>(subpacks), new HashSet<>(result));
 
         for (Subpack subpack : subpacks0) {
             List<Person> assignedPersons = subpackManager.getPersonsAssignedToSubpack(subpack);
