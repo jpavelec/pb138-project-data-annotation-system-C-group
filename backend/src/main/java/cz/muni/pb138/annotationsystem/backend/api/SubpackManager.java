@@ -41,23 +41,15 @@ public interface SubpackManager {
     List<Person> getPersonsAssignedToSubpack(Subpack subpack) throws DaoException;
 
     /**
-     * Update assigment of person. First remove all present assigments and after fill new ones.
-     * Finally only given subpacks are assigned to given person.
+     * Update assigment of person. All given subpacks has to be from given pack.
+     * Exception is thrown otherwise.
+     * Manipulate only with assigments in given pack.
      *
      * @param person person to be updated
      * @param subpacks to be assigned to person
      * @throws DaoException
      */
-    void updatePersonsAssignment(Person person, List<Subpack> subpacks) throws DaoException;
+    void updatePersonsAssignment(Person person, Pack pack, List<Subpack> subpacks) throws DaoException;
 
-    /**
-     * Update assigment of subpack. First remove all present assigments and after fill new ones.
-     * Finally only given persons are assigned to given subpack.
-     *
-     * @param subpack to be updated
-     * @param persons to be assigned to subpack
-     * @throws DaoException
-     */
-    void updateSubpacksAssignment(Subpack subpack, List<Person> persons) throws DaoException;
 
 }

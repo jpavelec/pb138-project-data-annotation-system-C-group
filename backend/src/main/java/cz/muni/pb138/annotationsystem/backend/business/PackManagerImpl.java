@@ -94,7 +94,7 @@ public class PackManagerImpl implements PackManager {
         for (int i = 0; i < numOfSubpacks; i++) {
 
 
-            String subpackName = String.format("%0"+String.valueOf(numOfSubpacks).length()+"d", i);
+            String subpackName = String.format(pack.getName()+"/%0"+String.valueOf(numOfSubpacks).length()+"d", i);
             Subpack subpack = new Subpack(pack, subpackName);
             subpackDao.create(subpack);
 

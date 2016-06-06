@@ -150,11 +150,11 @@ public class StatisticsManagerTest {
 
         List<Subpack> annasSubpacks = new ArrayList<>();
         annasSubpacks.addAll(subpackManager.getSubpacksInPack(animalsPack).subList(0, 2));
-        subpackManager.updatePersonsAssignment(anna, annasSubpacks);
+        subpackManager.updatePersonsAssignment(anna, animalsPack, annasSubpacks);
 
         List<Subpack> carlsSubpacks = new ArrayList<>();
         carlsSubpacks.addAll(subpackManager.getSubpacksInPack(animalsPack).subList(1, 3));
-        subpackManager.updatePersonsAssignment(carl, carlsSubpacks);
+        subpackManager.updatePersonsAssignment(carl, animalsPack, carlsSubpacks);
 
 
         Answer annaAnswer;

@@ -98,7 +98,7 @@ public class SubpackManagerImpl implements SubpackManager {
 
     @Override
     @Transactional
-    public void updatePersonsAssignment(Person person, List<Subpack> subpacks) throws DaoException {
+    public void updatePersonsAssignment(Person person, Pack pack, List<Subpack> subpacks) throws DaoException {
         if (person == null) {
             throw new IllegalArgumentException("person is null");
         }
@@ -119,35 +119,36 @@ public class SubpackManagerImpl implements SubpackManager {
                 throw new BeanNotExistsException("one of given subpack does not exist");
             }
         }
-
-        subpackDao.updateAssignment(person, subpacks);
-    }
-
-    @Override
-    @Transactional
-    public void updateSubpacksAssignment(Subpack subpack, List<Person> persons) throws DaoException {
-        if (subpack == null) {
-            throw new IllegalArgumentException("subpack is null");
-        }
-        if (subpack.getId() == null || subpack.getId() < 0) {
-            throw new IllegalArgumentException("subpack id is null");
-        }
-        if (!subpackDao.doesExist(subpack)) {
-            throw new BeanNotExistsException("given subpack does not exist");
-        }
-        if (persons == null) {
-            throw new IllegalArgumentException("persons is null");
-        }
-        for (Person p : persons) {
-            if (p == null || p.getId() == null || p.getId() < 0) {
-                throw new ValidationException("Some person is null or its id is null or negative");
+        for (Subpack s : subpacks) {
+            if (s == null || s.getId() == null || s.getId() < 0) {
+                throw new ValidationException("Some subpack is null or its id is null or negative");
             }
-            if (!personDao.doesExist(p)) {
-                throw new BeanNotExistsException("one of given person does not exist");
+            if (!subpackDao.doesExist(s)) {
+                throw new BeanNotExistsException("one of given subpack does not exist");
+            }
+            if (!s.getParent().equals(pack)) {
+                throw new IllegalArgumentException("some subpacks are not from given pack");
             }
         }
 
-        subpackDao.updateAssignment(subpack, persons);
+        List<Subpack> toRemove = getSubpacksInPack(pack);
+        toRemove.removeAll(subpacks);
+
+        System.out.println("To remove:");
+        for (Subpack s : toRemove) {
+            System.out.print(s.getName());
+        }
+        System.out.println();
+
+        List<Subpack> toAdd = new ArrayList<>(subpacks);
+        toAdd.removeAll(getSubpacksInPack(pack));
+
+        System.out.println("To add:");
+        for (Subpack s : toAdd) {
+            System.out.print(s.getName());
+        }
+        System.out.println();
 
     }
+
 }

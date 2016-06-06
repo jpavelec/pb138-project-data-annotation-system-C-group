@@ -74,7 +74,7 @@ public class AnswerManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
 
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
 
@@ -91,7 +91,7 @@ public class AnswerManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
 
         for (Answer answer : answerManager.getAnswersInSubpack(subpacks.get(1))) {
             evaluationManager.eval(new Evaluation(persons[1], answer, Rating.POSITIVE, 10));
@@ -112,7 +112,7 @@ public class AnswerManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
 
         answerManager.nextAnswer(null, subpacks.get(1));
     }
@@ -121,7 +121,7 @@ public class AnswerManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Person person = TestUtils.getPerson0();
         person.setId(TestUtils.UNKNOWN_ID);
         answerManager.nextAnswer(person, subpacks.get(1));
@@ -131,7 +131,7 @@ public class AnswerManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
 
         answerManager.nextAnswer(persons[1], null);
     }
@@ -140,7 +140,7 @@ public class AnswerManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         subpacks.get(1).setId(TestUtils.UNKNOWN_ID);
         answerManager.nextAnswer(persons[1], subpacks.get(1));
     }

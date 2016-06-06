@@ -149,9 +149,11 @@ public class SubpackManagerTest {
 
         List<Subpack> subpacks0 = subpackManager.getSubpacksInPack(packs[0]);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
-        subpacks.add(subpacks0.get(1));
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
 
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks0);
+        subpackManager.updatePersonsAssignment(persons[1], packs[0], subpacks);
+
+        subpacks.addAll(subpacks0);
         List<Subpack> result = subpackManager.getSubpacksAssignedToPerson(persons[1]);
         assertEquals(new HashSet<>(subpacks), new HashSet<>(result));
     }
@@ -197,7 +199,9 @@ public class SubpackManagerTest {
         persons.add(personsAll[0]);
         persons.add(personsAll[1]);
 
-        subpackManager.updateSubpacksAssignment(subpacks.get(1), persons);
+        for (Person p : persons) {
+            subpackManager.updatePersonsAssignment(p, packs[0], subpacks);
+        }
 
         List<Person> assignedPersons = subpackManager.getPersonsAssignedToSubpack(subpacks.get(1));
         assertEquals(new HashSet<>(persons), new HashSet<>(assignedPersons));
@@ -221,7 +225,9 @@ public class SubpackManagerTest {
         persons.add(personsAll[0]);
         persons.add(personsAll[1]);
 
-        subpackManager.updateSubpacksAssignment(subpacks.get(1), persons);
+        for (Person p : persons) {
+            subpackManager.updatePersonsAssignment(p, packs[0], subpacks);
+        }
 
         subpacks.get(0).setId(TestUtils.UNKNOWN_ID);
 
@@ -240,7 +246,7 @@ public class SubpackManagerTest {
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         subpacks.add(subpacks0.get(1));
 
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
 
         List<Subpack> result = subpackManager.getSubpacksAssignedToPerson(persons[1]);
         assertEquals(new HashSet<>(subpacks), new HashSet<>(result));
@@ -260,11 +266,11 @@ public class SubpackManagerTest {
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         subpacks.add(subpacks0.get(1));
 
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
 
         subpacks0.add(subpacks.get(1));
 
-        subpackManager.updatePersonsAssignment(persons[1], subpacks0);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks0);
 
         List<Subpack> result = subpackManager.getSubpacksAssignedToPerson(persons[1]);
         assertEquals(new HashSet<>(subpacks0), new HashSet<>(result));
@@ -279,7 +285,7 @@ public class SubpackManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         Person[] persons = TestUtils.createPersons(personManager);
 
-        subpackManager.updatePersonsAssignment(persons[1], new ArrayList<Subpack>());
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], new ArrayList<Subpack>());
 
         List<Subpack> result = subpackManager.getSubpacksAssignedToPerson(persons[1]);
         assertEquals(new ArrayList<Subpack>(), result);
@@ -300,14 +306,14 @@ public class SubpackManagerTest {
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         subpacks.add(subpacks0.get(1));
 
-        subpackManager.updatePersonsAssignment(null, subpacks);
+        subpackManager.updatePersonsAssignment(null, packs[1], subpacks);
     }
     @Test(expected = IllegalArgumentException.class)
     public void updatePersonsAssignmentNullSubpacks() throws Exception {
         Pack[] packs = TestUtils.createPacks(packManager);
         Person[] persons = TestUtils.createPersons(personManager);
 
-        subpackManager.updatePersonsAssignment(persons[1], null);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], null);
     }
     @Test(expected = BeanNotExistsException.class)
     public void updatePersonsAssignmentUnknownPerson() throws Exception {
@@ -317,82 +323,9 @@ public class SubpackManagerTest {
         person.setId(TestUtils.UNKNOWN_ID);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
 
-        subpackManager.updatePersonsAssignment(person, subpacks);
+        subpackManager.updatePersonsAssignment(person, packs[1], subpacks);
     }
 
-
-
-
-    @Test
-    public void updateSubpacksAssignment() throws Exception {
-
-        Pack[] packs = TestUtils.createPacks(packManager);
-        Person[] personsAll = TestUtils.createPersons(personManager);
-
-        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[0]);
-        List<Person> persons = new ArrayList<>();
-        persons.add(personsAll[0]);
-        persons.add(personsAll[1]);
-
-        subpackManager.updateSubpacksAssignment(subpacks.get(1), persons);
-
-        List<Person> assignedPersons = subpackManager.getPersonsAssignedToSubpack(subpacks.get(1));
-        assertEquals(new HashSet<>(persons), new HashSet<>(assignedPersons));
-
-        for (Person person : persons) {
-            List<Subpack> assignedSubpacks = subpackManager.getSubpacksAssignedToPerson(person);
-            assertTrue(assignedSubpacks.contains(subpacks.get(1)));
-        }
-    }
-    @Test
-    public void updateSubpacksAssignmentEmpty() throws Exception {
-
-        Pack[] packs = TestUtils.createPacks(packManager);
-        Person[] personsAll = TestUtils.createPersons(personManager);
-
-        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[0]);
-        List<Person> persons = new ArrayList<>();
-        persons.add(personsAll[0]);
-        persons.add(personsAll[1]);
-
-        subpackManager.updateSubpacksAssignment(subpacks.get(1), new ArrayList<Person>());
-
-        List<Person> assignedPersons = subpackManager.getPersonsAssignedToSubpack(subpacks.get(1));
-        assertEquals(new ArrayList<>(), assignedPersons);
-
-        for (Person person : personsAll) {
-            List<Subpack> assignedSubpacks = subpackManager.getSubpacksAssignedToPerson(person);
-            assertFalse(assignedSubpacks.contains(subpacks.get(1)));
-        }
-    }
-    @Test(expected = IllegalArgumentException.class)
-    public void updateSubpacksAssignmentNullSubpack() throws Exception {
-
-        Pack[] packs = TestUtils.createPacks(packManager);
-        Person[] personsAll = TestUtils.createPersons(personManager);
-        List<Person> persons = Arrays.asList(personsAll);
-
-        subpackManager.updateSubpacksAssignment(null, persons);
-    }
-    @Test(expected = IllegalArgumentException.class)
-    public void updateSubpacksAssignmentNullPersons() throws Exception {
-
-        Pack[] packs = TestUtils.createPacks(packManager);
-        Person[] personsAll = TestUtils.createPersons(personManager);
-        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[0]);
-
-        subpackManager.updateSubpacksAssignment(subpacks.get(0), null);
-    }
-    @Test(expected = BeanNotExistsException.class)
-    public void updateSubpacksAssignmentUnknownSubpack() throws Exception {
-
-        Pack[] packs = TestUtils.createPacks(packManager);
-        Person[] personsAll = TestUtils.createPersons(personManager);
-        List<Person> persons = Arrays.asList(personsAll);
-        List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[0]);
-        subpacks.get(0).setId(TestUtils.UNKNOWN_ID);
-        subpackManager.updateSubpacksAssignment(subpacks.get(0), persons);
-    }
 
 
 

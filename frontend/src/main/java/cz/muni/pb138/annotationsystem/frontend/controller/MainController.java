@@ -519,7 +519,7 @@ public class MainController {
 
     @RequestMapping(value ="/assign/{packID}/{userID}", method = {RequestMethod.POST})
     public String assignPackGet(ServletRequest req,
-                                @PathVariable String packID,
+                                @PathVariable long packID,
                                 @PathVariable String userID,
                                 @RequestParam("value") String[] values) {
         try {
@@ -529,7 +529,7 @@ public class MainController {
                 subpackList.add(subpack);
             }
             Person user = personManager.getPersonById(Long.parseLong(userID));
-            subpackManager.updatePersonsAssignment(user, subpackList);
+            subpackManager.updatePersonsAssignment(user, packManager.getPackById(packID), subpackList);
         } catch (DaoException e) {
             req.setAttribute("error", e);
             return "view-error";

@@ -73,7 +73,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
 
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
@@ -89,7 +89,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
 
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
@@ -102,11 +102,11 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
 
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
 
-        subpackManager.updatePersonsAssignment(persons[1], new ArrayList<Subpack>());
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], new ArrayList<Subpack>());
 
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
         evaluationManager.eval(eval);
@@ -116,7 +116,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
 
         evaluationManager.eval(null);
     }
@@ -125,7 +125,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
 
         Evaluation eval = new Evaluation(persons[1], null, Rating.POSITIVE, 10);
 
@@ -136,7 +136,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
 
         Evaluation eval = new Evaluation(null, answer, Rating.POSITIVE, 10);
@@ -148,7 +148,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
         answer.setId(TestUtils.UNKNOWN_ID);
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
@@ -160,7 +160,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
         persons[1].setId(TestUtils.UNKNOWN_ID);
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
@@ -174,7 +174,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
         evaluationManager.eval(eval);
@@ -196,7 +196,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
         evaluationManager.eval(eval);
@@ -212,7 +212,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
         evaluationManager.eval(eval);
@@ -228,7 +228,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
         evaluationManager.eval(eval);
@@ -236,7 +236,7 @@ public class EvaluationManagerTest {
         Evaluation correct = evaluationManager.getEvaluationById(eval.getId());
         correct.setRating(Rating.NEGATIVE);
 
-        subpackManager.updatePersonsAssignment(persons[1], new ArrayList<Subpack>());
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], new ArrayList<Subpack>());
 
         evaluationManager.correct(correct);
     }
@@ -245,7 +245,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
         evaluationManager.eval(eval);
@@ -261,7 +261,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
         evaluationManager.eval(eval);
@@ -277,7 +277,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
         evaluationManager.eval(eval);
@@ -293,7 +293,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
         evaluationManager.eval(eval);
@@ -309,7 +309,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Answer answer = answerManager.nextAnswer(persons[1], subpacks.get(1));
         Evaluation eval = new Evaluation(persons[1], answer, Rating.POSITIVE, 10);
         evaluationManager.eval(eval);
@@ -328,7 +328,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
 
         Evaluation result = evaluationManager.getEvaluationById(evals[1].getId());
@@ -346,7 +346,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
 
         evaluationManager.getEvaluationById(null);
@@ -356,7 +356,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
 
         evaluationManager.getEvaluationById((long) -1);
@@ -366,7 +366,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
 
         evaluationManager.getEvaluationById(TestUtils.UNKNOWN_ID);
@@ -379,7 +379,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
 
         List<Evaluation> result = evaluationManager.getEvaluationsOfPerson(persons[1]);
@@ -391,7 +391,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
 
         evaluationManager.getEvaluationsOfPerson(null);
@@ -401,7 +401,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
 
         evaluationManager.getEvaluationsOfPerson(TestUtils.getPerson1());
@@ -411,7 +411,7 @@ public class EvaluationManagerTest {
         Pack[] packs = TestUtils.createPacks(packManager);
         List<Subpack> subpacks = subpackManager.getSubpacksInPack(packs[1]);
         Person[] persons = TestUtils.createPersons(personManager);
-        subpackManager.updatePersonsAssignment(persons[1], subpacks);
+        subpackManager.updatePersonsAssignment(persons[1], packs[1], subpacks);
         Evaluation[] evals = TestUtils.createEvals(evaluationManager, answerManager, persons[1], subpacks.get(0));
 
         Person person = TestUtils.getPerson1();

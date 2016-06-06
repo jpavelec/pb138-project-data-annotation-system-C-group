@@ -65,17 +65,28 @@ public class TestDataConfig {
         Pack namePack = namePack();
         packManager.createPack(namePack, nameAnswers(), nameNoise(), 9);
 
+        List<Subpack> annasAnimalsSubpacks = subpackManager.getSubpacksInPack(animalsPack).subList(0, 2);
+        List<Subpack> annasWordSubpacks = subpackManager.getSubpacksInPack(wordPack).subList(0, 1);
+        List<Subpack> annasNameSubpacks = subpackManager.getSubpacksInPack(namePack).subList(1, 3);
+
+        subpackManager.updatePersonsAssignment(anna, animalsPack, annasAnimalsSubpacks);
+        subpackManager.updatePersonsAssignment(anna, wordPack, annasWordSubpacks);
+        subpackManager.updatePersonsAssignment(anna, namePack, annasNameSubpacks);
+
         List<Subpack> annasSubpacks = new ArrayList<>();
-        annasSubpacks.addAll(subpackManager.getSubpacksInPack(animalsPack).subList(0, 2));
-        annasSubpacks.addAll(subpackManager.getSubpacksInPack(wordPack).subList(0, 1));
-        annasSubpacks.addAll(subpackManager.getSubpacksInPack(namePack).subList(1, 3));
-        subpackManager.updatePersonsAssignment(anna, annasSubpacks);
+        annasSubpacks.addAll(annasAnimalsSubpacks);
+        annasSubpacks.addAll(annasWordSubpacks);
+        annasSubpacks.addAll(annasNameSubpacks);
+
+        List<Subpack> carlsAnimalsSubpacks = subpackManager.getSubpacksInPack(animalsPack).subList(1, 2);
+        List<Subpack> carlsWordSubpacks = subpackManager.getSubpacksInPack(wordPack).subList(0, 1);
+
+        subpackManager.updatePersonsAssignment(carl, animalsPack, carlsAnimalsSubpacks);
+        subpackManager.updatePersonsAssignment(carl, wordPack, carlsWordSubpacks);
 
         List<Subpack> carlsSubpacks = new ArrayList<>();
-        carlsSubpacks.addAll(subpackManager.getSubpacksInPack(animalsPack).subList(1, 2));
-        carlsSubpacks.addAll(subpackManager.getSubpacksInPack(wordPack).subList(0, 1));
-        subpackManager.updatePersonsAssignment(carl, carlsSubpacks);
-
+        carlsSubpacks.addAll(carlsAnimalsSubpacks);
+        carlsSubpacks.addAll(carlsWordSubpacks);
 
         Answer annaAnswer;
         annaAnswer = answerManager.nextAnswer(anna, annasSubpacks.get(1));
