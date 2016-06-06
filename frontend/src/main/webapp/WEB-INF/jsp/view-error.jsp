@@ -23,7 +23,7 @@
             <div id="middle">
                 <h1>Oops! Something went terribly wrong. You simply can't always get what you want.</h1>
                 </br>
-                <h1>Error: ${error}</h1>
+                <h2>Error: ${error}</h2>
             </div>
     </div>
 </div>

@@ -68,3 +68,27 @@
 	font-size: 120%;
 	vertical-align: bottom;
 }
+
+form .file-label {
+	text-align: left;
+	margin-bottom: 8px;
+	font-weight: bold;
+}
+
+.subpack-progress {
+	border-radius: 0px;
+	margin-bottom: 0px;
+	height: auto;
+}
+.subpack-progress > div {
+	font-size: 10px;
+	line-height: normal;
+}
+
+.assign-checkbox {
+	text-align: left;
+}
+[data-toggle=buttons]>.btn input[type=checkbox] {
+	position: relative;
+	clip: auto;
+}

@@ -26,29 +26,27 @@
         </div>
 
         <div class="column-in">
-            <div id="counter">${progress} % finished.</div>
-            <div>
-                <span id="fileid">Subpack id: ${thisSubpack.id}</span>
-                </br>
-                <span id="filename">Subpack name: ${thisSubpack.name}</span>
-            </div>
+            <div id="counter">${progress} % finished</div>
+            <span id="filename">Subpack name: <b>${thisSubpack.name}</b></span>
             <div id="ontology">Is the following word ${thisQuestion}?</div>
             <div id="np">${thisAnswer.answer}</div>
             </br>
             <div id="wrap">
                 <button onclick="window.location.href='/correct/${thisSubpack.id}'" class="btn btn-default"
                 ${(not canCorrect) ? 'disabled' : ''} >Previous word</button>
-                <form id="reportForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}/${lStartTime}" method="POST" enctype="multipart/form-data">
+
+                <form id="reportForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}/${lStartTime}" method="POST" style="display: inline-block">
                     <input name="value" type="hidden" value="3" />
-                    <input class="btn btn-default" type="submit" value="Report this word" />
                     <input name="isCorrection" type="hidden" value="${isCorrection}" />
+                    <input class="btn btn-default" type="submit" value="Report this word" />
                 </form>
+
             </div>
         </div>
 
         <div id="left">
             <div class="column-in">
-                <div class="next" id="minus-next">
+                <div class="next btn-lg" id="minus-next">
                     <form id="answerForm2" action="/mark/${thisSubpack.id}/${thisAnswer.id}/${lStartTime}" method="POST" enctype="multipart/form-data">
                         <input id="value" name="value" type="image" alt="no" value="0" src="<c:url value="/resources/images/no.svg" />" width="100%"/>
                         <input name="isCorrection" type="hidden" value="${isCorrection}" />
@@ -59,7 +57,7 @@
 
         <div id="right">
             <div class="column-in">
-                <div class="next" id="plus-next">
+                <div class="next btn-lg" id="plus-next">
                     <form id="answerForm" action="/mark/${thisSubpack.id}/${thisAnswer.id}/${lStartTime}" method="POST" enctype="multipart/form-data">
                         <input id="value" name="value" type="image" alt="no" value="1" src="<c:url value="/resources/images/yes.svg" />" width="100%"/>
                         <input name="isCorrection" type="hidden" value="${isCorrection}" />

@@ -19,35 +19,44 @@
 </head>
 <body>
 <div class="container">
-    <div id="wrap">
-        <form id="fileuploadForm" method="POST" enctype="multipart/form-data">
-            <h2>Upload a new dictionary:</h2>
-            <span class="btn btn-default btn-file">
-                <label for="uploadDic">Pick dictionary file (CSV)</label>
-                <input id="uploadDic" type='file' class="file" name='file' required>
-            </span>
-            <span class="btn btn-default btn-file">
-                <label for="uploadNoise">Pick noise file (CSV) - optional</label>
-                <input id="uploadNoise" type='file' name='file'>
-            </span>
-            </br>
-            </br>
-            <div id="middle">
-                <label for="noiseRate">Enter repetition rate in %</label>
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8">
+            <form id="fileuploadForm" method="POST" enctype="multipart/form-data">
+                <h2>Upload a new dictionary:</h2>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="btn btn-default btn-block" for="uploadDic">
+                            <div class="file-label">Pick dictionary file (CSV)</div>
+                            <input id="uploadDic" type='file' name='file' required>
+                        </label>
+                        <br/>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="btn btn-default btn-block" for="uploadNoise">
+                            <div class="file-label">Pick noise file (CSV) - optional</div>
+                            <input id="uploadNoise" type='file' name='file'>
+                        </label>
+                        <br/>
+                    </div>
+                </div>
+                <label>Enter repetition rate in %</label>
                 <input class="form-control" type="number" name="value" value="5" required>
-                </br>
-                <label for="repeatingRate">Enter noise rate in %</label>
+                <br/>
+                <label>Enter noise rate in %</label>
                 <input class="form-control" type="number" name="value" value="5" required>
-                </br>
-                <label for="numOfAnswersInSubpack">Enter maximum size of one package</label>
+                <br/>
+                <label>Enter maximum size of one package</label>
                 <input class="form-control" type="number" name="value" value="200" required>
-                </br>
-            </div>
-            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Upload">
-        </form>
+                <br/>
+                <input type="submit" class="btn btn-lg btn-primary btn-block" value="Upload">
+            </form>
+
+            </br>
+
+            <a href="<spring:url value="/"/>" class="btn btn-lg btn-primary btn-block">Go back</a>
+        </div>
     </div>
-    </br>
-    <a href="<spring:url value="/"/>" class="btn btn-lg btn-primary btn-block">Go back</a>
 </div>
 </body>
 </html>

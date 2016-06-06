@@ -10,27 +10,32 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="<c:url value="/resources/css/style.css" />"/>
     <title>Annotation system</title>
 </head>
 <body>
-    <div class="container">
-        </br>
-        <center><h2>Choose your package</h2></center>
-        </br>
-            <c:forEach items="${allPacks}" var="Pack">
-                <form action="<spring:url value="/stats/${Pack.id}"/>">
-                    <input type="submit" class="btn btn-lg btn-primary btn-block"   value="${Pack.name}">
-                    </br>
-                </form>
-
-            </c:forEach>
-
-
-
-        <form action="<spring:url value="/"/>">
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8">
             </br>
-            <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back">
-        </form>
+            <h2 align="center">Choose your package</h2>
+            </br>
+            <div class="list-group">
+                <c:forEach items="${allPacks}" var="Pack">
+
+                    <a href="<spring:url value="/stats/${Pack.id}"/>" class="list-group-item text-center">
+                        <b>${Pack.name}</b>
+                    </a>
+
+                </c:forEach>
+            </div>
+
+            <form action="<spring:url value="/"/>">
+                </br>
+                <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back">
+            </form>
+        </div>
     </div>
+</div>
 </body>
 </html>

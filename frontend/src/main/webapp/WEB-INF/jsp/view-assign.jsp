@@ -15,28 +15,29 @@
 <body>
 
 <div class="container">
-    <h2>Assign users to package ${pack.name}</h2>
-    <form id="fileAssignForm" method="POST" enctype="multipart/form-data">
-    <div id="middle">
-
-        <div class="list-group">
-            <c:forEach items="${users}" var="person">
-                <a href="<spring:url value="/assign/${pack.id}/${person.id}" />" class="list-group-item" type="submit">
-                    ${person.username}
-                </a>
-            </c:forEach>
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8">
+            <h2>Assign users to package ${pack.name}</h2>
+            <form id="fileAssignForm" method="POST" enctype="multipart/form-data">
+            <div id="middle">
+                <div class="list-group">
+                    <c:forEach items="${users}" var="person">
+                        <a href="<spring:url value="/assign/${pack.id}/${person.id}" />" class="list-group-item" type="submit">
+                            <b>${person.username}</b>
+                        </a>
+                    </c:forEach>
+                </div>
+            </div>
+            </form>
+            <c:if test="${allAssigned == true}">
+                <h3>All packages are assigned</h3>
+            </c:if>
+            <form action="<spring:url value="/"/>">
+                </br>
+                <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back to main menu">
+            </form>
         </div>
     </div>
-    </form>
-    <c:if test="${allAssigned == true}">
-        <center>
-            <h3>All packages are assigned</h3>
-        </center>
-    </c:if>
-    <form action="<spring:url value="/"/>">
-        </br>
-        <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Go back to main menu">
-    </form>
 </div>
 </body>
 </html>

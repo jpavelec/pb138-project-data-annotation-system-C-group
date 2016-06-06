@@ -15,21 +15,26 @@
     <title>Annotation system</title>
 </head>
 <body>
-    <div class="container">
-        </br>
-        <h2>Select the subpack you wish to start marking:</h2>
-        <div class="list-group">
-            <c:forEach items = "${subpacks}" var="subpack">
-                <a href="/packages/${subpack.key.id}" class="list-group-item">
-                    ID: <b>${subpack.key.id}</b>  ;  NAME: <b>${subpack.key.name}</b>  ;  ${subpack.value} % finished
-                </a>
-            </c:forEach>
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8">
+            </br>
+            <h2>Select the subpack you wish to start marking:</h2>
+            <div class="list-group">
+                <c:forEach items = "${subpacks}" var="subpack">
+                    <a href="/packages/${subpack.key.id}" class="list-group-item">
+                        </b>Name: <b>${subpack.key.name}</b>
+                        <span class="pull-right">${subpack.value} % finished</span>
+                    </a>
+                </c:forEach>
+            </div>
+            </br>
+            <form action="<spring:url value="/"/>">
+                <input type="submit" class="btn btn-lg btn-primary btn-block" value="Go back to main page">
+            </form>
+            </br>
         </div>
-        </br>
-        <form action="<spring:url value="/"/>">
-            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Go back to main page">
-        </form>
-        </br>
     </div>
+</div>
 </body>
 </html>

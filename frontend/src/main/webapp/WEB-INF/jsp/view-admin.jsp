@@ -18,25 +18,20 @@
 </head>
 <body>
     <div class="container">
-        <div id="wrap">
-            </br>
-            <center><h2>What would you like to do?</h2></center>
-            </br>
-            <form action="<spring:url value="/upload"/>">
-                <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Upload a new dictionary">
-            </form>
-            </br>
-            <form action="<spring:url value="/assignMenu"/>">
-                <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Assign users to an existing dictionary">
-            </form>
-            </br>
-            <form action="<spring:url value="/packages"/>">
-                <input type="submit" class="btn btn-lg btn-primary btn-block"   value="Mark words">
-            </form>
-            </br>
-            <form action="<spring:url value="/stats"/>">
-                <input type="submit" class="btn btn-lg btn-primary btn-block"   value="View statistics">
-            </form>
+        <div class="row">
+            <div class="col-md-offset-2 col-md-8">
+                <br/>
+                <h2 align="center">What would you like to do?</h2>
+                <br/>
+                <a href="<spring:url value="/upload"/>" class="btn btn-lg btn-primary btn-block" >Upload a new dictionary</a>
+                <br/>
+                <a href="<spring:url value="/assignMenu"/>" class="btn btn-lg btn-primary btn-block" >Assign users to dictionaries</a>
+                <br/>
+                <a href="<spring:url value="/packages"/>" class="btn btn-lg btn-primary btn-block" >Mark words</a>
+                <br/>
+                <a href="<spring:url value="/stats"/>" class="btn btn-lg btn-primary btn-block" >View statistics</a>
+                <br/>
+            </div>
         </div>
     </div>
 </body>
