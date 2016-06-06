@@ -1,7 +1,9 @@
 package cz.muni.pb138.annotationsystem.frontend.controller;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import cz.muni.pb138.annotationsystem.backend.api.*;
+import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.*;
 import org.springframework.stereotype.Controller;
@@ -12,8 +14,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.*;
 import java.io.*;
@@ -239,8 +243,10 @@ public class MainController {
         return "view-statsPack";
     }
 
+
     @RequestMapping(value = "/mark/{subpack}", method = {RequestMethod.GET})
-    public String markGet(ServletRequest req, @PathVariable String subpack, HttpServletRequest httpReq) {
+    public String markGet(ServletRequest req, @PathVariable String subpack, HttpServletRequest httpReq,
+                          Model model, @CookieValue("previousEvalId") String previousEvalId) throws DaoException {
 
         try {
 
@@ -254,9 +260,32 @@ public class MainController {
             String question = pack.getQuestion();
             req.setAttribute("thisQuestion", question);
 
+            Boolean isCorrection = (Boolean) model.asMap().get("isCorrection");
+
+            Answer answer;
+            Evaluation correction;
             try {
-                Answer answer = answerManager.nextAnswer(personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser()),
-                        subpackManager.getSubpackById(Long.parseLong(subpack)));
+                correction = evaluationManager.getEvaluationById(Long.valueOf(previousEvalId));
+            } catch (BeanNotExistsException e) {
+                correction = null;
+            }
+
+            req.setAttribute("canCorrect", true);
+
+            if (isCorrection != null && isCorrection == true) {
+                req.setAttribute("canCorrect", false);
+                answer = correction.getAnswer();
+            } else {
+                if (correction == null || !correction.getAnswer().getFromSubpack().equals(thisSubpack)) {
+                    req.setAttribute("canCorrect", false);
+                }
+                answer = answerManager.nextAnswer(
+                        personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser()),
+                        thisSubpack);
+            }
+
+
+                try {
                 req.setAttribute("thisAnswer", answer);
             } catch (IllegalStateException e) {
                 if (e.getMessage() == "No more answers left.") {
@@ -267,16 +296,34 @@ public class MainController {
             }
 
         } catch (Exception e) {
-            return "redirect:/view-error";
+            throw e;
+            //return "redirect:/view-error";
         }
         return "view-mark";
 
     }
 
+
+    @RequestMapping(value = "/correct/{subpackId}", method = {RequestMethod.GET})
+    public String markCorrect(ServletRequest req, RedirectAttributes redirectAttrs) {
+
+        try {
+            redirectAttrs.addFlashAttribute("isCorrection", true);
+            return "redirect:/mark/{subpackId}";
+        } catch (Exception e) {
+            req.setAttribute("error", e);
+            return "view-error";
+        }
+
+    }
+
+
+
     @RequestMapping(value = "/mark/{subpack}/{answer}/{time}", method = {RequestMethod.POST})
     public String markPost(RedirectAttributes redirectAttributes, @RequestParam String value,
                            @PathVariable String subpack, @PathVariable String answer,
-                           @PathVariable String time, HttpServletRequest httpReq) {
+                           @PathVariable String time, HttpServletRequest httpReq,
+                           HttpServletResponse res) {
 
         try {
 
@@ -287,13 +334,17 @@ public class MainController {
             Answer thisAnswer = answerManager.getAnswerById(Long.parseLong(answer));
             Person thisPerson = personManager.getOrCreatePersonByUsername(httpReq.getRemoteUser());
 
+            Evaluation evaluation;
             if (Integer.parseInt(value) == 1) {
-              Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, (int) (long) difference);
-                evaluationManager.eval(evaluation);
+                evaluation = new Evaluation(thisPerson, thisAnswer, Rating.POSITIVE, (int) (long) difference);
             } else {
-                Evaluation evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NEGATIVE, (int) (long) difference);
-                evaluationManager.eval(evaluation);
+                evaluation = new Evaluation(thisPerson, thisAnswer, Rating.NEGATIVE, (int) (long) difference);
             }
+            evaluationManager.eval(evaluation);
+
+            Cookie previousEvalCookie = new Cookie("previousEvalId", String.valueOf(evaluation.getId()));
+            previousEvalCookie.setPath("/");
+            res.addCookie(previousEvalCookie);
 
             Long longSubpack = Long.parseLong(subpack);
             Subpack thisSubpack = subpackManager.getSubpackById(longSubpack);
