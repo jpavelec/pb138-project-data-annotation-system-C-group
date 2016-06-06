@@ -15,6 +15,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.sql.DataSource;
@@ -335,6 +336,7 @@ public class AnswerDaoImpl implements AnswerDao {
         if (!subpackDao.doesExist(subpack)) {
             throw new BeanNotExistsException("Subpack " + subpack + " not found in DB!");
         }
+        //CopyOnWriteArrayList<Answer> answersInSubpack = new CopyOnWriteArrayList<>();
         List<Answer> answersInSubpack = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
              PreparedStatement st = conn.prepareStatement(
@@ -360,6 +362,10 @@ public class AnswerDaoImpl implements AnswerDao {
 
     @Override
     public List<Answer> getUnevaluatedAnswers(Subpack subpack, Person person) throws DaoException {
+        /*CopyOnWriteArrayList<Answer> unevaluatedAnswers = new CopyOnWriteArrayList<>();
+        unevaluatedAnswers.addAll(getAnswersInSubpack(subpack));
+        CopyOnWriteArrayList<Answer> evaluatedAnswers = new CopyOnWriteArrayList<>();
+        evaluatedAnswers.addAll(getEvaluatedAnswers(subpack, person));*/
         List<Answer> unevaluatedAnswers = getAnswersInSubpack(subpack);
         List<Answer> evaluatedAnswers = getEvaluatedAnswers(subpack, person);
         Iterator<Answer> i = unevaluatedAnswers.iterator();
@@ -395,6 +401,7 @@ public class AnswerDaoImpl implements AnswerDao {
             throw new BeanNotExistsException("Person " + person + " not found in DB!");
         }
         List<Answer> evaluatedAnswers = new ArrayList<>();
+        //CopyOnWriteArrayList<Answer> evaluatedAnswers = new CopyOnWriteArrayList<>();
         try (Connection conn = dataSource.getConnection();
             PreparedStatement st = conn.prepareStatement(
             "SELECT answer.id, subpackid, answervalue, isnoise "+
@@ -416,5 +423,13 @@ public class AnswerDaoImpl implements AnswerDao {
         }
     }
 
+    @Override
+    public boolean isInsertingLastEvaluation(Subpack subpack, Person person) throws DaoException {
+        if (getUnevaluatedAnswers(subpack, person).size() == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }

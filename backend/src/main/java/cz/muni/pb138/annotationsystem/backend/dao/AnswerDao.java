@@ -18,5 +18,7 @@ public interface AnswerDao extends Dao<Answer> {
     public List<Answer> getUnevaluatedAnswers(Subpack subpack, Person person) throws DaoException;
     
     public List<Answer> getEvaluatedAnswers(Subpack subpack, Person person) throws DaoException;
+    
+    public boolean isInsertingLastEvaluation(Subpack subpack, Person person) throws DaoException;
 
 }

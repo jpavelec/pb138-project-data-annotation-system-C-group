@@ -4,7 +4,6 @@ import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
-import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Subpack;
@@ -16,7 +15,6 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -553,6 +551,100 @@ public class SubpackDaoImpl implements SubpackDao {
             
         } catch (SQLException ex) {
             String msg = "Error when retriving subpacks with parent pack with id "+pack.getId();
+            throw new ServiceFailureException(msg, ex);
+        }
+    }
+
+    @Override
+    public long getCompletationTime(Subpack subpack, Person person) throws DaoException {
+        checkDataSource();
+        if (person == null) {
+            throw new IllegalArgumentException("Person is null");
+        }
+        if (person.getId() == null || person.getId() < 1) {
+            throw new ValidationException("Person id is null or negative");
+        }
+        if (subpack == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (subpack.getId() == null || subpack.getId() < 1) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        if (!doesExist(subpack)) {
+            throw new BeanNotExistsException("Subpack with id " + subpack.getId()+" is not in DB!");
+        }
+        if (!personDao.doesExist(person)) {
+            throw new BeanNotExistsException("Person with id " + person.getId()+" is not in DB!");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "SELECT endtime FROM assignedperson WHERE subpackid = ? AND personid = ?")) {
+            
+            st.setLong(1, subpack.getId());
+            st.setLong(2, person.getId());
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                    Timestamp endTime = rs.getTimestamp(1);
+                    if (rs.next()) {
+                        throw new ServiceFailureException(
+                            "Internal error: More entities with the same subpackid and personid found " +
+                            "in assignment subpacks and people");
+                    }
+                    return endTime.getTime();
+                } else {
+                    String msg = "Assignation person "+person+" to subpack " + subpack + " not found!";
+                    throw new BeanNotExistsException(msg);
+                }
+            
+        } catch (SQLException ex) {
+            String msg = "Error when retriving completation time for assignation person " +
+            person + " to subpack " + subpack;
+            throw new ServiceFailureException(msg, ex);
+        }
+    }
+
+    @Override
+    public void setCompletationTime(Subpack subpack, Person person) throws DaoException {
+        checkDataSource();
+        if (person == null) {
+            throw new IllegalArgumentException("Person is null");
+        }
+        if (person.getId() == null || person.getId() < 1) {
+            throw new ValidationException("Person id is null or negative");
+        }
+        if (subpack == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (subpack.getId() == null || subpack.getId() < 1) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        if (!doesExist(subpack)) {
+            throw new BeanNotExistsException("Subpack with id " + subpack.getId()+" is not in DB!");
+        }
+        if (!personDao.doesExist(person)) {
+            throw new BeanNotExistsException("Person with id " + person.getId()+" is not in DB!");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "UPDATE assignedperson SET endtime = ? " + 
+                "WHERE subpackid = ? OR personid = ?")) {
+            
+            Calendar calendar = Calendar.getInstance();
+            st.setTimestamp(1, new java.sql.Timestamp(calendar.getTime().getTime()));
+            st.setLong(2, subpack.getId());
+            st.setLong(3, person.getId());
+            System.err.println("Time: "+new java.sql.Timestamp(calendar.getTime().getTime())+" "+person+subpack);
+            int count = st.executeUpdate();
+            if (count == 0) {
+                throw new BeanNotExistsException("Invalid records in assignedperson");
+            } else if (count != 1) {
+                throw new ServiceFailureException(
+                "Invalid updated rows count detected (one row should be updated): " + count);
+            }
+            
+        } catch (SQLException ex) {
+            String msg = "Error when inserting completation time for assignation person " +
+            person + " to subpack " + subpack;
             throw new ServiceFailureException(msg, ex);
         }
     }
