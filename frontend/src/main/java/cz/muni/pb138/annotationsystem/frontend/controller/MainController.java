@@ -236,7 +236,7 @@ public class MainController {
                     }
                     currentUserStats[1] = statisticsManager.getCohenKappa(user, subPack);
                     if (currentUserStats[1] != null) {
-                        currentUserStats[1] = Math.round(currentUserStats[1])*100.0/100.0;
+                        currentUserStats[1] = Math.round(currentUserStats[1]*100.0)/100.0;
                     }
 
                     currentUserStats[2] = statisticsManager.averageEvaluationTimeOfSubpackForPerson(subPack, user);
@@ -258,12 +258,10 @@ public class MainController {
                 Double[] generalStats = new Double[7];
 
                 generalStats[0] = statisticsManager.getProgressOfSubpack(subPack);
-                System.out.println("GenStat0" + generalStats[0]);
                 if ( !generalStats[0].isNaN()) {
                     generalStats[0] = Math.round(generalStats[0])*100.0/100.0;
                 }
                 generalStats[1] = statisticsManager.averageCompletionTimeOfSubpack(subPack);
-                System.out.println(generalStats[1]);
                 if (generalStats[1] != null) {
 
                     int seconds = (int) ((generalStats[1] / (1000)) % 60); //sec
@@ -288,8 +286,6 @@ public class MainController {
                 } else {
                     generalStats[6] = (double) 0;
                 }
-
-                System.out.println(generalStats[6]);
 
                 subpackGeneralStats.put(subPack, generalStats);
             }
