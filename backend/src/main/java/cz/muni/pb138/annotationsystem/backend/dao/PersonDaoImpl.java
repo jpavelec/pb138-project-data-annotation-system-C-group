@@ -3,7 +3,6 @@ package cz.muni.pb138.annotationsystem.backend.dao;
 import cz.muni.pb138.annotationsystem.backend.common.BeanAlreadyExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
-import cz.muni.pb138.annotationsystem.backend.common.DaoException;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -285,11 +284,6 @@ public class PersonDaoImpl implements PersonDao {
                             
                     return person;
                 } else {
-                    /*  Throw an exception isn't a good way how to solve
-                        nonexisting record in DB which doesn't have to be there.
-                        What shall I do when I catch BeanNotExistsException
-                    throw new BeanNotExistsException("Person with username " +
-                            username + "isn't in DB");*/
                     return null;
                 }
             }
