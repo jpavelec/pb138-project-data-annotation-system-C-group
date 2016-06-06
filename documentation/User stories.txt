@@ -1,0 +1,9 @@
+As a user, i want to be able to mark the words, so that i can pick from +,-,/
+As a user, i want to be able to see the packages available for me to solve, so that i can see my progress in each of them
+As an administrator, i want to be able to upload new word dictionaries, so that i can choose a size of packages
+As an administrator, i want to be able to choose the repetition value for the dictionary im uploading
+As an administrator, i want to be able to choose a noise value for the dictionary im uploading
+As an administrator, i want to be able to pick users which can work on individual packages
+As an administrator, i want to be able to see the time in which the user finished the package
+As an administrator, i want to be able to the coher kappa value, so that i can compare the results from different users
+As an administrator, i want to be able to export the file with the results to a csv
