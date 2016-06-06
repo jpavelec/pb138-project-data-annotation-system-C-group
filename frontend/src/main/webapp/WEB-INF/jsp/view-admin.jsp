@@ -21,7 +21,7 @@
         <div class="row">
             <div class="col-md-offset-2 col-md-8">
                 <br/>
-                <h2 align="center">What would you like to do?</h2>
+                <h2 align="center">Hello ${person.username}! What would you like to do?</h2>
                 <br/>
                 <a href="<spring:url value="/upload"/>" class="btn btn-lg btn-primary btn-block" >Upload a new dictionary</a>
                 <br/>

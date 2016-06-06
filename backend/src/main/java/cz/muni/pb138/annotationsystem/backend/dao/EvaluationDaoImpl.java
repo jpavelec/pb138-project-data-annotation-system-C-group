@@ -2,18 +2,19 @@ package cz.muni.pb138.annotationsystem.backend.dao;
 
 import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
-import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.model.Answer;
 import cz.muni.pb138.annotationsystem.backend.model.Evaluation;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
 import cz.muni.pb138.annotationsystem.backend.model.Rating;
+import cz.muni.pb138.annotationsystem.backend.model.Subpack;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,6 +34,9 @@ public class EvaluationDaoImpl implements EvaluationDao {
     
     @Inject
     private AnswerDaoImpl answerDao;
+    
+    @Inject
+    private PersonDaoImpl personDao;
 
     public EvaluationDaoImpl() {
     }
@@ -62,22 +66,22 @@ public class EvaluationDaoImpl implements EvaluationDao {
         }
     }
     
-    private Long getKey(ResultSet keyRS, Evaluation evaluation) throws ServiceFailureException, SQLException {
+    private Long getKey(ResultSet keyRS, Evaluation evaluation) throws DaoException, SQLException {
         if (keyRS.next()) {
             if (keyRS.getMetaData().getColumnCount() != 1) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert evaluation " + evaluation
                         + " - wrong key fields count: " + keyRS.getMetaData().getColumnCount());
             }
             Long result = keyRS.getLong(1);
             if (keyRS.next()) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert evaluation " + evaluation
                         + " - more keys found");
             }
             return result;
         } else {
-            throw new ServiceFailureException("Internal Error: Generated key"
+            throw new DaoException("Internal Error: Generated key"
                     + "retriving failed when trying to insert evaluation " + evaluation
                     + " - no key found");
         }
@@ -159,7 +163,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
             st.setInt(4, evaluation.getElapsedTime());
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
-                throw new ServiceFailureException("Internal Error: More rows ("
+                throw new DaoException("Internal Error: More rows ("
                         + addedRows + ") inserted when trying to insert evaluation " + evaluation);
             }
             
@@ -169,12 +173,57 @@ public class EvaluationDaoImpl implements EvaluationDao {
             
             if (answerDao.isSubpackCompletelyEvaluated(evaluation.getAnswer().
                     getFromSubpack(), evaluation.getPerson())) {
-                subpackDao.setCompletationTime(evaluation.getAnswer().
+                setCompletationTime(evaluation.getAnswer().
                     getFromSubpack(), evaluation.getPerson());
         }
             
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when inserting evaluation " + evaluation, ex);
+            throw new DaoException("Error when inserting evaluation " + evaluation, ex);
+        }
+    }
+    
+    private void setCompletationTime(Subpack subpack, Person person) throws DaoException {
+        checkDataSource();
+        if (person == null) {
+            throw new IllegalArgumentException("Person is null");
+        }
+        if (person.getId() == null || person.getId() < 1) {
+            throw new ValidationException("Person id is null or negative");
+        }
+        if (subpack == null) {
+            throw new IllegalArgumentException("Subpack is null");
+        }
+        if (subpack.getId() == null || subpack.getId() < 1) {
+            throw new ValidationException("Subpack id is null or negative");
+        }
+        if (!subpackDao.doesExist(subpack)) {
+            throw new BeanNotExistsException("Subpack with id " + subpack.getId()+" is not in DB!");
+        }
+        if (!personDao.doesExist(person)) {
+            throw new BeanNotExistsException("Person with id " + person.getId()+" is not in DB!");
+        }
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                "UPDATE assignedperson SET endtime = ? " + 
+                "WHERE subpackid = ? AND personid = ?")) {
+            
+            Calendar calendar = Calendar.getInstance();
+            st.setTimestamp(1, new java.sql.Timestamp(calendar.getTime().getTime()));
+            st.setLong(2, subpack.getId());
+            st.setLong(3, person.getId());
+            System.err.println("Time: "+new java.sql.Timestamp(calendar.getTime().getTime())+" "+person+subpack);
+            int count = st.executeUpdate();
+            if (count == 0) {
+                throw new BeanNotExistsException("Invalid records in assignedperson");
+            } else if (count != 1) {
+                throw new DaoException(
+                "Invalid updated rows count detected (one row should be updated): " + count);
+            }
+            
+        } catch (SQLException ex) {
+            String msg = "Error when inserting completation time for assignation person " +
+            person + " to subpack " + subpack;
+            throw new DaoException(msg, ex);
         }
     }
 
@@ -193,7 +242,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
                     Evaluation eval = resultSetToEvaluation(rs);
 
                     if (rs.next()) {
-                        throw new ServiceFailureException(
+                        throw new DaoException(
                             "Internal error: More entities with the same id found " +
                             "(source id: " + id + ", found " + eval + 
                             " and " + resultSetToEvaluation(rs));
@@ -204,7 +253,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
                 }
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                 "Error when retriving evaluation with id " + id, ex);
         }
     }
@@ -225,7 +274,7 @@ public class EvaluationDaoImpl implements EvaluationDao {
             
         } catch (SQLException ex) {
             String msg = "Error when getting all evaluations from DB";
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
     }
 
@@ -251,10 +300,10 @@ public class EvaluationDaoImpl implements EvaluationDao {
             if (count == 0) {
                 throw new BeanNotExistsException("Evaluation " + evaluation + " was not found in database!");
             } else if (count != 1) {
-                throw new ServiceFailureException("Invalid updated rows count detected (one row should be updated): " + count);
+                throw new DaoException("Invalid updated rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                 "Error when updating evaluation " + evaluation, ex);
         }
     }
@@ -278,10 +327,10 @@ public class EvaluationDaoImpl implements EvaluationDao {
             if (count == 0) {
                 throw new BeanNotExistsException("Evaluation " + evaluation + " was not found in database!");
             } else if (count != 1) {
-                throw new ServiceFailureException("Invalid deleted rows count detected (one row should be updated): " + count);
+                throw new DaoException("Invalid deleted rows count detected (one row should be updated): " + count);
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                     "Error when deleting evaluation " + evaluation, ex);
         }
     }

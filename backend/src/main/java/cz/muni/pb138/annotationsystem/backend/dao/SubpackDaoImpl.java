@@ -3,7 +3,6 @@ package cz.muni.pb138.annotationsystem.backend.dao;
 import cz.muni.pb138.annotationsystem.backend.common.BeanAlreadyExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.BeanNotExistsException;
 import cz.muni.pb138.annotationsystem.backend.common.DaoException;
-import cz.muni.pb138.annotationsystem.backend.common.ServiceFailureException;
 import cz.muni.pb138.annotationsystem.backend.common.ValidationException;
 import cz.muni.pb138.annotationsystem.backend.model.Pack;
 import cz.muni.pb138.annotationsystem.backend.model.Person;
@@ -88,22 +87,22 @@ public class SubpackDaoImpl implements SubpackDao {
     }
     
 
-    private Long getKey(ResultSet keyRS, Subpack subpack) throws ServiceFailureException, SQLException {
+    private Long getKey(ResultSet keyRS, Subpack subpack) throws DaoException, SQLException {
         if (keyRS.next()) {
             if (keyRS.getMetaData().getColumnCount() != 1) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert subpack " + subpack
                         + " - wrong key fields count: " + keyRS.getMetaData().getColumnCount());
             }
             Long result = keyRS.getLong(1);
             if (keyRS.next()) {
-                throw new ServiceFailureException("Internal Error: Generated key"
+                throw new DaoException("Internal Error: Generated key"
                         + "retriving failed when trying to insert subpack " + subpack
                         + " - more keys found");
             }
             return result;
         } else {
-            throw new ServiceFailureException("Internal Error: Generated key"
+            throw new DaoException("Internal Error: Generated key"
                     + "retriving failed when trying to insert subpack " + subpack
                     + " - no key found");
         }
@@ -162,7 +161,7 @@ public class SubpackDaoImpl implements SubpackDao {
             st.setString(2, subpack.getName());
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
-                throw new ServiceFailureException("Internal Error: More rows ("
+                throw new DaoException("Internal Error: More rows ("
                         + addedRows + ") inserted when trying to insert subpack " + subpack);
             }
             
@@ -170,7 +169,7 @@ public class SubpackDaoImpl implements SubpackDao {
                 subpack.setId(getKey(keyRS, subpack));
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when inserting subpack " + subpack, ex);
+            throw new DaoException("Error when inserting subpack " + subpack, ex);
         }
     }
 
@@ -206,7 +205,7 @@ public class SubpackDaoImpl implements SubpackDao {
                     Subpack subpack = resultSetToSubpack(rs);
 
                     if (rs.next()) {
-                        throw new ServiceFailureException(
+                        throw new DaoException(
                             "Internal error: More entities with the same id found " +
                             "(source id: " + id + ", found " + subpack + 
                             " and " + resultSetToSubpack(rs));
@@ -217,7 +216,7 @@ public class SubpackDaoImpl implements SubpackDao {
                     throw new BeanNotExistsException(msg);
                 }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                 "Error when retriving subpack with id " + id, ex);
         }
     }
@@ -238,7 +237,7 @@ public class SubpackDaoImpl implements SubpackDao {
             
         } catch (SQLException ex) {
             String msg = "Error when getting all subpacks from DB";
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
     }
 
@@ -261,12 +260,12 @@ public class SubpackDaoImpl implements SubpackDao {
             if (count == 0) {
                 throw new BeanNotExistsException("Subpack" + subpack + "wasn't found in database");
             } else if (count != 1) {
-                throw new ServiceFailureException(
+                throw new DaoException(
                 "Invalid updated rows count detected (one row should be updated): " + count);
             }
             
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when updating subpack " + subpack, ex);
+            throw new DaoException("Error when updating subpack " + subpack, ex);
         }
     }
 
@@ -289,12 +288,12 @@ public class SubpackDaoImpl implements SubpackDao {
             if (count == 0) {
                 throw new BeanNotExistsException("Subpack " + subpack + " was not found in database!");
             } else if (count != 1) {
-                throw new ServiceFailureException(
+                throw new DaoException(
                         "Invalid deleted rows count detected (one row should be updated): " + count);
             }
             
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                     "Error when deleting subpack " + subpack, ex);
         }
         
@@ -326,7 +325,7 @@ public class SubpackDaoImpl implements SubpackDao {
             
         } catch (SQLException ex) {
             String msg = "Error when retriving assigned people to subpack with id "+subpack.getId();
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
     }
 
@@ -356,7 +355,7 @@ public class SubpackDaoImpl implements SubpackDao {
             
         } catch (SQLException ex) {
             String msg = "Error when retriving assigned people to subpack with id "+person.getId();
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
     }
 
@@ -373,13 +372,13 @@ public class SubpackDaoImpl implements SubpackDao {
                     st.setTimestamp(3, new java.sql.Timestamp(calendar.getTime().getTime()));
                     int addedRows = st.executeUpdate();
                     if (addedRows != 1) {
-                        throw new ServiceFailureException("Internal Error: More rows ("
+                        throw new DaoException("Internal Error: More rows ("
                         + addedRows + ") inserted when trying to insert assignedperson " + subpack);
                     }
                 }
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when updating assignedperson " + person, ex);
+            throw new DaoException("Error when updating assignedperson " + person, ex);
         }
     }
 
@@ -396,13 +395,13 @@ public class SubpackDaoImpl implements SubpackDao {
                     st.setTimestamp(3, new java.sql.Timestamp(calendar.getTime().getTime()));
                     int addedRows = st.executeUpdate();
                     if (addedRows != 1) {
-                        throw new ServiceFailureException("Internal Error: More rows ("
+                        throw new DaoException("Internal Error: More rows ("
                         + addedRows + ") inserted when trying to insert assignedperson " + person);
                     }
                 }
             }
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when updating assignedperson " + subpack, ex);
+            throw new DaoException("Error when updating assignedperson " + subpack, ex);
         }
     }
     
@@ -414,11 +413,11 @@ public class SubpackDaoImpl implements SubpackDao {
                     int assignedPeopleCount = this.getPeopleAssignedToSubpack(subpack).size();
                     int deletedRows = st.executeUpdate();
                     if (assignedPeopleCount != deletedRows) {
-                        throw new ServiceFailureException("Error when deleting assignment people "
+                        throw new DaoException("Error when deleting assignment people "
                             + "to subpack. "+assignedPeopleCount+" should delete but was " + deletedRows);
                     }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                     "Error when deleting assignment people to subpack " + subpack, ex);
         }
     }
@@ -431,11 +430,11 @@ public class SubpackDaoImpl implements SubpackDao {
                     int assignedSubpacksCount = this.getSubpacksAssignedToPerson(person).size();
                     int deletedRows = st.executeUpdate();
                     if (assignedSubpacksCount != deletedRows) {
-                        throw new ServiceFailureException("Error when deleting assignment person "
+                        throw new DaoException("Error when deleting assignment person "
                             + "to subpacks. "+assignedSubpacksCount+" should delete but was " + deletedRows);
                     }
         } catch (SQLException ex) {
-            throw new ServiceFailureException(
+            throw new DaoException(
                     "Error when deleting assignment subpacks to perrson " + person, ex);
         }
     }
@@ -473,7 +472,7 @@ public class SubpackDaoImpl implements SubpackDao {
                     }
                 }
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when insert assignment person "
+            throw new DaoException("Error when insert assignment person "
                             + person +" to subpack " + subpack, ex);
         }
     }
@@ -504,12 +503,12 @@ public class SubpackDaoImpl implements SubpackDao {
                 st.setTimestamp(3, new java.sql.Timestamp(calendar.getTime().getTime()));
                 int addedRows = st.executeUpdate();
                 if (addedRows != 1) {
-                    throw new ServiceFailureException("Internal Error: More rows ("
+                    throw new DaoException("Internal Error: More rows ("
                     + addedRows + ") inserted when trying insert assignment person "
                             + person +" to subpack " + subpack);
                 }
         } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when insert assignment person "
+            throw new DaoException("Error when insert assignment person "
                             + person +" to subpack " + subpack, ex);
         }
     }
@@ -545,7 +544,7 @@ public class SubpackDaoImpl implements SubpackDao {
             if (rs.next()) {
                     Timestamp startTime = rs.getTimestamp(1);
                     if (rs.next()) {
-                        throw new ServiceFailureException(
+                        throw new DaoException(
                             "Internal error: More entities with the same subpackid and personid found " +
                             "in assignment subpacks and people");
                     }
@@ -558,7 +557,7 @@ public class SubpackDaoImpl implements SubpackDao {
         } catch (SQLException ex) {
             String msg = "Error when retriving start time for assignation person " +
             person + " to subpack " + subpack;
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
         
     }
@@ -591,7 +590,7 @@ public class SubpackDaoImpl implements SubpackDao {
             
         } catch (SQLException ex) {
             String msg = "Error when retriving subpacks with parent pack with id "+pack.getId();
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
     }
 
@@ -626,7 +625,7 @@ public class SubpackDaoImpl implements SubpackDao {
             if (rs.next()) {
                     Timestamp endTime = rs.getTimestamp(1);
                     if (rs.next()) {
-                        throw new ServiceFailureException(
+                        throw new DaoException(
                             "Internal error: More entities with the same subpackid and personid found " +
                             "in assignment subpacks and people");
                     }
@@ -642,55 +641,11 @@ public class SubpackDaoImpl implements SubpackDao {
         } catch (SQLException ex) {
             String msg = "Error when retriving completation time for assignation person " +
             person + " to subpack " + subpack;
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
     }
 
-    @Override
-    public void setCompletationTime(Subpack subpack, Person person) throws DaoException {
-        checkDataSource();
-        if (person == null) {
-            throw new IllegalArgumentException("Person is null");
-        }
-        if (person.getId() == null || person.getId() < 1) {
-            throw new ValidationException("Person id is null or negative");
-        }
-        if (subpack == null) {
-            throw new IllegalArgumentException("Subpack is null");
-        }
-        if (subpack.getId() == null || subpack.getId() < 1) {
-            throw new ValidationException("Subpack id is null or negative");
-        }
-        if (!doesExist(subpack)) {
-            throw new BeanNotExistsException("Subpack with id " + subpack.getId()+" is not in DB!");
-        }
-        if (!personDao.doesExist(person)) {
-            throw new BeanNotExistsException("Person with id " + person.getId()+" is not in DB!");
-        }
-        try (Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement(
-                "UPDATE assignedperson SET endtime = ? " + 
-                "WHERE subpackid = ? AND personid = ?")) {
-            
-            Calendar calendar = Calendar.getInstance();
-            st.setTimestamp(1, new java.sql.Timestamp(calendar.getTime().getTime()));
-            st.setLong(2, subpack.getId());
-            st.setLong(3, person.getId());
-            System.err.println("Time: "+new java.sql.Timestamp(calendar.getTime().getTime())+" "+person+subpack);
-            int count = st.executeUpdate();
-            if (count == 0) {
-                throw new BeanNotExistsException("Invalid records in assignedperson");
-            } else if (count != 1) {
-                throw new ServiceFailureException(
-                "Invalid updated rows count detected (one row should be updated): " + count);
-            }
-            
-        } catch (SQLException ex) {
-            String msg = "Error when inserting completation time for assignation person " +
-            person + " to subpack " + subpack;
-            throw new ServiceFailureException(msg, ex);
-        }
-    }
+    
 
     @Override
     public void deleteAssignmentPersonToSubpack(Subpack subpack, Person person) throws DaoException {
@@ -718,14 +673,14 @@ public class SubpackDaoImpl implements SubpackDao {
             if (count == 0) {
                 throw new BeanNotExistsException("Record for subpack and person was not found in database!");
             } else if (count != 1) {
-                throw new ServiceFailureException(
+                throw new DaoException(
                         "Invalid deleted rows count detected (one row should be updated): " + count);
             }
             
         } catch (SQLException ex) {
             String msg = "Error when deleting assignation person " +
             person + " to subpack " + subpack;
-            throw new ServiceFailureException(msg, ex);
+            throw new DaoException(msg, ex);
         }
             
     }

@@ -1,0 +1,8 @@
+cz.muni.pb138.annotationsystem.backend.api
+cz.muni.pb138.annotationsystem.backend.business
+cz.muni.pb138.annotationsystem.backend.common
+cz.muni.pb138.annotationsystem.backend.config
+cz.muni.pb138.annotationsystem.backend.dao
+cz.muni.pb138.annotationsystem.backend.model
+cz.muni.pb138.annotationsystem.frontend.config
+cz.muni.pb138.annotationsystem.frontend.controller

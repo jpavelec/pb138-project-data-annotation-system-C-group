@@ -20,11 +20,11 @@
 <body>
 <div class="container">
     <div id="wrap">
-            <div id="middle">
-                <h1>Oops! Something went terribly wrong. You simply can't always get what you want.</h1>
-                </br>
-                <h2>Error: ${error}</h2>
-            </div>
+        <div id="middle">
+            <h1>Oops! Something went terribly wrong. You simply can't always get what you want.</h1>
+            </br>
+            <h2>Error: ${error}</h2>
+        </div>
     </div>
 </div>
 </body>
