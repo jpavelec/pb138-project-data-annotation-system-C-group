@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+                         "http://docbook.org/xml/4.5/docbookx.dtd">
+<article>
+    <title>PB138: Závěrečná zpráva k projektu, Kristýna Pavlíčková (422537)</title>
+    <sect1>
+        <title>Zadaní a můj úkol</title>
+        <para>Zadaním bylo vytvořit systém, který umožňuje uživateli "anotátorovi" označkovat data pro úlohy strojového učení. Anotátor odpovídá na jednotlivé otázky kladně nebo záporně, podle těchto dat se mohou učit algoritmy srojového učení. Při značkování se však mohou vyskytovat chyby, které aplikace zohledňuje opakování jednotlivých otázek a zařazení šumu. Na základě výsledků jsou v aplikaci počítané a zobrazované statiistiky.
+            </para>
+        <para>V počáteční fázi vývoje projektu jsme si rozdělili úlohy na aplikaci. Mým úkolem bylo pracovat na frondendu aplikace. Frontend je závislý na backendu, ke správě závislostí využívám  dependency injection (Spring IoC). </para>
+    </sect1>
+    <sect1>
+        <title>Use cases a wireframes</title>
+        <para> V rámci vytváření fromtendu aplikace jsme vytvořili náčrty wireframů (graficky na papír), několik jednoduchých scénářů pro uživatele a administrátora a znich potom graficky use case diagram, který je sooučástí dokumentace projektu.</para>
+        
+        <para>Příprava jednotlivých scénářů a use case diagramů však částečně ztratilo smysl, protože jsme se dozvěděli, že všichni uživatelé přistující k aplikaci mají práva administrátora.</para>
+    </sect1>
+    <sect1>
+        <title>HTML a CSS</title>
+        <para>Use casy, které jsou měla na strarosti, jsem převedla do html včetně css. K zjednodušení naší práce využívám knihovnu boootstrap, diky které jsou jednotlivé stránky jednoduché a snadno navigovatelné. Knihovna bootstrap nám dále umožňuje vytvořit celou aplikaci bez větších problémů respozivní, což byla jedna z požadovaných funkcionalit aplikace. </para>
+    </sect1>
+    <sect1>
+        <title>Přiřazovaní podbalíků uživatelům a zobrazovnání statistik</title>
+        <para> Mým úkolem bylo vytvořit systém na přiřazování podbalíků jednotlivým uživatelům. Nacházíme se tedy v situaci, kdy je soubor již naparsovaný a uložený do databáze, včetně opakování a šumu, a rozdělený na jednotlivé podbalíky. Protože jednotlivé podbalíky mohou být přiřazeny více uživatelům a každý uživatel může pracovat na více podbalících, zvolila jsem přístup, kdy se administrátorovy zobrazí seznam uživatelů aplikace, ze kterých si vybere, kterému chce podbalíky přiřazovat. Dále se administrátorovy zobrazí seznam podbalíků balíku. U každho z nich je napsáno, zda je přiřazen a pokud ano, tak kterým uživatelů.</para>
+        <para>Statistiky se zobrazují na samostatné stránce pro každý balík. Největším problémem u generovní těchto stránek bylo uspořádání všech přenesených dat, tak abych je dokázala zobrazit na view. Zobrazuje se kolik procent balíku je již zpracováno. Jsou vypsané všechny podbalíky daného balíku, postup jejich celkového zpracování, průměrná doba označování a průměrná doba strávená na značení jedné otázky. Dále jsou vypsáni všichni uživatelé, jejich postup, statistická funkce cohen kappa a jejich průměrná doba strávená na značení jedné otázky.</para>
+    </sect1>
+    <sect1>
+        <title>Přínos projektu</title>
+        <para>Projekt mě naučil lépe pracovat v týmu. S tehnologií jsem si odnesla rozhodně práci s bootstrapem a pak celý zážitek serverové aplikace od spouštění tomcat serveru po psaní kontroleru a jednotlivých view. Naučila jsem se předávat data z jednotlivých view do kontrolelu a naopak, což u některých složitějších datových typů není nejjednoduší. Jak správně napsat závislosti pro chod serverové aplikace a jak ji rozumně navrhnout, hlavně z pohledu uživatele. 
+ </para>
+    </sect1>
+
+</article>
+

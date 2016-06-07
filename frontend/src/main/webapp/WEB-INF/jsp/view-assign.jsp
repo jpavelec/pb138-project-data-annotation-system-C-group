@@ -2,6 +2,9 @@
 <%@ taglib prefix="spring" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="utf-8" trimDirectiveWhitespaces="true" session="false" %>
 
+<!--
+@author Kristýna Pavlíčková <422537@mail.muni.cz>
+-->
 
 <!DOCTYPE html>
 <html lang="${pageContext.request.locale}">
