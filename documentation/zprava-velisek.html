@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Závěrečná zpráva projektu Annotation system - skupina C</title><meta name="generator" content="DocBook XSL Stylesheets V1.78.1" /></head><body><div xml:lang="cs" class="article" lang="cs"><div class="titlepage"><div><div><h2 class="title"><a id="idm45183854438768"></a>Závěrečná zpráva projektu Annotation system - skupina C</h2></div></div><hr /></div><div class="toc"><p><strong>Obsah</strong></p><dl class="toc"><dt><span class="sect1"><a href="#idm45183854436400">Úvod</a></span></dt><dt><span class="sect1"><a href="#idm45183852604320">Vytvoření struktury</a></span></dt><dt><span class="sect1"><a href="#idm45183850523536">Modelování</a></span></dt><dt><span class="sect1"><a href="#idm45183851435424">Business vrstva</a></span></dt></dl></div><span class="author"><span class="firstname">Ondřej</span> <span class="surname">Velíšek</span></span><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idm45183854436400"></a>Úvod</h2></div></div></div><p>
+            Naším úkolem bylo vytvořit systém pro anotování
+            dat pro účely strojového zpracování. Do systému správce
+            nahraje soubor s seznamem slov. Ten může rozdělit
+            a přiřadit k anotování ostatním uživatelům systému.
+            Uživatel pak otázky ohodnocuje (anotuje) příznakem
+            "správně" nebo "nesprávně" v závislosti na zadané
+            otázce pro seznam. Výstupem systému jsou oanotovaná
+            data a statistiky o hodnocení uživatelů.
+
+            Práci jsme si rozdělili rovnoměrně mezi backend a frontend.
+            Přičemž já jsem pracoval s Josefem na backendu
+            a Kristýna s Matějem na frontendu.
+            Tento dokument shrnuje moji práci na projektu.
+        </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idm45183852604320"></a>Vytvoření struktury</h2></div></div></div><p>
+            Nejdříve jsem vytvořil základní kostru projektu.
+            Závislosti projektu jsou spravovány nástrojem Maven.
+            Kdokoliv kdo bude chtít na projektu spolupracovat
+            se díky tomu nemusí starat o závislosti na knihovnách,
+            které využíváme. Maven mu je standardně obstará.
+
+            Projekt jsem rozdělil na dva balíky, frontend a backend,
+            přičemž frontend je závislý na backendu.
+            Díky tomu může být v budoucnu vytvořen nový balík,
+            který bude závislý jen na backendu. Například RPC rozraní,
+            které bude využíváno moderním ajax klientem.
+
+            Závislosti v Mavenu jsou konfigurvány pomocí XML souboru pom.xml
+            v kořenovém adresáři. Jde o stadardní XML soubor jehož schéma
+            je specifikováno <a class="ulink" href="http://maven.apache.org/xsd/maven-4.0.0.xsd" target="_top">
+            http://maven.apache.org/xsd/maven-4.0.0.xsd</a>. Do této
+            konfigurace každý člen týmu přidával závislosti na knihovnách,
+            které potřeboval.
+
+            Vnitřní závislosti mezi komponentami v projektu, jsou spravovány Spring frameworkem.
+            Resp. jeho komponentou IoC (inversion of control), která pracuje
+            na principu dependency injection. Dále Spring využíváme
+            ke správě transakcí a k MVC architektuře na frontendu.
+            Nastavení jsem napsal pomocí java konfiguraci. Protože IDE
+            se v java konfigurací dokáže lépe navigovat a dokáže ji
+            jednodušeji refaktorovat. Také se jednodušeji rozděluje.
+        </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idm45183850523536"></a>Modelování</h2></div></div></div><p>
+            Společně s Josefem Pavelcem jsme navrhli model problému.
+            Objekt Pack obsahuje repetitivní faktor
+            a faktor šumu. Subpack obsahuje odkaz na svého rodiče (Pack).
+            Odpověď reprezentuje třída Answer, která nese odkaz na Subpack, ze kterého pochází.
+            Dále příznak zda je šumová nebo obyčejná a samotný řetězec s odpovědí.
+            Uživatel reprezentovaný třídou Person může Answery hodnotit. Tento vztah je definován
+            vazební třídou Evaluation, která obsahuje hodnocení "správně" nebo "nesprávně",
+            referenci na odpověď a uživatele, který ji ohodnotil.
+        </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idm45183851435424"></a>Business vrstva</h2></div></div></div><p>
+            Backend je rodělen na dvě vrstvy, business a dao.
+            Každá vrstva definuje rozhraní, které nabízí, a tím
+            zajišťuje testovatelnost, udržovatelnost systému.
+            Já jsem měl na starost business vrstvu. K ní
+            jsem ještě před implementací navrhnul rozhraní a napsal
+            přes 100 testů a tím ho dostatečně specifikoval.
+            Všechny metody si striktně validují svá vstupní data.
+            To vše přispívá ke stabilitě a robustnosti systému.
+
+            Business vrstva využívá dao vrstvu
+            k manipulaci s persistentními daty. Naopak nabízí funcionalitu
+            pomocí definovaného API. Hlavní funkcionalitu jsme navrhli tak,
+            že vytvoření balíku zajistí jedna funkce, která se postará
+            o rozdělení otázek do podbalíků a vygenerování opakujících se otázek
+            a šumových otázek. Poté správce zavolá metodu pro přiřazení
+            podbalíků uživatelům. A končně může uživatel, který má přidělený
+            podbalík otázek začít s jejich ohodnocováním. K tomu má opět
+            nachystanou metodu, která z daného balíku náhodně vybere
+            neohodnocenou otázku včetně repetitivních a šumových otázek.
+
+            Konečným výstupem jsou statistiky o ohodnocení.
+            Například jak velká část balíku je ohodnocena,
+            průměrný čás hodnocení otázky. Nebo kvalita hodnocení
+            uživatele pomocí cohen kappa indexu, který porovnává odpovědi
+            šumu a repetitivních otázek. Každý tato statistika je přístupná
+            pomocí metody v business API.
+        </p></div></div></body></html>

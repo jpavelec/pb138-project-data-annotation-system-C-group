@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Tue May 10 13:30:13 CEST 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0154-9a6e-7dfd-000005bf7e70 
+on database directory memory:/home/ondrejvelisek/projects/annotation-system/backend with class loader sun.misc.Launcher$AppClassLoader@5acf9800 
+Loaded from file:/home/ondrejvelisek/.m2/repository/org/apache/derby/derby/10.12.1.1/derby-10.12.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_91-8u91-b14-0ubuntu4~14.04-b14
+user.dir=/home/ondrejvelisek/projects/annotation-system
+os.name=Linux
+os.arch=amd64
+os.version=3.19.0-58-generic
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
