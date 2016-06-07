@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+                         "http://docbook.org/xml/4.5/docbookx.dtd">
+<article>
+<title>Závěrečná zpráva k projektu z předmětu PB138</title>
+<title>Vrstva Data access object</title>
+<para>
+Na projektu Webový systém pro anotaci dat autor implementoval backendovou část, konkrétně vrstvu realizující Data access object (DAO). DAO vrstva je tvořena pěti rozhraními, která předepisují použitelné metody pro přístup k datům v databázi. Každé rozhraní dědí z obecného Dao rozhraní, které předepisuje základní CRUD (create, update, delete a getById) operace pro manipulaci s entitami, jejichž modely jsou rovněž předepsány na této vrstvě. Součástí vrstvy je samozřejmě implementace každého z rozhraní. Třídy logicky dělí implementaci v souladu s class diagramem zveřejněným na wiki stránkách projektu. Vzniklá package realizuje přístup k datům uloženým v relační databázi.
+</para>
+
+<title>Datový model</title>
+<para>
+Relační databáze byla zvolena pro ukládání dat z několika důvodů. Mezi hlavní patří spolehlivost, je to ověřený způsob pro ukládání a manipulaci s daty a plně postačuje pro tento typ aplikace. Bylo nutné navrhnout datový model pro aplikaci. Ten autor vypracoval s konzultacemi s Ondrou Velíškem. Jeho struktura je patrná na ER diagramu na wiki stránkách projektu.
+Dle ER diagramu jsou do databáze ukládány veškerá data, se kterými aplikace pracuje. Hlavní myšlenku tvoří dekompozice hlavního balíku/souboru určeného k anotaci (Pack) na menší bloky (Subpack), které jsou přiřazeny uživatelům (Person) k anotaci. Uživatel hodnotí jednotlivé odpovědi na otázky (Answer) a jeho hodnocení včetně dalších údajů jsou ukládány jako hodnocení (Evaluation).
+Největším problémem při návrhu modelu dat se ukázalo ukládní tzv. šumu a snadná manipulace s ním. Jako řešení bylo zvoleno ukládání bitového příznaku ke každé vlastní odpovědi.
+</para>
+
+<title>Vlastní přínos pro aplikaci</title>
+<para>
+Hlavním vlastním přínosem autora je implementace dříve popsané Data access object vrtstvy s modely dat a její otestování (což představuje přibližně tři a půl tisíce řádků kódu). Autor navrhl a implementoval rozhraní, která zajistí manipulaci s modelovými třídami Pack, Subpack, Answer, Evaluation a Person a poskytne tak služby pro vyšší vrstvu. Veškeré vstupy jsou ošetřeny proti špatným vstupním hodnotám, na které reagují relevantní nehlídanou výjimkou. Pokud i přes dodržení kotraktu metody (ten je patrný zejména z JavaDoců jednotlivých rozhraní) dojde k nějaké chybě (zejména v přístupu do databáze) metoda vyhodí hlídanou vyjímku DaoException s podrobnou zprávou problému.
+</para>
+
+<title>Přínos pro autora</title>
+<para>
+Autor se na tomto projektu zaměřil na práci s daty, vytvořil robustní a otestované rozhraní pro přístup k databázi, které poskytuje služby vyšší business vrstvě. Zároveň s autorem business vrstvy úzce spolupracoval a reagoval na potřebné změny v rozhraní (např. metoda na vrácení všech odpovědí, které anotátor ještě neoznačil, dotazování, zda daná entita existuje apod.). Tímto autor získal cennou praxi práce v týmu na reálném projektu.
+</para>
+</article>
