@@ -3,6 +3,9 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="utf-8" trimDirectiveWhitespaces="true" session="false" %>
 
+<!--
+@author Kristýna Pavlíčková <422537@mail.muni.cz>
+-->
 
 <!DOCTYPE html>
 <html lang="${pageContext.request.locale}">
